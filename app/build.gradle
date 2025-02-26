@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.robotrally2local'
+    namespace 'com.example.robotrally'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.example.robotrally2local"
+        applicationId "com.example.robotrally"
         minSdk 30
         targetSdk 35
         versionCode 1

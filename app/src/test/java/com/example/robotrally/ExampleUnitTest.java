@@ -1,4 +1,4 @@
-package com.example.robotrally2local;
+package com.example.robotrally;
 
 import org.junit.Test;
 
