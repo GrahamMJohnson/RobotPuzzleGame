@@ -1,4 +1,4 @@
-package com.example.robotrally;
+package robotrally;
 
 import org.junit.Test;
 

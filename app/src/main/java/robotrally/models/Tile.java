@@ -1,6 +1,6 @@
-package com.example.robotrally.models;
+package robotrally.models;
 
-import com.example.robotrally.enumerations.ObstacleTypes;
+import robotrally.enumerations.ObstacleTypes;
 
 public class Tile {
 

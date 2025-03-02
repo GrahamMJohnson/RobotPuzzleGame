@@ -1,4 +1,4 @@
-package com.example.robotrally;
+package robotrally;
 
 import android.content.Context;
 

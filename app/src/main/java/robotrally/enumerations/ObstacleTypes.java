@@ -1,4 +1,4 @@
-package com.example.robotrally.enumerations;
+package robotrally.enumerations;
 
 public enum ObstacleTypes {
     Chair,
