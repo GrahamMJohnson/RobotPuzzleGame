@@ -1,4 +1,4 @@
-package com.example.robotrally.models;
+package robotrally.models;
 
 import java.io.BufferedWriter;
 import java.io.File;
