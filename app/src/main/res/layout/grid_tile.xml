@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImageView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="HardcodedText"
+    android:id="@+id/tile_view"
+    android:layout_width="50sp"
+    android:layout_height="50sp"
+    android:layout_gravity="center"
+    android:contentDescription="a game tile"
+    android:src="@mipmap/ic_launcher"/>
