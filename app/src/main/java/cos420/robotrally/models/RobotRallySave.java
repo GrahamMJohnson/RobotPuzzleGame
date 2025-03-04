@@ -1,4 +1,4 @@
-package robotrally.models;
+package cos420.robotrally.models;
 
 import java.io.BufferedWriter;
 import java.io.File;

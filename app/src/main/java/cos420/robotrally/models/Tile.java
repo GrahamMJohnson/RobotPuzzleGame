@@ -1,6 +1,6 @@
-package robotrally.models;
+package cos420.robotrally.models;
 
-import robotrally.enumerations.TileType;
+import cos420.robotrally.enumerations.TileType;
 
 public class Tile {
 

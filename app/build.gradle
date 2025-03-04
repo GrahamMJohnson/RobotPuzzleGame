@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'robotrally'
+    namespace 'cos420.robotrally'
     compileSdk 35
 
     defaultConfig {
-        applicationId 'robotrally'
+        applicationId 'cos420.robotrally'
         minSdk 30
         targetSdk 35
         versionCode 1

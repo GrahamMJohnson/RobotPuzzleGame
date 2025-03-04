@@ -1,4 +1,4 @@
-package robotrally.enumerations;
+package cos420.robotrally.enumerations;
 
 /**
  * Enum for what can be on a tile

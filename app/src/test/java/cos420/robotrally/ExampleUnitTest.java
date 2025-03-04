@@ -1,4 +1,4 @@
-package robotrally;
+package cos420.robotrally;
 
 import org.junit.Test;
 
