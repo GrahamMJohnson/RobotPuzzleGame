@@ -1,61 +1,49 @@
 package cos420.robotrally.models;
 
-import cos420.robotrally.enumerations.TileType;
+import cos420.robotrally.enumerations.ObstacleType;
 
 public class Tile {
+    /** Boolean to store if this is a goal tile */
+    private boolean isGoalTile;
 
     /** Boolean to track if there is an obstacle on this tile */
-    private final boolean isObstacle;
-
-    /** Boolean to store if this is a goal tile */
-    private final boolean isGoalTile;
-
-    /**
-     * An enum to store what is on the tile
-     * (Thinking this could be used for the UI to load the right image?)
-     */
-    private final TileType tileType;
-
-
-    /** Boolean to track if tile has collectable */
-    private boolean hasCollectable;
+    private boolean isObstacle;
 
     /** Boolean to track if the roomba currently occupies this tile */
     private boolean isOccupied;
 
+    /** Boolean to track if tile has collectable */
+    private boolean hasCollectable;
+
+    /**
+     * An enum to store what is on the tile
+     */
+    private ObstacleType obstacleType;
+
+    //TODO: Can we get buy with constructor that has no parameters since GameBoard updates tiles after creating array?
     /**
      * Constructor for Tile class
-     * @param tileType The type of obstacle on this tile (Can be NONE)
-     * @param isGoalTile Is this tile a goal state?
-     * @param hasCollectable Does this tile have a collectable?
      */
-    public Tile(TileType tileType, boolean isGoalTile, boolean hasCollectable) {
-        this(tileType, isGoalTile, hasCollectable, false);
+    public Tile() {
+        this(null, false, false, false);
     }
 
     /**
      * Constructor for a tile that the roomba currently occupies
-     * @param tileType The type of obstacle on this tile (Can be NONE)
+     * @param obstacleType The type of obstacle on this tile (null if not an obstacle
      * @param isGoalTile Is this tile a goal state?
      * @param hasCollectable Does this tile have a collectable?
      * @param isOccupied Is the roomba on this tile?
      */
-    public Tile(TileType tileType, boolean isGoalTile, boolean hasCollectable, boolean isOccupied) {
-        isObstacle = tileType != TileType.EMPTY;
-        this.tileType = tileType;
+    public Tile(ObstacleType obstacleType, boolean isGoalTile, boolean hasCollectable, boolean isOccupied) {
+        isObstacle = obstacleType == null;
+        this.obstacleType = obstacleType;
         this.isGoalTile = isGoalTile;
         this.hasCollectable = hasCollectable;
         this.isOccupied = isOccupied;
     }
 
-    /**
-     * Check if tile can be occupied by the roomba
-     * @return true -> roomba can move here <br>
-     *         false -> roomba can't move here
-     */
-    public boolean isObstacle() {
-        return !isObstacle;
-    }
+    // Getter and Setters
 
     /**
      * Check if tile is a goal state
@@ -67,21 +55,20 @@ public class Tile {
     }
 
     /**
-     * Set whether or not the roomba is on this tile
-     * @param newValue the new value to store in isOccupied
-     * @throws Exception Throws exception if trying to set value to what it already is or if tile is obstacle
+     * Set isGoalTile to new Value
+     * @param isGoalTile boolean -> new value
      */
-    public void setOccupied(boolean newValue) throws Exception {
-        if (newValue == isOccupied)
-        {
-            throw new Exception("Cannot set to what value already is");
-        }
-        else if (isObstacle)
-        {
-            throw new Exception("Cannot set isOccupied because this tile is an obstacle");
-        }
+    public void setGoalTile(boolean isGoalTile) {
+        this.isGoalTile = isGoalTile;
+    }
 
-        isOccupied = newValue;
+    /**
+     * Check if tile is an obstacle
+     * @return true -> has obstacle <br>
+     *         false -> does not have obstacle
+     */
+    public boolean isObstacle() {
+        return isObstacle;
     }
 
     /**
@@ -89,29 +76,50 @@ public class Tile {
      * @return true -> roomba is on tile <br>
      *         false -> roomba is not on tile
      */
-    public boolean isRoombaHere() {
+    public boolean isOccupied() {
         return isOccupied;
     }
 
     /**
-     * Method to collect any collectable on tile
-     * @throws Exception Throws Exception if method is called on tile that does not have a collectable
+     * Set whether or not the roomba is on this tile
+     * @param isOccupied the new value to store in isOccupied
      */
-    public void collect() throws Exception {
-        if (!hasCollectable)
-        {
-            throw new Exception("There is no item to collect");
-        }
-        hasCollectable = false;
+    public void setOccupied(boolean isOccupied) {
+        this.isOccupied = isOccupied;
     }
 
     /**
-     * Method to get the type of obstacle on a tile <br>
-     * (Thinking this could be used to tell the UI what to display for the tile?)
+     * Method to check if tile has collectable
+     * @return true -> has collectable <br>
+     *         false -> no collectable
+     */
+    public boolean hasCollectable() {
+        return hasCollectable;
+    }
+
+    /**
+     * Method to collect any collectable on tile
+     */
+    public void setHasCollectable(boolean hasCollectable) {
+        this.hasCollectable = hasCollectable;
+    }
+
+    /**
+     * Method to get the type of obstacle on a tile
      * @return The type of obstacle on tile
      */
-    public TileType getTileType() {
-        return tileType;
+    public ObstacleType getObstacleType() {
+        return obstacleType;
+    }
+
+    /**
+     * Method to set the obstacle type. This also updates isObstacle attribute
+     * @param obstacleType ObstacleType enum to set the obstacle type for the tile<br>
+     *                     set to null if tile is not an obstacle
+     */
+    public void setObstacleType(ObstacleType obstacleType) {
+        this.obstacleType = obstacleType;
+        isObstacle = obstacleType != null;
     }
 
 }

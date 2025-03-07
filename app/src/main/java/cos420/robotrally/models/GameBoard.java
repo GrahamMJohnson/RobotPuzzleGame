@@ -1,6 +1,6 @@
 package cos420.robotrally.models;
 
-import cos420.robotrally.enumerations.TileType;
+import cos420.robotrally.helpers.GameBoardData;
 
 public class GameBoard{
 
@@ -8,40 +8,55 @@ public class GameBoard{
     private Tile[][] gameBoard;
     private int currentRow;
     private int currentColumn;
-    private int size;
+    private final int size;
 
     /**
-     * Made to initialize the gameBoard object.
-     * @param givenSize is the number of tiles that you want in each row or column
+     * Constructor
+     * @param gameBoardData GameBoardData object with all of the data for the game board
      */
-    public GameBoard(int givenSize) {
-        size = givenSize;
-        MakeBoard(size);
+    public GameBoard(GameBoardData gameBoardData)
+    {
+        this.size = gameBoardData.getSize();
+        this.makeBoard(gameBoardData);
     }
 
     /**
      * This is the function to copy in a given level layout
      * @param levelLayout this is the pre-programmed level lay out
      */
-    private void ImportBoard(Tile[][] levelLayout){
+    private void importBoard(Tile[][] levelLayout){
         gameBoard = levelLayout;
     }
 
     /**
-     * This method makes a blank board with the given size.
-     * @param givenSize is the number of tiles that you want in each row or column
+     * Makes and sets up the 2d array for the game board
+     * @param gameBoardData GameBoardData object with all of the data for the game board
      */
-    private void MakeBoard(int givenSize){
-        size = givenSize;
+    private void makeBoard(GameBoardData gameBoardData){
+        gameBoard = new Tile[size][size];
 
         //this loop will initialize each vertex of the array
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
-                assert gameBoard != null;
-                gameBoard[x][y] = new Tile(TileType.EMPTY, false, false);
+                gameBoard[x][y] = new Tile();
             }
         }
-        return;
+
+        // Set Starting and Goal tiles
+        gameBoard[gameBoardData.getStartRow()][gameBoardData.getStartColumn()].setOccupied(true);
+        gameBoard[gameBoardData.getGoalRow()][gameBoardData.getGoalColumn()].setGoalTile(true);
+
+        // Set Obstacles
+        for (Obstacle o : gameBoardData.getObstacles())
+        {
+            gameBoard[o.getRow()][o.getColumn()].setObstacleType(o.getObstacleType());
+        }
+
+        // Set Collectables
+        for (Collectable c : gameBoardData.getCollectables())
+        {
+            gameBoard[c.getRow()][c.getColumn()].setHasCollectable(true);
+        }
     }
 
     /**
@@ -49,7 +64,7 @@ public class GameBoard{
      * @return a boolean value that represents whether the action completed or not
      * @throws Exception if the roomba is somehow being set to where it already is.
      */
-    public boolean MoveUp() throws Exception {
+    public boolean moveUp() throws Exception {
         // test whether space above Roomba is blocked or out of bounds
         // if Roomba at top of grid, fail, or if space is blocked by obstacle, fail
         if (currentRow == 0 || gameBoard[currentRow-1][currentColumn].isObstacle()) {
@@ -73,7 +88,7 @@ public class GameBoard{
      * @return a boolean value that represents whether the action completed or not
      * @throws Exception if the roomba is somehow being set to where it already is
      */
-    public boolean MoveLeft() throws Exception {
+    public boolean moveLeft() throws Exception {
         // test whether space to the left of Roomba is blocked or out of bounds
         // if Roomba at left side of grid, fail, or if space is blocked by obstacle, fail
         if (currentColumn == 0 || gameBoard[currentRow][currentColumn-1].isObstacle()) {
@@ -97,7 +112,7 @@ public class GameBoard{
      * @return a boolean value that represents whether the action completed or not
      * @throws Exception if the roomba is somehow being set to where it already is
      */
-    boolean MoveDown() throws Exception {
+    public boolean moveDown() throws Exception {
         // test whether space below Roomba is blocked or out of bounds
         // if Roomba at bottom of grid, fail or if space is blocked by obstacle, fail
         if (currentRow == size-1 || gameBoard[currentRow+1][currentColumn].isObstacle()) {
@@ -121,7 +136,7 @@ public class GameBoard{
      * @return a boolean value that represents whether the action completed or not
      * @throws Exception if the roomba is somehow being set to where it already is
      */
-    boolean MoveRight() throws Exception {
+    public boolean moveRight() throws Exception {
         // test whether space to the right of Roomba is blocked or out of bounds
         // if Roomba at right side of grid, fail or if space is blocked by obstacle, fail
         if (currentColumn == size-1 || gameBoard[currentRow][currentColumn+1].isObstacle()) {
