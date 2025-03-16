@@ -29,15 +29,10 @@ public class LevelController {
         attempts = 0;
     }
 
-    //TODO: Have UI call following methods when buttons are pressed
-
     /**
      * Method to add an Up command to script
      */
-    public void addUpCommand()
-    {
-        commandScript.addCommand(new Up(gameBoard));
-    }
+    public void addUpCommand() { commandScript.addCommand(new Up(gameBoard)); }
 
     /**
      * Method to add a Down command to script

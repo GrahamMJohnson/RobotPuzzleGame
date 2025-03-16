@@ -21,7 +21,7 @@ public class TestLevelData extends LevelDataTemplate {
     protected GameBoardData createGameBoardData() {
         List<Obstacle> obstacles = createObstacles();
         List<Collectable> collectables = createCollectables();
-        return new GameBoardData(5, 0, 0, 5, 5, obstacles, collectables);
+        return new GameBoardData(5, 0, 0, 4, 4, obstacles, collectables);
     }
 
     @Override
