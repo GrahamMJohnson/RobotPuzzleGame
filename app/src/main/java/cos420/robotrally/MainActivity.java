@@ -1,6 +1,13 @@
 package cos420.robotrally;
 
+import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
         // TODO make level dynamic
-        levelController = new LevelController(new TestLevelData());
+        LevelController levelController = new LevelController(new TestLevelData());
         setupGUIButtons(levelController);
     }
 
@@ -141,6 +148,39 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    private void showRobotHit(){
+        //TODO: Test to see if this works
+        //Still figuring out how to make the dialog show up.
+        Dialog robotHitDialog = new Dialog(this);
+        robotHitDialog.setContentView(R.layout.robot_hit_dialog);
+    }
+
+    private void addLevelToUI(int levelNumber){
+        switch(levelNumber) {
+            case 1:
+            case 2:
+            case 3:
+                break;
+            default: throw new InvalidParameterException(levelNumber + " is not a valid level number");
+        }
+
+        //create a new instance of the layout
+        LayoutInflater levelButtonView = getLayoutInflater();
+        View level = levelButtonView.inflate(R.layout.level_select_level_tile, null);
+
+        //edit the text of the layout to have the level number
+        androidx.appcompat.widget.AppCompatButton levelButton = findViewById(R.id.levelDynamic);
+        levelButton.setText(levelNumber);
+
+        //edit the stats/level rating
+        //TODO: Figure out what to display (stars, efficiency rating, etc) and how to display it
+        ImageView levelImage = findViewById(R.id.levelRatingDynamic);
+
+        //add the edited level to the grid view
+        GridView dynamicGrid = findViewById(R.id.dynamicLevelLayout);
+        dynamicGrid.addView(level);
+    }
 
     // TODO clear button listeners when done with level
 }

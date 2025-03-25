@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350sp"
+    android:layout_height="200sp"
+    android:background="@color/light_grey"
+    android:layout_gravity="center">
+
+    <!-- this is the win screen. -->
+    <TextView
+        android:id="@+id/robot_hit_text"
+        android:layout_width="match_parent"
+        android:layout_height="50sp"
+        android:text="@string/level_win"
+        android:textSize="25sp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:background="@color/dark_gray"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/robot_hit_description"
+        android:layout_below="@id/robot_hit_text"
+        android:layout_width="300sp"
+        android:layout_height="75sp"
+        android:layout_marginStart="25sp"
+        android:gravity="center"
+        android:text="@string/level_win_description"
+        android:textAlignment="center"
+        android:textSize="17sp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/RetryButton"
+        android:layout_width="100sp"
+        android:layout_height="65dp"
+        android:layout_below="@id/robot_hit_description"
+        android:layout_marginHorizontal="50dp"
+        android:text="@string/level_win_button1"
+        android:textSize="25sp"
+        android:background="@color/snow"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="100sp"
+        android:layout_height="65dp"
+        android:layout_below="@id/robot_hit_description"
+        android:layout_toEndOf="@id/RetryButton"
+        android:text="@string/level_win_button2"
+        android:textSize="20sp"
+        android:background="@color/snow"/>
+
+</RelativeLayout>

@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">RobotRally</string>
+    <string name="obstacle_hit">Your robot has hit an obstacle.</string>
+    <string name="obstacle_hit_description">Your robot has hit an obstacle. Try another
+    combination of moves that moves the robot around the obstacle.</string>
+    <string name="image_description">image representing how well you completed the level</string>
+    <string name="level_win">You have completed the level!!</string>
+    <string name="level_win_description">This level is now complete. You can try again and
+    make the path more efficient, or move on to the next level.</string>
+    <string name="level_win_button1">Retry</string>
+    <string name="level_win_button2">Next Level</string>
 </resources>

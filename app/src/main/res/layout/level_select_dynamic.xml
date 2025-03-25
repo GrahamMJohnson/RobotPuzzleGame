@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="150sp"
+        android:text="@string/app_name"
+        android:textSize="65sp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:fontFamily="serif"/>
+
+    <GridView
+        android:id="@+id/dynamicLevelLayout"
+        android:layout_width="375sp"
+        android:layout_height="550sp"
+        android:layout_below="@id/title"
+        android:layout_marginHorizontal="20sp"
+        android:background="@color/gray"
+        android:numColumns="2"
+        android:gravity="center"
+        tools:listitem="@layout/level_select_level_tile"/>
+
+</RelativeLayout>
