@@ -1,25 +1,47 @@
 package cos420.robotrally;
 
 import android.os.Bundle;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import cos420.robotrally.adaptersAndItems.MoveAdapter;
+import cos420.robotrally.adaptersAndItems.MoveItem;
 import cos420.robotrally.levels.TestLevelData;
 import cos420.robotrally.models.LevelController;
 
 public class MainActivity extends AppCompatActivity {
+    List<MoveItem> moveList;
+    MoveAdapter adapter;
+    LevelController levelController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+         //Moves view set up
+        RecyclerView recyclerView = findViewById(R.id.move_viewer);
+        moveList = new ArrayList<>();
+        //Set LayoutManager
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //Set Adapter
+        adapter = new MoveAdapter(moveList);
+        recyclerView.setAdapter(adapter);
+        //Set ItemTouchHelper
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
         // TODO make level dynamic
-        LevelController levelController = new LevelController(new TestLevelData());
+        levelController = new LevelController(new TestLevelData());
         setupGUIButtons(levelController);
     }
 
@@ -64,6 +86,11 @@ public class MainActivity extends AppCompatActivity {
             levelC.addBCommand();
             addMoveToUI("B");
         });
+        //Delete
+        findViewById(R.id.delete_button).setOnClickListener(v -> {
+            levelC.remove();
+            removeMoveFromUI();
+        });
     }
 
     /**
@@ -85,15 +112,35 @@ public class MainActivity extends AppCompatActivity {
             default: throw new InvalidParameterException(moveText + " is not a valid move.");
         }
 
-        // Setup the element to be added
-        // TODO change this to proper class and image
-        TextView newMove = new TextView(this);
-        newMove.setText(moveText);
-
-        // Add the move to the scrollable list
-        LinearLayout putMoveHere = findViewById(R.id.move_viewer);
-        putMoveHere.addView(newMove);
+        moveList.add(new MoveItem(moveText));//add item
+        adapter.notifyDataSetChanged();//notify adapter of change
     }
+
+    /**
+     * Remove the last move item from the list
+     */
+    private void removeMoveFromUI () {
+        moveList.remove(moveList.size() - 1); //Remove Last Item
+        adapter.notifyDataSetChanged(); //notify adapter of change
+    }
+
+    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END, 0) {
+        @Override //drag and drop moves
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            int fromPosition = viewHolder.getAdapterPosition();
+            int toPosition = target.getAdapterPosition();
+            Collections.swap(moveList, fromPosition, toPosition);
+            recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
+            //make changes to backend
+            levelController.switchMove(fromPosition, toPosition);
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+        }
+    };
 
     // TODO clear button listeners when done with level
 }

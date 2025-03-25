@@ -88,6 +88,12 @@ public class LevelController {
     }
 
     /**
+     * Method to remove last command from script
+     * @return the removed command
+     */
+    public void remove() { commandScript.removeLastCommand();}
+
+    /**
      * method to execute the script
      */
     public void executeScript()
@@ -95,4 +101,9 @@ public class LevelController {
         attempts++;
         commandScript.execute();
     }
+
+    /**
+     * Switches a command from position "from" to position "to"
+     */
+    public void switchMove(int from, int to) { commandScript.switchMove(from, to);}
 }
