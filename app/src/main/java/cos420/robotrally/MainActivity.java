@@ -2,6 +2,7 @@ package cos420.robotrally;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridView;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
         // TODO make level dynamic
-        LevelController levelController = new LevelController(new TestLevelData());
+        levelController = new LevelController(new TestLevelData());
         setupGUIButtons(levelController);
     }
 
@@ -95,8 +96,13 @@ public class MainActivity extends AppCompatActivity {
         });
         //Delete
         findViewById(R.id.delete_button).setOnClickListener(v -> {
-            levelC.remove();
-            removeMoveFromUI();
+
+            try {
+                levelC.remove();
+                removeMoveFromUI();
+            } catch (Exception e) {
+                Log.d("Button Actions", "Attempted to remove item from empty list");
+            }
         });
     }
 

@@ -1,5 +1,7 @@
 package cos420.robotrally.models;
 
+import android.widget.RemoteViews;
+
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -32,8 +34,15 @@ public class CommandList {
      * Method to remove the last command of the list
      * @return the command removed
      */
-    public void removeLastCommand(){
-        script.removeLast();
+    public void removeLastCommand() throws Exception {
+        if (!script.isEmpty())
+        {
+            script.removeLast();
+        }
+        else
+        {
+            throw new Exception("Cannot remove from empty list");
+        }
     }
 
     /**

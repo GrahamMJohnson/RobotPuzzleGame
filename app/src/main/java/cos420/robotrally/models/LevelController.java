@@ -91,7 +91,9 @@ public class LevelController {
      * Method to remove last command from script
      * @return the removed command
      */
-    public void remove() { commandScript.removeLastCommand();}
+    public void remove() throws Exception {
+        commandScript.removeLastCommand();
+    }
 
     /**
      * method to execute the script
