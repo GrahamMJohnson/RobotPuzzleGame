@@ -113,11 +113,12 @@ public class LevelController {
     /**
      * method to execute the script
      */
-    public void executeScript()
+    public boolean executeScript()
     {
         attempts++;
         Log.v(LOG_TAG, "Executing script");
         commandScript.execute();
+        return gameBoard.destReached();
     }
 
     /**

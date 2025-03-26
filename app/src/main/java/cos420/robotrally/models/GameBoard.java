@@ -154,4 +154,8 @@ public class GameBoard{
         // return true if command was valid
         return true;
     }
+
+    public boolean destReached() {
+        return gameBoard[currentRow][currentColumn].isGoalTile();
+    }
 }
