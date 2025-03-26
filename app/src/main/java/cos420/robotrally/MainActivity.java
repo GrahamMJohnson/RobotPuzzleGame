@@ -23,13 +23,20 @@ import java.util.List;
 
 import cos420.robotrally.adaptersAndItems.MoveAdapter;
 import cos420.robotrally.adaptersAndItems.MoveItem;
-import cos420.robotrally.levels.TestLevelData;
+import cos420.robotrally.levels.LevelData;
 import cos420.robotrally.models.LevelController;
+import cos420.robotrally.services.LevelMapper;
 
 public class MainActivity extends AppCompatActivity {
     List<MoveItem> moveList;
     MoveAdapter adapter;
     LevelController levelController;
+
+    /**
+     * 0 indexed list of the data for level layout<br>
+     * Level 1 can be accessed by levels.get(0)
+     */
+    List<LevelData> levels;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +55,11 @@ public class MainActivity extends AppCompatActivity {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
+        // list of data for all the levels
+        levels = LevelMapper.mapLevelDataFromFile(this);
+
         // TODO make level dynamic
-        levelController = new LevelController(new TestLevelData());
+        levelController = new LevelController(levels.get(0));
         setupGUIButtons(levelController);
     }
 

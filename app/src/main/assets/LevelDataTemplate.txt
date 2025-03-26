@@ -1,0 +1,35 @@
+This template currently has 1 of everything as of 3/21/25
+Please follow this template exactly or the Mapper class might not succeed
+More obstacles and collectables can be added following examples below
+Leading/trailing white space for a line does not matter, indentation is simply for readability purposes
+Copy the template below and paste it into the LevelData.txt file (found in the assets folder) below
+    any text already in file
+        - When copying, make sure to also copy the dashed line above the level number as this is what
+            tells the mapper a new level is being defined.
+        - When pasting it in make sure to have cursor all the way to the left before pasting or indentation
+            will do funny things
+
+-------------------------------------
+level: 0
+size: 5
+startRow: 0
+startColumn: 0
+goalRow: 4
+goalColumn: 4
+obstacle:
+    type: chair
+    row: 0
+    column 1
+obstacle:
+    type: wall
+    row: 0
+    column: 2
+collectables:
+    row: 0
+    column: 3
+specialA:
+    type: repeat
+    parameters: 2 1
+specialB:
+    type: repeat
+    parameters: 1 2

@@ -17,11 +17,11 @@ public class SpecialCommandCreationService {
      * @param parameters The array of parameters to be used in the constructor
      * @return An instance of the created command
      */
-    public static ICommand getInstanceOfSpecialCommand(CommandList script, SpecialCommandType commandType, Object[] parameters)
+    public static ICommand getInstanceOfSpecialCommand(CommandList script, SpecialCommandType commandType, int[] parameters)
     {
         switch (commandType)
         {
-            case REPEAT: return new Repeat(script, (int)parameters[0], (int)parameters[1]);
+            case REPEAT: return new Repeat(script, parameters[0], parameters[1]);
             case OTHER: return null; //TODO: do something here
             default: Log.e("Special Command Creation", "Invalid Special Command Type");
         };

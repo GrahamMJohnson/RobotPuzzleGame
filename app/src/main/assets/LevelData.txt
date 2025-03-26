@@ -1,0 +1,44 @@
+// This is the file for storing the data needed to create the levels
+// There is a template for creating new level in LevelDataTemplate.txt
+// The lines of a bunch of dashes are what is used to separate the levels from each other
+// Having a line start with two slashes like this will make the mapper ignore it so if
+//      you want to add comments in this file it works (but not block comments)
+
+-------------------------------------
+level: 1
+size: 5
+startRow: 0
+startColumn: 0
+goalRow: 4
+goalColumn: 4
+obstacle:
+    type: wall
+    row: 0
+    column 2
+obstacle:
+    type: wall
+    row: 1
+    column: 2
+obstacle:
+    type: chair
+    row: 2
+    column: 0
+obstacle:
+    type: chair
+    row: 3
+    column: 3
+collectables:
+    row: 3
+    column: 1
+collectables:
+    row: 1
+    column: 3
+collectables:
+    row: 3
+    column: 4
+specialA:
+    type: repeat
+    parameters: 2 1
+specialB:
+    type: repeat
+    parameters: 1 2

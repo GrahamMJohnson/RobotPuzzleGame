@@ -16,7 +16,7 @@ public class GameBoard{
      */
     public GameBoard(GameBoardData gameBoardData)
     {
-        this.size = gameBoardData.getSize();
+        this.size = gameBoardData.size;
         this.makeBoard(gameBoardData);
     }
 
@@ -43,17 +43,17 @@ public class GameBoard{
         }
 
         // Set Starting and Goal tiles
-        gameBoard[gameBoardData.getStartRow()][gameBoardData.getStartColumn()].setOccupied(true);
-        gameBoard[gameBoardData.getGoalRow()][gameBoardData.getGoalColumn()].setGoalTile(true);
+        gameBoard[gameBoardData.startRow][gameBoardData.startColumn].setOccupied(true);
+        gameBoard[gameBoardData.goalRow][gameBoardData.goalColumn].setGoalTile(true);
 
         // Set Obstacles
-        for (Obstacle o : gameBoardData.getObstacles())
+        for (Obstacle o : gameBoardData.obstacles)
         {
             gameBoard[o.getRow()][o.getColumn()].setObstacleType(o.getObstacleType());
         }
 
         // Set Collectables
-        for (Collectable c : gameBoardData.getCollectables())
+        for (Collectable c : gameBoardData.collectables)
         {
             gameBoard[c.getRow()][c.getColumn()].setHasCollectable(true);
         }

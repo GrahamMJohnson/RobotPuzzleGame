@@ -1,7 +1,9 @@
 package cos420.robotrally.models;
 
+import android.util.Log;
+
 import cos420.robotrally.commands.*;
-import cos420.robotrally.levels.LevelDataTemplate;
+import cos420.robotrally.levels.LevelData;
 import cos420.robotrally.services.SpecialCommandCreationService;
 
 public class LevelController {
@@ -12,19 +14,22 @@ public class LevelController {
     private final CommandList commandScript;
 
     /** attribute that is a reference to the stored level data */
-    private final LevelDataTemplate levelData;
+    private final LevelData levelData;
 
     /** attribute to store number of attempts on level */
     private int attempts;
+
+    private static final String LOG_TAG = "Level Controller";
+
 
     /**
      * Constructor that takes info for Level from Level class to create the Level Controller
      * @param level the object that stores the data for the desired level
      */
-    public LevelController(LevelDataTemplate level)
+    public LevelController(LevelData level)
     {
         levelData = level;
-        gameBoard = new GameBoard(level.getGameBoardData());
+        gameBoard = new GameBoard(level.gameBoardData);
         commandScript = new CommandList();
         attempts = 0;
     }
@@ -32,7 +37,11 @@ public class LevelController {
     /**
      * Method to add an Up command to script
      */
-    public void addUpCommand() { commandScript.addCommand(new Up(gameBoard)); }
+    public void addUpCommand()
+    {
+        commandScript.addCommand(new Up(gameBoard));
+        Log.v(LOG_TAG, "Added up command");
+    }
 
     /**
      * Method to add a Down command to script
@@ -40,6 +49,7 @@ public class LevelController {
     public void addDownCommand()
     {
         commandScript.addCommand(new Down(gameBoard));
+        Log.v(LOG_TAG, "Added down command");
     }
 
     /**
@@ -48,6 +58,7 @@ public class LevelController {
     public void addLeftCommand()
     {
         commandScript.addCommand(new Left(gameBoard));
+        Log.v(LOG_TAG, "Added left command");
     }
 
     /**
@@ -56,6 +67,7 @@ public class LevelController {
     public void addRightCommand()
     {
         commandScript.addCommand(new Right(gameBoard));
+        Log.v(LOG_TAG, "Added right command");
     }
 
     /**
@@ -65,26 +77,29 @@ public class LevelController {
     {
         ICommand command = SpecialCommandCreationService.getInstanceOfSpecialCommand(
                 commandScript,
-                levelData.getSpecialCommandAData().getCommandType(),
-                levelData.getSpecialCommandAData().getCommandParams());
-        if (command != null) {
+                levelData.commandAData.commandType,
+                levelData.commandAData.commandParams);
+        if (command != null)
+        {
             commandScript.addCommand(command);
         }
+        Log.v(LOG_TAG, "Added special command A");
     }
 
     /**
-     * Method to add an A command to script
+     * Method to add an B command to script
      */
     public void addBCommand()
     {
         ICommand command = SpecialCommandCreationService.getInstanceOfSpecialCommand(
                 commandScript,
-                levelData.getSpecialCommandBData().getCommandType(),
-                levelData.getSpecialCommandBData().getCommandParams());
+                levelData.commandBData.commandType,
+                levelData.commandBData.commandParams);
         if (command != null)
         {
             commandScript.addCommand(command);
         }
+        Log.v(LOG_TAG, "Added special command B");
     }
 
     /**
@@ -101,6 +116,7 @@ public class LevelController {
     public void executeScript()
     {
         attempts++;
+        Log.v(LOG_TAG, "Executing script");
         commandScript.execute();
     }
 
