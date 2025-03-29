@@ -41,4 +41,31 @@ public class GameBoardData {
         this.goalRow = goalRow;
         this.goalColumn = goalColumn;
     }
+
+    public int getSize() {
+        return size;
+    }
+    public int getStartRow() {
+        return startRow;
+    }
+
+    public int getStartColumn() {
+        return startColumn;
+    }
+
+    public int getGoalRow() {
+        return goalRow;
+    }
+
+    public int getGoalColumn() {
+        return goalColumn;
+    }
+
+    public List<Obstacle> getObstacles() {
+        return obstacles;
+    }
+
+    public List<Collectable> getCollectables() {
+        return collectables;
+    }
 }

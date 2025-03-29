@@ -1,36 +1,46 @@
 package cos420.robotrally;
 
 import android.app.Dialog;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import cos420.robotrally.adaptersAndItems.GridAdapter;
+import cos420.robotrally.adaptersAndItems.GridItem;
 import cos420.robotrally.adaptersAndItems.MoveAdapter;
 import cos420.robotrally.adaptersAndItems.MoveItem;
 import cos420.robotrally.levels.LevelData;
+import cos420.robotrally.models.Collectable;
 import cos420.robotrally.models.LevelController;
+import cos420.robotrally.models.Obstacle;
 import cos420.robotrally.services.LevelMapper;
 
 public class MainActivity extends AppCompatActivity {
     List<MoveItem> moveList;
     MoveAdapter adapter;
     LevelController levelController;
+
+    GridView gridTile;
+    ArrayList<GridItem> gridList;
+    GridAdapter gridAdapter;
 
     /**
      * 0 indexed list of the data for level layout<br>
@@ -43,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // list of data for all the levels
+        levels = LevelMapper.mapLevelDataFromFile(this);
+
          //Moves view set up
         RecyclerView recyclerView = findViewById(R.id.move_viewer);
         moveList = new ArrayList<>();
@@ -51,12 +64,18 @@ public class MainActivity extends AppCompatActivity {
         //Set Adapter
         adapter = new MoveAdapter(moveList);
         recyclerView.setAdapter(adapter);
-        //Set ItemTouchHelper
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        // list of data for all the levels
-        levels = LevelMapper.mapLevelDataFromFile(this);
+        //GridTile  view set up
+        gridTile = findViewById(R.id.grid);
+        gridList = new ArrayList<>();
+
+        //TODO remove hardcoding of level 1
+        setupGrid(levels.get(0));
+
+        //Set adapter
+        gridAdapter = new GridAdapter(this, gridList);
+        gridTile.setAdapter(gridAdapter);
+
 
         // TODO make level dynamic
         levelController = new LevelController(levels.get(0));
@@ -147,24 +166,6 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged(); //notify adapter of change
     }
 
-    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END, 0) {
-        @Override //drag and drop moves
-        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-            int fromPosition = viewHolder.getAdapterPosition();
-            int toPosition = target.getAdapterPosition();
-            Collections.swap(moveList, fromPosition, toPosition);
-            recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
-            //make changes to backend
-            levelController.switchMove(fromPosition, toPosition);
-            return false;
-        }
-
-        @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-
-        }
-    };
-
     private void showRobotHit(){
         //TODO: Test to see if this works
         //Still figuring out how to make the dialog show up.
@@ -196,6 +197,68 @@ public class MainActivity extends AppCompatActivity {
         //add the edited level to the grid view
         GridView dynamicGrid = findViewById(R.id.dynamicLevelLayout);
         dynamicGrid.addView(level);
+    }
+
+    /**
+     * Sets up the game board grid
+     * @param l the current level
+     */
+    private void setupGrid(LevelData l) {
+        int size = l.gameBoardData.getSize(); //size of game board
+        ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
+        ColorDrawable black = new ColorDrawable(Color.parseColor("#000000"));
+
+        for (int i = 0; i < size; i++) { // Row
+            for (int j = 0; j < size; j++) { //Column
+                if (i == l.gameBoardData.getStartRow() && j == l.gameBoardData.getStartColumn()) { //Check if start tile
+                    gridList.add(new GridItem("R", gray));
+                }else if (i == l.gameBoardData.getGoalRow() && j == l.gameBoardData.getGoalColumn()) { //Check if Goal tile
+                    gridList.add(new GridItem("D", gray));
+                }else if(isObstacle(l.gameBoardData.getObstacles(), i, j)) {
+                    gridList.add(new GridItem("", black));
+                }else if(isCollectable(l.gameBoardData.getCollectables(), i, j)) {
+                    gridList.add(new GridItem("C", gray));
+                } else {// Blank Tile
+                    gridList.add(new GridItem("", gray));
+                }
+            }
+        }
+    }
+
+    /**
+     * checks if the tile is a Obstacle
+     * @param list
+     * @param row
+     * @param col
+     * @return
+     */
+    private boolean isObstacle(List<Obstacle> list, int row, int col) {
+        for (int i = 0; i < list.size(); i++) {
+            int r = list.get(i).getRow();
+            int c = list.get(i).getColumn();
+            if(r == row && c == col) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the tile is a Collectable
+     * @param list
+     * @param row
+     * @param col
+     * @return
+     */
+    private boolean isCollectable(List<Collectable> list, int row, int col) {
+        for (int i = 0; i < list.size(); i++) {
+            int r = list.get(i).getRow();
+            int c = list.get(i).getColumn();
+            if(r == row && c == col) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // TODO clear button listeners when done with level
