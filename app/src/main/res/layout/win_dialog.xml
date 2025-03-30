@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="350sp"
-    android:layout_height="200sp"
+    android:layout_height="300sp"
     android:background="@color/light_grey"
     android:layout_gravity="center">
 
@@ -17,34 +17,120 @@
         android:background="@color/dark_gray"
         android:gravity="center" />
 
+
     <TextView
-        android:id="@+id/robot_hit_description"
+        android:id="@+id/goal_moves_number"
         android:layout_below="@id/robot_hit_text"
-        android:layout_width="300sp"
-        android:layout_height="75sp"
-        android:layout_marginStart="25sp"
+        android:layout_width="100sp"
+        android:layout_height="70sp"
+        android:textSize="50sp"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:id="@+id/goal_moves_text"
+        android:layout_below="@id/goal_moves_number"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="@string/goal_text"
         android:gravity="center"
-        android:text="@string/level_win_description"
-        android:textAlignment="center"
-        android:textSize="17sp"/>
+        android:textSize="20sp"
+        />
+
+    <TextView
+        android:id="@+id/total_moves"
+        android:layout_below="@id/robot_hit_text"
+        android:layout_toEndOf="@id/goal_moves_number"
+        android:layout_width="100sp"
+        android:layout_height="70sp"
+        android:layout_marginHorizontal="25sp"
+        android:textSize="50sp"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:id="@+id/total_moves_text"
+        android:layout_below="@id/goal_moves_number"
+        android:layout_toEndOf="@id/goal_moves_text"
+        android:layout_marginHorizontal="25sp"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="@string/total_moves_text"
+        android:gravity="center"
+        android:textSize="18sp"
+        />
+
+    <TextView
+        android:id="@+id/best_moves"
+        android:layout_below="@id/robot_hit_text"
+        android:layout_toEndOf="@id/total_moves"
+        android:layout_width="100sp"
+        android:layout_height="70sp"
+        android:textSize="50sp"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:id="@+id/best_moves_text"
+        android:layout_below="@id/goal_moves_number"
+        android:layout_toEndOf="@id/total_moves_text"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="@string/best_moves_text"
+        android:gravity="center"
+        android:textSize="20sp"
+        />
+
+    <ImageView
+        android:id="@+id/status_bar_background"
+        android:layout_width="300sp"
+        android:layout_height="40sp"
+        android:layout_marginVertical="20sp"
+        android:layout_marginHorizontal="25sp"
+        android:background="@color/gray"
+        android:layout_below="@id/best_moves_text"
+        android:contentDescription="@string/background_status_bar_description"/>
+    <ImageView
+        android:id="@+id/status_bar_inside_295total"
+        android:layout_width="250sp"
+        android:layout_height="35sp"
+        android:layout_below="@id/best_moves_text"
+        android:layout_marginVertical="22.5sp"
+        android:layout_marginHorizontal="27.5sp"
+        android:contentDescription="@string/status_bar_description"
+        android:background="@color/light_grey"/>
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/last_level_button"
+        android:layout_width="100sp"
+        android:layout_height="65sp"
+        android:layout_below="@id/status_bar_background"
+        android:background="@drawable/last_level_symbol_updated"
+        android:textSize="20sp"
+        android:contentDescription="@string/last_image_description"
+        android:layout_marginHorizontal="8.33sp"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/RetryButton"
         android:layout_width="100sp"
-        android:layout_height="65dp"
-        android:layout_below="@id/robot_hit_description"
-        android:layout_marginHorizontal="50dp"
-        android:text="@string/level_win_button1"
+        android:layout_height="65sp"
+        android:layout_below="@id/status_bar_background"
+        android:layout_marginHorizontal="10sp"
         android:textSize="25sp"
-        android:background="@color/snow"/>
+        android:layout_toEndOf="@id/last_level_button"
+        android:contentDescription="@string/retry_image_description"
+        android:background="@drawable/restart_image"/>
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/next_level_button"
         android:layout_width="100sp"
-        android:layout_height="65dp"
-        android:layout_below="@id/robot_hit_description"
+        android:layout_height="65sp"
+        android:layout_below="@id/status_bar_background"
         android:layout_toEndOf="@id/RetryButton"
-        android:text="@string/level_win_button2"
         android:textSize="20sp"
-        android:background="@color/snow"/>
+        android:background="@drawable/next_image"
+        android:contentDescription="@string/next_image_description"
+        android:layout_marginHorizontal="8.33sp"/>
 
 </RelativeLayout>

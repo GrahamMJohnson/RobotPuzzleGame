@@ -4,9 +4,16 @@
     <string name="obstacle_hit_description">Your robot has hit an obstacle. Try another
     combination of moves that moves the robot around the obstacle.</string>
     <string name="image_description">image representing how well you completed the level</string>
-    <string name="level_win">You have completed the level!!</string>
-    <string name="level_win_description">This level is now complete. You can try again and
-    make the path more efficient, or move on to the next level.</string>
+    <string name="next_image_description">next level button</string>
+    <string name="retry_image_description">retry level button</string>
+    <string name="last_image_description">last level button</string>
+    <string name="background_status_bar_description">background for the status bar</string>
+    <string name="status_bar_description">variable length status bar</string>
+    <string name="level_win">Victory!</string>
+    <string name="goal_text">Goal</string>
+    <string name="total_moves_text">Total Moves</string>
+    <string name="best_moves_text">Best</string>
     <string name="level_win_button1">Retry</string>
     <string name="level_win_button2">Next Level</string>
+    <string name="level_win_button3">Last Level</string>
 </resources>
