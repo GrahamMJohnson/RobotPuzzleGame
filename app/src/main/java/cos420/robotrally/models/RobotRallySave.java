@@ -1,5 +1,8 @@
 package cos420.robotrally.models;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,26 +29,32 @@ public class RobotRallySave {
     //save
     String[] fileRead;
 
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor prefEditor;
+
     /**
      * This is the default constructor for a robotRallySave object
-     * It should create a save file for the game.
+     * It should create shared preferences for the game.
+     * @param context this is the context that you are in
      */
-    public RobotRallySave() {
-        File robotRallySave = new File("robotRallySave.txt");
-        //System.out.println(robotRallySave.getAbsolutePath()); //used for debugging purposes
+    public RobotRallySave(Context context) {
+        sharedPreferences = context.getSharedPreferences("RobotRallySave",
+                Context.MODE_PRIVATE);
     }
 
     /**
      * This is the method used to clear the save file for testing purposes
-     * @throws IOException if the write to the file fails.
      */
-    public void ClearSave() throws IOException {
-        //Initializes the writing tools that we will be using
-        save_file = new FileWriter("robotRallySave.txt");
-        BufferedWriter save_write = new BufferedWriter(this.save_file);
-
-        //Write nothing to the file, which should override the file?
-        save_write.write("");
+    public void ClearSave() {
+        prefEditor = sharedPreferences.edit();
+        prefEditor.putString("moveSequence", "");
+        prefEditor.putFloat("numberOfAttempts", 0);
+        prefEditor.putFloat("efficiencyScore", 0);
+        prefEditor.putInt("totalSquaresTraveled", 0);
+        prefEditor.putString("currentMoveDifference", "");
+        prefEditor.putString("bestMoveDifference", "");
+        prefEditor.putString("percentCollectiblesCollected", "");
+        prefEditor.apply();
     }
 
     /**
@@ -57,30 +66,31 @@ public class RobotRallySave {
      * @param bestMoveCount is the number of moves that the best attempt had
      * @param tilesCollected is the number of tiles that have been collected by the user
      * @param tilesPossibleToCollect is the number of tiles that have collectibles on them
-     * @throws IOException if IO has failed or been interrupted
      */
     public void WriteAllToSave(char[] moveSequence, float numberOfAttempts, int optimalMoveCount,
                                int currentMoveCount, int bestMoveCount, int tilesCollected,
-                               int tilesPossibleToCollect) throws IOException {
+                               int tilesPossibleToCollect) {
+
+        //Initializes the string for building the move sequence save
+        String moveSequenceString = "";
 
         //Initializes the writing tools that we will be using
-        save_file = new FileWriter("robotRallySave.txt");
-        BufferedWriter save_write = new BufferedWriter(this.save_file);
+        prefEditor = sharedPreferences.edit();
 
-        //Writes all of the move sequence data to the text file
+        //Writes all of the move sequence data to the shared preference
         for(int i: moveSequence) {
-            save_write.write(moveSequence[i]);
+            moveSequenceString += moveSequence[i];
         }
-        save_write.write("\n");
+        prefEditor.putString("moveSequence", moveSequenceString);
 
-        //Writes the number of attempts to the text file
-        save_write.write(numberOfAttempts + "\n");
+        //Writes the number of attempts to the shared preference
+        prefEditor.putFloat("numberOfAttempts", numberOfAttempts);
 
-        //Calculates and writes the efficiency score to the text file
+        //Calculates and writes the efficiency score to the shared preferences
         float efficiencyScore = (numberOfAttempts / optimalMoveCount) * 1000;
-        save_write.write(efficiencyScore + "\n");
+        prefEditor.putFloat("efficiencyScore", efficiencyScore);
 
-        //calculates the total squares moved and writes that to the text file
+        //calculates the total squares moved and writes that to the shared preferences
         //In this case, s is special move one (5 moves), x is special move 2 (10 moves)
         int totalSquaresTraveled = 0;
         for(int i : moveSequence) {
@@ -94,20 +104,20 @@ public class RobotRallySave {
                 totalSquaresTraveled += 1;
             }
         }
-        save_write.write(totalSquaresTraveled + "\n");
+        prefEditor.putInt("totalSquaresTraveled", totalSquaresTraveled);
 
         //Calculates the difference in move count between the current and the optimal
-        //and writes that to the text file
+        //and writes that to the shared preferences
         int currentDifference = currentMoveCount - optimalMoveCount;
-        save_write.write(currentDifference + "\n");
+        prefEditor.putInt("currentMoveDifference", currentDifference);
 
 
         //Calculates the difference in move count between the current and the optimal
-        //and writes that to the text file
+        //and writes that to the shared preferences
         int bestDifference = bestMoveCount - optimalMoveCount;
-        save_write.write(bestDifference + "\n");
+        prefEditor.putInt("bestMoveDifference", bestDifference);
 
-        //Calculates the percentage of collectibles collected and writes that to the txt file
+        //Calculates the percentage of collectibles collected and writes that to the shared prefs
         //If/Else is to avoid div by 0 if there are no possible collection tiles
         if(tilesPossibleToCollect != 0) {
             collectiblesPercentage = ((float)tilesCollected/ (float)tilesPossibleToCollect) * 100;
@@ -115,169 +125,74 @@ public class RobotRallySave {
         else {
             collectiblesPercentage = 100;
         }
-        save_write.write(String.valueOf(collectiblesPercentage));
-        save_write.close();
+        prefEditor.putFloat("percentageCollectiblesCollected", collectiblesPercentage);
+        prefEditor.apply();
     }
 
-    /**
-     * This is the call to write edited data to the save file. It take different params since these values have already
-     * been calculated from the game, they have just been edited, and need to be rewritten.
-     * @param moveSequence the current sequence of moves that is the best
-     * @param numberOfAttempts the number of attempts the user has taken at the level
-     * @param efficiencyScore Current Calculation: (number of attempts/optimalMoveCount) * 1000
-     * @param tilesTraveled The number of tiles that the user’s best attempt traveled over
-     * @param differenceCurrent The difference between the user’s current attempt’s number of tiles traveled over and the optimal number of tiles traveled over
-     * @param differenceBest The difference between the user’s best attempt’s number of tiles traveled over and the optimal number of tiles traveled over
-     * @param percentCollectibles The percent of possible collectibles the user collected on their best attempt
-     * @throws IOException if the write fails
-     */
-    private void WriteEditedToSave(char[] moveSequence, float numberOfAttempts,
-                                   float efficiencyScore, int tilesTraveled, int differenceCurrent,
-                                   int differenceBest, float percentCollectibles) throws IOException
-    {
 
-        //Initializes the writing tools that we will be using
-        save_file = new FileWriter("robotRallySave.txt");
-        BufferedWriter save_write = new BufferedWriter(this.save_file);
-
-        //These are the writes that will write each of the params into their own line in the save file
-        for(int i : moveSequence) {
-            save_write.write(moveSequence[i]);
-        }
-        save_write.write("\n");
-        save_write.write(numberOfAttempts + "\n");
-        save_write.write(efficiencyScore + "\n");
-        save_write.write(tilesTraveled + "\n");
-        save_write.write(differenceCurrent + "\n");
-        save_write.write(differenceBest + "\n");
-        save_write.write(String.valueOf(percentCollectibles));
-        save_write.close();
+    //These are all of the setters for all of the different values that need to be saved.
+    public void SetMoveSequence(String MoveSequence){
+        prefEditor.putString("moveSequence", MoveSequence);
+        prefEditor.apply();
     }
 
-    /**
-     * This is a call to read the move sequence from the save file
-     * @param dataPoint the string representing the data point you would like to retrieve.
-     * OPTIONS FOR PARAM (moveSequence, numAttempts, efficiencyScore, tilesTraveled, differenceCurrent,
-     * differenceBest, percentCollectibles, all) -> empty or invalid returns an empty string
-     * @return the index that corresponds with the line that the piece of information should be on in the save file
-     * @throws FileNotFoundException if the save file is not found
-     */
-    public String ReadFromSave(String dataPoint) throws FileNotFoundException {
-
-        //This is the array that is going to contain all of the read-in data
-        //There should only be 7 lines in the save file
-        String[] readData = {"", "", "", "", "", "", ""};
-        String allDataString = "";
-
-        //this is the save file that we are going to be reading from
-        File saveFile = new File("robotRallySave.txt");
-
-        //This initializes the scanner to be able to scan through the save file
-        Scanner scanner = new Scanner(saveFile);
-
-        //Fills the readMoveSequence array with each line of the save file
-        for(int i = 0; i < readData.length - 1; i++) {
-            readData[i] = scanner.nextLine();
-            allDataString += readData[i] + "\n";
-        }
-        //The last part of the iteration is out of the loop because the last line doesn't need a new line\
-        readData[readData.length - 1] = scanner.nextLine();
-        allDataString = readData[readData.length - 1];
-
-        //closes the scanner so that it works properly
-        scanner.close();
-
-        //goes through all the possible params to be able to give only the data asked for
-        switch(dataPoint){
-            case "moveSequence":
-                return readData[0];
-            case "numAttempts":
-                return readData[1];
-            case "efficiencyScore":
-                return readData[2];
-            case "tilesTraveled":
-                return readData[3];
-            case "differenceCurrent":
-                return readData[4];
-            case "differenceBest":
-                return readData[5];
-            case "percentCollectibles":
-                return readData[6];
-            case "all":
-                return allDataString;
-            default:
-                return "";
-        }
+    public void SetNumAttempts(int numOfAttempts){
+        prefEditor.putInt("numberOfAttempts", numOfAttempts);
+        prefEditor.apply();
     }
 
-    /**
-     * This is the method to write a specific data point to the save file
-     * @param dataPoint the string representing the data point you would like to write to.
-     * OPTIONS FOR PARAM (moveSequence, numAttempts, efficiencyScore, tilesTraveled, differenceCurrent,
-     * differenceBest, percentCollectibles) -> empty returns all
-     * @param value the value that you would like to store at that specific data point in the save file
-     * @throws IOException if the writeAllToSave fails
-     */
-    public void WriteSpecificToSave(String dataPoint, String value) throws IOException {
+    public void SetEfficiencyScore(float EfficiencyScore){
+        prefEditor.putFloat("efficiencyScore", EfficiencyScore);
+        prefEditor.apply();
+    }
 
-        //this is the save file that we are going to be reading from
-        File saveFile = new File("robotRallySave.txt");
+    public void SetTotalSquaresTraveled(int TotalSquaresTraveled){
+        prefEditor.putInt("totalSquaresTraveled", TotalSquaresTraveled);
+        prefEditor.apply();
+    }
 
-        //This initializes the scanner to be able to scan through the save file
-        Scanner scanner = new Scanner(saveFile);
+    public void SetCurrentMoveDifference(int currentMoveDifference){
+        prefEditor.putInt("currentMoveDifference", currentMoveDifference);
+        prefEditor.apply();
+    }
 
-        //This is the array that is going to contain all of the read-in data.
-        //Since we need to overwrite the whole save file, we must save what we already have
-        //There should only be 7 lines in the save file
-        String[] readData = {"", "", "", "", "", "", ""};
+    public void SetBestMoveDifference(int bestMoveDifference){
+        prefEditor.putInt("bestMoveDifference", bestMoveDifference);
+        prefEditor.apply();
+    }
 
-        //Fills the readMoveSequence array with each line of the save file
-        for(int i = 0; i < readData.length; i++) {
-            readData[i] = scanner.nextLine();
-        }
+    public void SetCollectiblesCollected(float percentCollectiblesCollected){
+        prefEditor.putFloat("percentCollectiblesCollected", percentCollectiblesCollected);
+        prefEditor.apply();
+    }
 
-        //goes through all the possible params to be able to give only the data asked for
-        switch(dataPoint){
-            case "moveSequence":
-                readData[0] = value;
-                break;
-            case "numAttempts":
-                readData[1] = value;
-                break;
-            case "efficiencyScore":
-                readData[2] = value;
-                break;
-            case "tilesTraveled":
-                readData[3] = value;
-                break;
-            case "differenceCurrent":
-                readData[4] = value;
-                break;
-            case "differenceBest":
-                readData[5] = value;
-                break;
-            case "percentCollectibles":
-                readData[6] = value;
-                break;
-            default:
-                break;
-        }
 
-        //This is to turn the all of the data back into their native types so that they can be used in the writeAllToSave method
-        char[] moveSequenceReconstructed = new char[readData[0].length()];
-        for(int i = 0; i < readData[0].length(); i++) {
-            moveSequenceReconstructed[i] = readData[0].charAt(i);
-        }
-        float numberOfAttemptsReconstructed = Float.parseFloat(readData[1]);
-        float efficiencyScoreReconstructed = Float.parseFloat(readData[2]);
-        int tilesTraveledReconstructed = Integer.parseInt(readData[3]);
-        int differenceCurrentReconstructed = Integer.parseInt(readData[4]);
-        int differenceBestReconstructed = Integer.parseInt(readData[5]);
-        float percentCollectiblesReconstructed = Float.parseFloat(readData[6]);
+    //These are all of the getters for all of the saved values
+    public String GetMoveSequence(){
+        return sharedPreferences.getString("moveSequence", "");
+    }
 
-        //This writes all of the reconstructed information back into the save file
-        WriteEditedToSave(moveSequenceReconstructed, numberOfAttemptsReconstructed, efficiencyScoreReconstructed,
-                tilesTraveledReconstructed, differenceCurrentReconstructed, differenceBestReconstructed,
-                percentCollectiblesReconstructed);
+    public int GetMoveAttempts(){
+        return sharedPreferences.getInt("numberOfAttempts", 0);
+    }
+
+    public float GetEfficiencyScore(){
+        return sharedPreferences.getFloat("efficiencyScore", 100);
+    }
+
+    public int GetTotalSquaresTraveled(){
+        return sharedPreferences.getInt("totalSquaresTraveled", 0);
+    }
+
+    public int GetCurrentMoveDifference(){
+        return sharedPreferences.getInt("currentMoveDifference", 0);
+    }
+
+    public int GetBestMoveDifference(){
+        return sharedPreferences.getInt("bestMoveDifference", 0);
+    }
+
+    public int GetPercentageCollectiblesCollected(){
+        return sharedPreferences.getInt("percentageCollectiblesCollected", 100);
     }
 }
