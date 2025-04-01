@@ -1,5 +1,7 @@
 package cos420.robotrally.models;
 
+import android.util.Log;
+
 import cos420.robotrally.helpers.GameBoardData;
 
 public class GameBoard{
@@ -62,12 +64,12 @@ public class GameBoard{
     /**
      * This is the move up function written by Christian, adapted into the gameBoard class
      * @return a boolean value that represents whether the action completed or not
-     * @throws Exception if the roomba is somehow being set to where it already is.
      */
-    public boolean moveUp() throws Exception {
+    public boolean moveUp() {
         // test whether space above Roomba is blocked or out of bounds
         // if Roomba at top of grid, fail, or if space is blocked by obstacle, fail
         if (currentRow == 0 || gameBoard[currentRow-1][currentColumn].isObstacle()) {
+            //TODO display to user that command was invalid
             return false;
         }
         // else move Roomba up
@@ -79,6 +81,9 @@ public class GameBoard{
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
         }
+
+        logPosition();
+
         // return true if command was valid
         return true;
     }
@@ -86,12 +91,12 @@ public class GameBoard{
     /**
      * This is the move left function written by Christian adapted into the gameBoard class
      * @return a boolean value that represents whether the action completed or not
-     * @throws Exception if the roomba is somehow being set to where it already is
      */
-    public boolean moveLeft() throws Exception {
+    public boolean moveLeft() {
         // test whether space to the left of Roomba is blocked or out of bounds
         // if Roomba at left side of grid, fail, or if space is blocked by obstacle, fail
         if (currentColumn == 0 || gameBoard[currentRow][currentColumn-1].isObstacle()) {
+            //TODO display to user that command was invalid
             return false;
         }
         // else move Roomba left
@@ -103,6 +108,9 @@ public class GameBoard{
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
         }
+
+        logPosition();
+
         // return true if command was valid
         return true;
     }
@@ -110,12 +118,12 @@ public class GameBoard{
     /**
      * This is the move down function written by Christian adapted into the gameBoard class
      * @return a boolean value that represents whether the action completed or not
-     * @throws Exception if the roomba is somehow being set to where it already is
      */
-    public boolean moveDown() throws Exception {
+    public boolean moveDown() {
         // test whether space below Roomba is blocked or out of bounds
         // if Roomba at bottom of grid, fail or if space is blocked by obstacle, fail
         if (currentRow == size-1 || gameBoard[currentRow+1][currentColumn].isObstacle()) {
+            //TODO display to user that command was invalid
             return false;
         }
         // else move Roomba down
@@ -123,10 +131,14 @@ public class GameBoard{
             //set the current tile to roomba is not there
             gameBoard[currentRow][currentColumn].setOccupied(false);
             //change the current row that the roomba is in
-            currentRow -= 1;
+            currentRow += 1;
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
         }
+
+        logPosition();
+
+
         // return true if command was valid
         return true;
     }
@@ -134,12 +146,12 @@ public class GameBoard{
     /**
      * This is the move right function written by Christian adapted into the gameBoard class
      * @return a boolean value that represents whether the action completed or not
-     * @throws Exception if the roomba is somehow being set to where it already is
      */
-    public boolean moveRight() throws Exception {
+    public boolean moveRight() {
         // test whether space to the right of Roomba is blocked or out of bounds
         // if Roomba at right side of grid, fail or if space is blocked by obstacle, fail
         if (currentColumn == size-1 || gameBoard[currentRow][currentColumn+1].isObstacle()) {
+            //TODO display to user that command was invalid
             return false;
         }
         // else move Roomba right
@@ -151,6 +163,9 @@ public class GameBoard{
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
         }
+
+        logPosition();
+
         // return true if command was valid
         return true;
     }
@@ -158,4 +173,10 @@ public class GameBoard{
     public boolean destReached() {
         return gameBoard[currentRow][currentColumn].isGoalTile();
     }
+
+    private void logPosition()
+    {
+        Log.d("Moving Roomba", "Current Position: [" + currentRow + "," + currentColumn + "]");
+    }
+
 }

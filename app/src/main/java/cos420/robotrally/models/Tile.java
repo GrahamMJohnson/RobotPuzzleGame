@@ -36,7 +36,7 @@ public class Tile {
      * @param isOccupied Is the roomba on this tile?
      */
     public Tile(ObstacleType obstacleType, boolean isGoalTile, boolean hasCollectable, boolean isOccupied) {
-        isObstacle = obstacleType == null;
+        isObstacle = obstacleType != null;
         this.obstacleType = obstacleType;
         this.isGoalTile = isGoalTile;
         this.hasCollectable = hasCollectable;

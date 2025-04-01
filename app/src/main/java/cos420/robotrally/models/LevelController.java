@@ -108,6 +108,7 @@ public class LevelController {
      */
     public void remove() throws Exception {
         commandScript.removeLastCommand();
+        Log.v(LOG_TAG, "Deleted command");
     }
 
     /**

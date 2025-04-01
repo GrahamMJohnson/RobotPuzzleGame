@@ -42,3 +42,93 @@ specialA:
 specialB:
     type: repeat
     parameters: 1 2
+-------------------------------------
+level: 2
+size: 5
+startRow: 0
+startColumn: 0
+goalRow: 2
+goalColumn: 2
+obstacle:
+    type: chair
+    row: 0
+    column 1
+obstacle:
+    type: wall
+    row: 0
+    column: 2
+obstacle:
+    type: wall
+    row: 0
+    column: 3
+obstacle:
+    type: wall
+    row: 0
+    column: 4
+obstacle:
+    type: wall
+    row: 1
+    column: 3
+obstacle:
+    type: wall
+    row: 1
+    column: 4
+obstacle:
+    type: wall
+    row: 2
+    column: 3
+obstacle:
+    type: wall
+    row: 2
+    column: 4
+obstacle:
+    type: wall
+    row: 3
+    column: 0
+obstacle:
+    type: chair
+    row: 3
+    column 1
+obstacle:
+    type: wall
+    row: 3
+    column: 2
+obstacle:
+    type: wall
+    row: 3
+    column: 3
+obstacle:
+    type: wall
+    row: 3
+    column: 4
+obstacle:
+    type: wall
+    row: 4
+    column: 0
+obstacle:
+    type: chair
+    row: 4
+    column 1
+obstacle:
+    type: wall
+    row: 4
+    column: 2
+obstacle:
+    type: wall
+    row: 4
+    column: 3
+obstacle:
+    type: wall
+    row: 4
+    column: 4
+
+
+collectables:
+    row: 1
+    column: 0
+specialA:
+    type: repeat
+    parameters: 2 1
+specialB:
+    type: repeat
+    parameters: 1 2

@@ -1,10 +1,13 @@
 package cos420.robotrally;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.GridView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      * Level 1 can be accessed by levels.get(0)
      */
     List<LevelData> levels;
+
+    private int selectedLevel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,14 +172,14 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 levelC.remove();
                 removeMoveFromUI();
             } catch (Exception e) {
-                Log.d("Button Actions", "Attempted to remove item from empty list");
+                Log.d("Button Pressed", "Attempted to remove item from empty list");
             }
         });
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
             boolean victory = levelC.executeScript();
             if (victory) { // reached destination
-                // TODO win screen
+                showWinScreen();
             } else {
                 // TODO crash screen
             }
@@ -184,6 +189,36 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             clearGameListeners();
             openLevelSelect();
         });
+    }
+
+    private void showWinScreen()
+    {
+        LayoutInflater inflater = getLayoutInflater();
+        View customView = inflater.inflate(R.layout.win_dialog, null);
+
+        AlertDialog winScreen = new AlertDialog.Builder(this)
+                .setView(customView)
+                .setCancelable(false)
+                .create();
+
+        // setup button actions
+        customView.findViewById(R.id.last_level_button).setOnClickListener(v -> {
+            Log.v("Win Dialogue", "Previous level button pressed");
+            //TODO go to previous level method
+        });
+
+        customView.findViewById(R.id.RetryButton).setOnClickListener(v -> {
+            Log.v("Win Dialogue", "Retry level button pressed");
+            //TODO call method to reset the level
+            winScreen.dismiss();
+        });
+
+        customView.findViewById(R.id.next_level_button).setOnClickListener(v -> {
+            Log.v("Win Dialogue", "Next level button pressed");
+            //TODO go to next level method
+        });
+
+        winScreen.show();
     }
 
     /**

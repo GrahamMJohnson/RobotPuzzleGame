@@ -1,5 +1,6 @@
 package cos420.robotrally.models;
 
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.util.Collections;
