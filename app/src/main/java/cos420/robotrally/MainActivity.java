@@ -1,20 +1,12 @@
 package cos420.robotrally;
 
 import android.app.Dialog;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.GridView;
-import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +17,8 @@ import java.util.List;
 
 import cos420.robotrally.adaptersAndItems.GridAdapter;
 import cos420.robotrally.adaptersAndItems.GridItem;
+import cos420.robotrally.adaptersAndItems.LevelAdapter;
+import cos420.robotrally.adaptersAndItems.LevelItem;
 import cos420.robotrally.adaptersAndItems.MoveAdapter;
 import cos420.robotrally.adaptersAndItems.MoveItem;
 import cos420.robotrally.levels.LevelData;
@@ -33,9 +27,14 @@ import cos420.robotrally.models.LevelController;
 import cos420.robotrally.models.Obstacle;
 import cos420.robotrally.services.LevelMapper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener {
+    /** A list of levels, for use by the adapter */
+    ArrayList<LevelItem> levelDisplayList;
+    /** Adapter to allow for dynamic list elements in level select */
+    LevelAdapter levelAdapter;
+
     List<MoveItem> moveList;
-    MoveAdapter adapter;
+    MoveAdapter moveAdapter;
     LevelController levelController;
 
     GridView gridTile;
@@ -51,42 +50,81 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
         // list of data for all the levels
         levels = LevelMapper.mapLevelDataFromFile(this);
+        openLevelSelect();
+    }
 
-         //Moves view set up
+    /// --------------
+    /// LEVEL SELECT
+    /// --------------
+
+    /**
+     * Generates and displays the level selection menu to the user.
+     */
+    private void openLevelSelect() {
+        setContentView(R.layout.level_select_dynamic);
+        levelDisplayList = new ArrayList<>();
+        // for each level
+        for (int i = 0; i < levels.size(); i++) {
+            // TODO Calc percentage
+            double percentage = .5;
+            // Create LevelItem
+            levelDisplayList.add(new LevelItem(i, percentage));
+        }
+        levelAdapter = new LevelAdapter(this, levelDisplayList, this);
+        GridView levelLayout = findViewById(R.id.dynamicLevelLayout);
+        levelLayout.setAdapter(levelAdapter);
+    }
+
+    @Override
+    public void onLevelSelectClick(int levelID) {
+        if (levelID < 0 || levelID >= levels.size()) {
+            throw new IndexOutOfBoundsException("Level " + levelID + " does not exist.");
+        }
+        openSelectedLevel(levelID);
+    }
+
+    /// --------------
+    /// PLAYABLE UI
+    /// --------------
+    /// SETUP
+
+    /**
+     * Changes the game screen to the main activity and sets up the level
+     * @param levelID   to load the level for
+     */
+    private void openSelectedLevel(int levelID) {
+        setContentView(R.layout.activity_main);
+
+        // Moves view set up
         RecyclerView recyclerView = findViewById(R.id.move_viewer);
         moveList = new ArrayList<>();
-        //Set LayoutManager
+
+        // Set LayoutManager
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         //Set Adapter
-        adapter = new MoveAdapter(moveList);
-        recyclerView.setAdapter(adapter);
+        moveAdapter = new MoveAdapter(moveList);
+        recyclerView.setAdapter(moveAdapter);
 
         //GridTile  view set up
         gridTile = findViewById(R.id.grid);
         gridList = new ArrayList<>();
 
-        //TODO remove hardcoding of level 1
-        setupGrid(levels.get(0));
+        setupGrid(levels.get(levelID));
 
         //Set adapter
         gridAdapter = new GridAdapter(this, gridList);
         gridTile.setAdapter(gridAdapter);
 
-
-        // TODO make level dynamic
-        levelController = new LevelController(levels.get(0));
+        levelController = new LevelController(levels.get(levelID));
         setupGUIButtons(levelController);
     }
 
     /**
      * Adds new moves to the back-end, and adds them to the UI if no errors occur.
-     *
-     * @implNote  Present here rather than the level controller because findViewById
-     * was difficult to access within the controller.
+     * Also allows for deleting moves from the back-end list & GUI and beginning run execution.
      *
      * @param levelC    The level controller responsible for the current stage.
      */
@@ -123,9 +161,8 @@ public class MainActivity extends AppCompatActivity {
             levelC.addBCommand();
             addMoveToUI("B");
         });
-        //Delete
+        // DELETE
         findViewById(R.id.delete_button).setOnClickListener(v -> {
-
             try {
                 levelC.remove();
                 removeMoveFromUI();
@@ -133,70 +170,20 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Button Actions", "Attempted to remove item from empty list");
             }
         });
-    }
-
-    /**
-     * Adds a new move to the list shown to the user.
-     *
-     * @param moveText The designator of the move; must be "UP", "DOWN", LEFT", "RIGHT", "A", or "B"
-     */
-    private void addMoveToUI (String moveText) {
-        // Using a switch w/ fallthrough rather than if-statement in order to make future work
-        // easier. Each type of move will need to access a different image.
-        switch (moveText) {
-            case "UP":
-            case "DOWN":
-            case "LEFT":
-            case "RIGHT":
-            case "A":
-            case "B":
-                break;
-            default: throw new InvalidParameterException(moveText + " is not a valid move.");
-        }
-
-        moveList.add(new MoveItem(moveText));//add item
-        adapter.notifyDataSetChanged();//notify adapter of change
-    }
-
-    /**
-     * Remove the last move item from the list
-     */
-    private void removeMoveFromUI () {
-        moveList.remove(moveList.size() - 1); //Remove Last Item
-        adapter.notifyDataSetChanged(); //notify adapter of change
-    }
-
-    private void showRobotHit(){
-        //TODO: Test to see if this works
-        //Still figuring out how to make the dialog show up.
-        Dialog robotHitDialog = new Dialog(this);
-        robotHitDialog.setContentView(R.layout.robot_hit_dialog);
-    }
-
-    private void addLevelToUI(int levelNumber){
-        switch(levelNumber) {
-            case 1:
-            case 2:
-            case 3:
-                break;
-            default: throw new InvalidParameterException(levelNumber + " is not a valid level number");
-        }
-
-        //create a new instance of the layout
-        LayoutInflater levelButtonView = getLayoutInflater();
-        View level = levelButtonView.inflate(R.layout.level_select_level_tile, null);
-
-        //edit the text of the layout to have the level number
-        androidx.appcompat.widget.AppCompatButton levelButton = findViewById(R.id.levelDynamic);
-        levelButton.setText(levelNumber);
-
-        //edit the stats/level rating
-        //TODO: Figure out what to display (stars, efficiency rating, etc) and how to display it
-        ImageView levelImage = findViewById(R.id.levelRatingDynamic);
-
-        //add the edited level to the grid view
-        GridView dynamicGrid = findViewById(R.id.dynamicLevelLayout);
-        dynamicGrid.addView(level);
+        // START
+        findViewById(R.id.start_button).setOnClickListener(v -> {
+            boolean victory = levelC.executeScript();
+            if (victory) { // reached destination
+                // TODO win screen
+            } else {
+                // TODO crash screen
+            }
+        });
+        // BACK
+        findViewById(R.id.back_button).setOnClickListener(v -> {
+            clearGameListeners();
+            openLevelSelect();
+        });
     }
 
     /**
@@ -227,10 +214,10 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * checks if the tile is a Obstacle
-     * @param list
-     * @param row
-     * @param col
-     * @return
+     * @param list  of obstacles
+     * @param row   of the tile
+     * @param col   of the tile
+     * @return      true if obstacle, false otherwise
      */
     private boolean isObstacle(List<Obstacle> list, int row, int col) {
         for (int i = 0; i < list.size(); i++) {
@@ -245,10 +232,10 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Checks if the tile is a Collectable
-     * @param list
-     * @param row
-     * @param col
-     * @return
+     * @param list  of collectables
+     * @param row   of the tile
+     * @param col   of the tile
+     * @return      true if a collectable, false otherwise
      */
     private boolean isCollectable(List<Collectable> list, int row, int col) {
         for (int i = 0; i < list.size(); i++) {
@@ -261,5 +248,62 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    // TODO clear button listeners when done with level
+    /// IN-GAME CHANGES
+
+    /**
+     * Adds a new move to the list shown to the user.
+     *
+     * @param moveText The designator of the move; must be "UP", "DOWN", LEFT", "RIGHT", "A", or "B"
+     */
+    private void addMoveToUI (String moveText) {
+        // Using a switch w/ fallthrough rather than if-statement in order to make future work
+        // easier. Each type of move will need to access a different image.
+        switch (moveText) {
+            case "UP":
+            case "DOWN":
+            case "LEFT":
+            case "RIGHT":
+            case "A":
+            case "B":
+                break;
+            default: throw new InvalidParameterException(moveText + " is not a valid move.");
+        }
+
+        moveList.add(new MoveItem(moveText));//add item
+        moveAdapter.notifyDataSetChanged();//notify adapter of change
+    }
+
+    /**
+     * Remove the last move item from the list
+     */
+    private void removeMoveFromUI () {
+        moveList.remove(moveList.size() - 1); //Remove Last Item
+        moveAdapter.notifyDataSetChanged(); //notify adapter of change
+    }
+
+    private void showRobotHit(){
+        //TODO: Test to see if this works
+        //Still figuring out how to make the dialog show up.
+        Dialog robotHitDialog = new Dialog(this);
+        robotHitDialog.setContentView(R.layout.robot_hit_dialog);
+    }
+
+    /// CLEANUP
+
+    /**
+     * Clears all listeners from buttons in the playable interface.
+     */
+    private void clearGameListeners() {
+        findViewById(R.id.up_button).setOnClickListener(null);
+        findViewById(R.id.down_button).setOnClickListener(null);
+        findViewById(R.id.left_button).setOnClickListener(null);
+        findViewById(R.id.right_button).setOnClickListener(null);
+        findViewById(R.id.button_a).setOnClickListener(null);
+        findViewById(R.id.button_b).setOnClickListener(null);
+        findViewById(R.id.delete_button).setOnClickListener(null);
+        findViewById(R.id.start_button).setOnClickListener(null);
+        findViewById(R.id.back_button).setOnClickListener(null);
+    }
+
+    /// END PLAYABLE UI METHODS
 }
