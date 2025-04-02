@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -118,6 +119,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         gridList = new ArrayList<>();
 
         setupGrid(levels.get(levelID));
+        //Set up text at top of screen
+        TextView tv = findViewById(R.id.level_text);
+        tv.setText(String.valueOf(levelID + 1));
 
         //Set adapter
         gridAdapter = new GridAdapter(this, gridList);
@@ -174,6 +178,11 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             } catch (Exception e) {
                 Log.d("Button Pressed", "Attempted to remove item from empty list");
             }
+        });
+        //Reset
+        findViewById(R.id.reset_button).setOnClickListener(v -> {
+            //TODO method to reset grid
+            //TODO method to reset moves
         });
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {

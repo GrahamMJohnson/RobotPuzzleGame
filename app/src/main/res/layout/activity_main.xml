@@ -6,29 +6,34 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:divider="?android:listDivider"
-    android:showDividers="middle"
     android:orientation="vertical"
     tools:context=".MainActivity"
+    android:fitsSystemWindows="true"
     android:background="@color/light_grey">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical">
+        android:orientation="horizontal">
         <Button
             android:id="@+id/back_button"
             android:layout_width="80dp"
             android:layout_height="50dp"
             android:text="Back"
+            android:textSize="14sp"
+            android:paddingTop="20dp"
+            android:layout_marginStart="30dp"
             android:backgroundTint="@color/black"/>
         <TextView
-            android:id="@+id/top_text"
-            android:layout_width="410dp"
+            android:id="@+id/level_text"
+            android:layout_width="100dp"
             android:layout_height="70dp"
-            android:textSize="40sp"/>
+            android:layout_marginStart="50dp"
+            android:textSize="40sp"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:text="-1"/>
     </LinearLayout>
 
     <GridView
@@ -101,70 +106,74 @@
 
         </RelativeLayout>
 
-        <LinearLayout
+
+        <RelativeLayout
             android:layout_width="120dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:layout_gravity="top">
-
-                <Button
-                    android:id="@+id/button_a"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentStart="true"
-                    android:text="A"
-                    android:textSize="25sp"
-                    android:clickable="true"
-                    android:backgroundTint="@color/red"/>
-                <Button
-                    android:id="@+id/button_b"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentEnd="true"
-                    android:text="B"
-                    android:textSize="25sp"
-                    android:clickable="true"
-                    android:backgroundTint="@color/red"/>
-
-            </RelativeLayout>
+            android:layout_height="120dp"
+            android:layout_gravity="center">
 
             <Button
-                android:id="@+id/start_button"
-                android:layout_width="110dp"
+                android:id="@+id/button_a"
+                android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginTop="20dp"
-                android:text="Start"
-                android:textSize="23sp"
-                android:backgroundTint="@color/dim_gray"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="110dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/move_viewer"
-                android:contentDescription="List of moves"
-                android:layout_width="110dp"
-                android:layout_height="150dp"
-                />
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:text="A"
+                android:textSize="25sp"
+                android:clickable="true"
+                android:backgroundTint="@color/red"/>
             <Button
-                android:id="@+id/delete_button"
-                android:layout_width="110dp"
-                android:layout_height="50dp"
-                android:text="Delete"
-                android:textSize="20sp"
-                android:backgroundTint="@color/dim_gray"/>
-        </LinearLayout>
+                android:id="@+id/button_b"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:text="B"
+                android:textSize="25sp"
+                android:clickable="true"
+                android:backgroundTint="@color/red"/>
 
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/move_viewer"
+            android:contentDescription="List of moves"
+            android:layout_width="110dp"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent">
+
+        <Button
+            android:id="@+id/start_button"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:text="Start"
+            android:textSize="23sp"
+            android:layout_marginStart="5dp"
+            android:backgroundTint="@color/dim_gray" />
+
+        <Button
+            android:id="@+id/reset_button"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:text="Reset"
+            android:textSize="23sp"
+            android:layout_marginStart="35dp"
+            android:layout_marginEnd="35dp"
+            android:backgroundTint="@color/dim_gray"/>
+
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:text="Delete"
+            android:textSize="21sp"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@color/dim_gray"/>
     </LinearLayout>
 
 </LinearLayout>
