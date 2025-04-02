@@ -316,11 +316,28 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         moveAdapter.notifyDataSetChanged(); //notify adapter of change
     }
 
-    private void showRobotHit(){
-        //TODO: Test to see if this works
-        //Still figuring out how to make the dialog show up.
-        Dialog robotHitDialog = new Dialog(this);
-        robotHitDialog.setContentView(R.layout.robot_hit_dialog);
+    /**
+     * Show the collision screen
+     */
+    private void showCollisionScreen() {
+        //TODO: Figure out where to place this into the main activity to get it to execute
+
+        //this is creating the view to be referenced
+        LayoutInflater collisionInflator = getLayoutInflater();
+        View collisionView = collisionInflator.inflate(R.layout.robot_hit_dialog, null);
+
+        //this is putting the alert onto the screen with the created view
+        AlertDialog collisionScreen = new AlertDialog.Builder(this)
+                .setView(collisionView)
+                .setCancelable(false)
+                .create();
+
+        //this is the button listener to close the dialog
+        collisionView.findViewById(R.id.crash_dialog_retry).setOnClickListener(v -> {
+            collisionScreen.dismiss();
+        });
+
+        collisionScreen.show();
     }
 
     /// CLEANUP
