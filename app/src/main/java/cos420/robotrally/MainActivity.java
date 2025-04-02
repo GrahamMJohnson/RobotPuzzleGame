@@ -200,6 +200,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         });
     }
 
+    /**
+     * Method that displays the win pop up to the player
+     */
     private void showWinScreen()
     {
         LayoutInflater inflater = getLayoutInflater();
