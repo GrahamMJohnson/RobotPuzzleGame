@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350sp"
+    android:layout_height="400sp"
+    android:background="@color/light_grey"
+    android:layout_gravity="center">
+
+    <TextView
+        android:id="@+id/save_debug_header"
+        android:layout_width="275sp"
+        android:layout_height="70sp"
+        android:text="@string/save_debug_header"
+        android:textSize="45sp"
+        android:background="@color/dark_gray"
+        android:textStyle="bold"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/save_title_moveSequence"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_debug_header"
+        android:layout_marginHorizontal="15sp"
+        android:textSize="18sp"
+        android:gravity="end|center_vertical"
+        android:text="@string/save_debug_moveSeq"/>
+
+    <TextView
+        android:id="@+id/save_title_numberOfAttempts"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_moveSequence"
+        android:layout_marginHorizontal="15sp"
+        android:textSize="14sp"
+        android:gravity="end|center_vertical"
+        android:text="@string/save_debug_numAttempts"/>
+
+    <TextView
+        android:id="@+id/save_title_efficiencyScore"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_numberOfAttempts"
+        android:layout_marginHorizontal="15sp"
+        android:textSize="18sp"
+        android:gravity="end|center_vertical"
+        android:text="@string/save_debug_effScore"/>
+
+    <TextView
+        android:id="@+id/save_title_totalSquaresTraveled"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_efficiencyScore"
+        android:layout_marginHorizontal="15sp"
+        android:textSize="18sp"
+        android:gravity="end|center_vertical"
+        android:text="@string/save_debug_totalSquares"/>
+
+    <TextView
+        android:id="@+id/save_title_currentMoveDifference"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_totalSquaresTraveled"
+        android:layout_marginHorizontal="15sp"
+        android:textSize="15sp"
+        android:gravity="end|center_vertical"
+        android:text="@string/save_debug_curMoveDiff"/>
+
+    <TextView
+        android:id="@+id/save_title_bestMoveDifference"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_currentMoveDifference"
+        android:layout_marginHorizontal="15sp"
+        android:textSize="14sp"
+        android:gravity="end|center_vertical"
+        android:text="@string/save_debug_bestMoveDiff"/>
+
+    <TextView
+        android:id="@+id/save_title_percentageCollectiblesCollected"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_bestMoveDifference"
+        android:layout_marginHorizontal="15sp"
+        android:textSize="15sp"
+        android:gravity="end|center_vertical"
+        android:text="@string/save_debug_percentColl"/>
+
+    <Button
+        android:id="@+id/save_debug_close"
+        android:layout_width="70sp"
+        android:layout_height="70sp"
+        android:layout_marginStart="278.5sp"
+        android:text="@string/save_debug_close"
+        android:textSize="30sp"
+        android:gravity="center"
+        android:backgroundTint="@color/dark_gray"/>
+
+    <TextView
+        android:id="@+id/save_content_moveSequence"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_debug_header"
+        android:layout_marginStart="150sp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/save_content_numberOfAttempts"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_moveSequence"
+        android:layout_marginStart="150sp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/save_content_efficiencyScore"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_numberOfAttempts"
+        android:layout_marginStart="150sp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/save_content_totalSquaresTraveled"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_efficiencyScore"
+        android:layout_marginStart="150sp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/save_content_currentMoveDifference"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_totalSquaresTraveled"
+        android:layout_marginStart="150sp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/save_content_bestMoveDifference"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_currentMoveDifference"
+        android:layout_marginStart="150sp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/save_content_percentageCollectiblesCollected"
+        android:layout_width="100sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/save_title_bestMoveDifference"
+        android:layout_marginStart="150sp"
+        android:gravity="center"/>
+
+</RelativeLayout>

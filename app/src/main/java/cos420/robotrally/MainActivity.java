@@ -2,9 +2,11 @@ package cos420.robotrally;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +32,7 @@ import cos420.robotrally.models.Collectable;
 import cos420.robotrally.models.LevelController;
 import cos420.robotrally.models.Obstacle;
 import cos420.robotrally.services.LevelMapper;
+import cos420.robotrally.models.RobotRallySave;
 
 public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener {
     /** A list of levels, for use by the adapter */
@@ -44,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     GridView gridTile;
     ArrayList<GridItem> gridList;
     GridAdapter gridAdapter;
+
+    RobotRallySave saveFunction;
 
     /**
      * 0 indexed list of the data for level layout<br>
@@ -129,6 +134,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         levelController = new LevelController(levels.get(levelID));
         setupGUIButtons(levelController);
+
+        //this starts an instance of a save class based on the level number
+        saveFunction = new RobotRallySave(this, levelID);
     }
 
     /**
@@ -191,10 +199,26 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 showWinScreen();
             } else {
                 // TODO crash screen
+
+                //this won't be here when we have a level fail screen, but it is here for now.
+                showCollisionScreen();
             }
         });
         // BACK
         findViewById(R.id.back_button).setOnClickListener(v -> {
+
+            //This is currently holding placeholder values.
+            //When we begin storing level data, we can replace the values here.
+            saveFunction.SetMoveSequence("test");
+            saveFunction.SetNumAttempts(10);
+            saveFunction.SetEfficiencyScore(100);
+            saveFunction.SetTotalSquaresTraveled(15);
+            saveFunction.SetCurrentMoveDifference(12);
+            saveFunction.SetBestMoveDifference(6);
+            saveFunction.SetCollectiblesCollected(100);
+            saveFunction.saveLevelData();
+            //showSaveDebug();
+
             clearGameListeners();
             openLevelSelect();
         });
@@ -335,8 +359,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         //TODO: Figure out where to place this into the main activity to get it to execute
 
         //this is creating the view to be referenced
-        LayoutInflater collisionInflator = getLayoutInflater();
-        View collisionView = collisionInflator.inflate(R.layout.robot_hit_dialog, null);
+        LayoutInflater collisionInflater = getLayoutInflater();
+        View collisionView = collisionInflater.inflate(R.layout.robot_hit_dialog, null);
 
         //this is putting the alert onto the screen with the created view
         AlertDialog collisionScreen = new AlertDialog.Builder(this)
@@ -350,6 +374,57 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         });
 
         collisionScreen.show();
+    }
+
+    /**
+     * This is the method for changing the values of the save dialog and then showing it
+     */
+    private void showSaveDebug(){
+
+        //this is creating the view to be referenced
+        LayoutInflater saveInflater = getLayoutInflater();
+        View saveDebug = saveInflater.inflate(R.layout.save_debug_dialog, null);
+
+        //this is putting the alert onto the screen with the created view
+        AlertDialog saveDebugScreen = new AlertDialog.Builder(this)
+                .setView(saveDebug)
+                .setCancelable(false)
+                .create();
+
+        //this is the button listener to close the dialog
+        saveDebug.findViewById(R.id.save_debug_close).setOnClickListener(v ->{
+            saveDebugScreen.dismiss();
+        });
+
+        //This is setting the move sequence text to the current move sequence save value
+        TextView moveSequence = (TextView) saveDebug.findViewById(R.id.save_content_moveSequence);
+        moveSequence.setText(saveFunction.GetMoveSequence()+"");
+
+        //This is setting the number of attempts text to the current number of attempts save value
+        TextView numberOfAttempts = (TextView) saveDebug.findViewById(R.id.save_content_numberOfAttempts);
+        numberOfAttempts.setText(saveFunction.GetMoveAttempts()+"");
+
+        //This is setting the efficiency score text to the current efficiency score save value
+        TextView efficiencyScore = (TextView) saveDebug.findViewById(R.id.save_content_efficiencyScore);
+        efficiencyScore.setText(saveFunction.GetEfficiencyScore()+"");
+
+        //This is setting the total squares traveled text to the current total squares traveled save value
+        TextView totalSquaresTraveled = (TextView) saveDebug.findViewById(R.id.save_content_totalSquaresTraveled);
+        totalSquaresTraveled.setText(saveFunction.GetTotalSquaresTraveled()+"");
+
+        //This is setting the current move difference text to the current move difference save value
+        TextView currentMoveDifference = (TextView) saveDebug.findViewById(R.id.save_content_currentMoveDifference);
+        currentMoveDifference.setText(saveFunction.GetCurrentMoveDifference()+"");
+
+        //This is setting the best move difference text to the best move difference save value
+        TextView bestMoveDifference = (TextView) saveDebug.findViewById(R.id.save_content_bestMoveDifference);
+        bestMoveDifference.setText(saveFunction.GetBestMoveDifference()+"");
+
+        //This is setting the percentage collectibles collected text to the current percentage collectibles collected save value
+        TextView percentageCollectiblesCollected = (TextView) saveDebug.findViewById(R.id.save_content_percentageCollectiblesCollected);
+        percentageCollectiblesCollected.setText(saveFunction.GetPercentageCollectiblesCollected()+"");
+
+        saveDebugScreen.show();
     }
 
     /// CLEANUP

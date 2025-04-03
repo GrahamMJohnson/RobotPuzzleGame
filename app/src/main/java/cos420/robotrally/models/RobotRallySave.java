@@ -3,196 +3,333 @@ package cos420.robotrally.models;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Scanner;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 /**
  * This is the robotRallySave class
  */
 public class RobotRallySave {
 
-    //Initializes the file writer
-    FileWriter save_file;
+    ///--------------
+    /// These are the global variables for the RobotRallySave class
+    ///--------------
 
-    //initializes collectibles percentage variable for if/else statement to avoid div by 0
-    float collectiblesPercentage;
+    //These are the shared prefs
+    private final SharedPreferences sharedPreferences;
 
-    //These are the values to change to represent the number of moves for the special moves
-    int specialMoveCount1 = 5;
-    int specialMoveCount2 = 10;
+    //JSON Object and the key to use to save that JSON Object in shared prefs
+    JSONObject currentJSON;
+    String sharedKey;
 
-    //This is initializing the string that is going to return all of the data contained within the
-    //save
-    String[] fileRead;
+    //this is the name that we are going to use in the JSON name param
+    String jsonMoveSequence = "move_sequence";
+    String jsonNumAttempts = "num_attempts";
+    String jsonEfficiencyScore = "efficiency_score";
+    String jsonSquaresTraveled = "total_squares_traveled";
+    String jsonCurMoveDiff = "current_move_difference";
+    String jsonBestMoveDiff = "best_move_difference";
+    String jsonPercentCollectibles = "percent_collected";
 
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor prefEditor;
+
+    ///--------------
+    /// This is the constructor for the save function
+    ///--------------
 
     /**
      * This is the default constructor for a robotRallySave object
      * It should create shared preferences for the game.
      * @param context this is the context that you are in
      */
-    public RobotRallySave(Context context) {
+    public RobotRallySave(Context context, int levelNumber) {
+        //this is the key for the shared prefs that stores the JSON string
+        sharedKey = "level" + levelNumber;
+
+        //this is getting the shared preferences
         sharedPreferences = context.getSharedPreferences("RobotRallySave",
                 Context.MODE_PRIVATE);
+
+        //this is getting the JSON string from the shared preferences
+        String jsonString = sharedPreferences.getString(sharedKey, "{}");
+
+        //it will then use the key to try to construct a JSON Object
+        try{
+            currentJSON = new JSONObject(jsonString);
+        }
+        //if bad JSON string, it will create a new JSON file
+        catch(JSONException e){
+            e.printStackTrace();
+            currentJSON = new JSONObject();
+        }
+    }
+
+    ///--------------
+    /// These methods are for testing purposes
+    ///--------------
+
+    /**
+     * This is the method to reset all of the values for a level save to their defaults
+     * @throws Exception JSONException if the JSON Object has any issues
+     */
+    public void ClearSave() throws Exception {
+
+        //edit all of the values of the passed in JSON object
+        currentJSON.put(jsonMoveSequence, "");
+        currentJSON.put(jsonNumAttempts, -1);
+        currentJSON.put(jsonEfficiencyScore, -1);
+        currentJSON.put(jsonSquaresTraveled, -1);
+        currentJSON.put(jsonCurMoveDiff, -1);
+        currentJSON.put(jsonBestMoveDiff, -1);
+        currentJSON.put(jsonPercentCollectibles, -1);
+    }
+
+    ///--------------
+    /// These are all of the setters for all of the different values that need to be saved.
+    ///--------------
+
+    /**
+     * This is the method for saving the move sequence
+     * @param commandList the string for the list of commands
+     */
+    public void SetMoveSequence(String commandList){
+        //this is to catch passing in a null string (it was giving me an error for this)
+        if(commandList == null){
+            return;
+        }
+        try {
+            //try putting the string into the json object
+            currentJSON.put(jsonMoveSequence, commandList);
+        }
+        //if it fails, log the exception, and do nothing else
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
-     * This is the method used to clear the save file for testing purposes
+     * This is the method for saving the number of attempts
+     * @param numOfAttempts the int representing how many attempts the user has made
      */
-    public void ClearSave() {
-        prefEditor = sharedPreferences.edit();
-        prefEditor.putString("moveSequence", "");
-        prefEditor.putFloat("numberOfAttempts", 0);
-        prefEditor.putFloat("efficiencyScore", 0);
-        prefEditor.putInt("totalSquaresTraveled", 0);
-        prefEditor.putString("currentMoveDifference", "");
-        prefEditor.putString("bestMoveDifference", "");
-        prefEditor.putString("percentCollectiblesCollected", "");
-        prefEditor.apply();
-    }
-
-    /**
-     * This is the call for writing a save in a file
-     * @param moveSequence the current sequence of moves that is the best
-     * @param numberOfAttempts the number of attempts the user has taken at the level
-     * @param optimalMoveCount is the number of moves for the level that is optimal
-     * @param currentMoveCount is the number of moves that the current attempt has
-     * @param bestMoveCount is the number of moves that the best attempt had
-     * @param tilesCollected is the number of tiles that have been collected by the user
-     * @param tilesPossibleToCollect is the number of tiles that have collectibles on them
-     */
-    public void WriteAllToSave(char[] moveSequence, float numberOfAttempts, int optimalMoveCount,
-                               int currentMoveCount, int bestMoveCount, int tilesCollected,
-                               int tilesPossibleToCollect) {
-
-        //Initializes the string for building the move sequence save
-        String moveSequenceString = "";
-
-        //Initializes the writing tools that we will be using
-        prefEditor = sharedPreferences.edit();
-
-        //Writes all of the move sequence data to the shared preference
-        for(int i: moveSequence) {
-            moveSequenceString += moveSequence[i];
-        }
-        prefEditor.putString("moveSequence", moveSequenceString);
-
-        //Writes the number of attempts to the shared preference
-        prefEditor.putFloat("numberOfAttempts", numberOfAttempts);
-
-        //Calculates and writes the efficiency score to the shared preferences
-        float efficiencyScore = (numberOfAttempts / optimalMoveCount) * 1000;
-        prefEditor.putFloat("efficiencyScore", efficiencyScore);
-
-        //calculates the total squares moved and writes that to the shared preferences
-        //In this case, s is special move one (5 moves), x is special move 2 (10 moves)
-        int totalSquaresTraveled = 0;
-        for(int i : moveSequence) {
-            if(moveSequence[i] == 's') {
-                totalSquaresTraveled += specialMoveCount1;
-            }
-            else if(moveSequence[i] == 'x') {
-                totalSquaresTraveled += specialMoveCount2;
-            }
-            else {
-                totalSquaresTraveled += 1;
-            }
-        }
-        prefEditor.putInt("totalSquaresTraveled", totalSquaresTraveled);
-
-        //Calculates the difference in move count between the current and the optimal
-        //and writes that to the shared preferences
-        int currentDifference = currentMoveCount - optimalMoveCount;
-        prefEditor.putInt("currentMoveDifference", currentDifference);
-
-
-        //Calculates the difference in move count between the current and the optimal
-        //and writes that to the shared preferences
-        int bestDifference = bestMoveCount - optimalMoveCount;
-        prefEditor.putInt("bestMoveDifference", bestDifference);
-
-        //Calculates the percentage of collectibles collected and writes that to the shared prefs
-        //If/Else is to avoid div by 0 if there are no possible collection tiles
-        if(tilesPossibleToCollect != 0) {
-            collectiblesPercentage = ((float)tilesCollected/ (float)tilesPossibleToCollect) * 100;
-        }
-        else {
-            collectiblesPercentage = 100;
-        }
-        prefEditor.putFloat("percentageCollectiblesCollected", collectiblesPercentage);
-        prefEditor.apply();
-    }
-
-
-    //These are all of the setters for all of the different values that need to be saved.
-    public void SetMoveSequence(String MoveSequence){
-        prefEditor.putString("moveSequence", MoveSequence);
-        prefEditor.apply();
-    }
-
     public void SetNumAttempts(int numOfAttempts){
-        prefEditor.putInt("numberOfAttempts", numOfAttempts);
-        prefEditor.apply();
+        try {
+            //try putting the int into the json object
+            currentJSON.put(jsonNumAttempts, numOfAttempts);
+        }
+        //if it fails, log the exception, and do nothing else
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void SetEfficiencyScore(float EfficiencyScore){
-        prefEditor.putFloat("efficiencyScore", EfficiencyScore);
-        prefEditor.apply();
+    /**
+     * This is the method for saving the efficiency score
+     * @param efficiencyScore the int representing the user's efficiency score
+     */
+    public void SetEfficiencyScore(int efficiencyScore){
+        try {
+            //try putting the int into the json object
+            currentJSON.put(jsonEfficiencyScore, efficiencyScore);
+        }
+        //if it fails, log the exception, and do nothing else
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void SetTotalSquaresTraveled(int TotalSquaresTraveled){
-        prefEditor.putInt("totalSquaresTraveled", TotalSquaresTraveled);
-        prefEditor.apply();
+    /**
+     * This is the method for saving the number of squares that the user traveled
+     * @param totalSquaresTraveled the int representing the user's number of squares traveled
+     */
+    public void SetTotalSquaresTraveled(int totalSquaresTraveled){
+        try {
+            //try putting the int into the json object
+            currentJSON.put(jsonSquaresTraveled, totalSquaresTraveled);
+        }
+        //if it fails, log the exception, and do nothing else
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void SetCurrentMoveDifference(int currentMoveDifference){
-        prefEditor.putInt("currentMoveDifference", currentMoveDifference);
-        prefEditor.apply();
+    /**
+     * This is the method for saving the difference between the current and optimal moves
+     * @param currentMoveDifference the int representing the difference between current and optimal
+     */
+    public void SetCurrentMoveDifference(int currentMoveDifference) {
+        try {
+            //try putting the int into the json object
+            currentJSON.put(jsonCurMoveDiff, currentMoveDifference);
+        }
+        //if it fails, log the exception, and do nothing else
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * This is the method for saving the difference between the best and optimal moves
+     * @param bestMoveDifference the int representing the difference between best and optimal
+     */
     public void SetBestMoveDifference(int bestMoveDifference){
-        prefEditor.putInt("bestMoveDifference", bestMoveDifference);
-        prefEditor.apply();
+        try {
+            //try putting the int into the JSON object
+            currentJSON.put(jsonBestMoveDiff, bestMoveDifference);
+        }
+        //if it fails, log the exception, and do nothing else
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void SetCollectiblesCollected(float percentCollectiblesCollected){
-        prefEditor.putFloat("percentCollectiblesCollected", percentCollectiblesCollected);
-        prefEditor.apply();
+    /**
+     * This is the method for saving the percentage of collectibles that the user has collected
+     * @param percentCollectiblesCollected the int representing the percentage
+     */
+    public void SetCollectiblesCollected(int percentCollectiblesCollected){
+        try {
+            //try putting the int into the json object
+            currentJSON.put(jsonPercentCollectibles, percentCollectiblesCollected);
+        }
+        //if it fails, log the exception, and do nothing else
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
+    ///--------------
+    /// These are all of the getters for all of the different values that need to be saved.
+    ///--------------
 
-    //These are all of the getters for all of the saved values
+    /**
+     * This is the method for getting the saved move sequence
+     * @return the string that represents the current move sequence
+     */
     public String GetMoveSequence(){
-        return sharedPreferences.getString("moveSequence", "");
+        try {
+            //try to get the string from the json object
+            return currentJSON.getString(jsonMoveSequence);
+        }
+        //if it fails, log the exception, and return an empty string
+        catch (JSONException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
-    public int GetMoveAttempts(){
-        return sharedPreferences.getInt("numberOfAttempts", 0);
+    /**
+     * This is the method for getting the saved move attempts
+     * @return the int that represents the amount of moves the robot took
+     */
+    public int GetMoveAttempts() {
+        try {
+            //try to get the int from the json object
+            return currentJSON.getInt(jsonNumAttempts);
+        }
+        //if it fails, log the exception, and return a default value of -1
+        catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
-    public float GetEfficiencyScore(){
-        return sharedPreferences.getFloat("efficiencyScore", 100);
+    /**
+     * This is the method for getting the saved efficiency score
+     * @return the int that represents the efficiency score of the best attempt
+     */
+    public int GetEfficiencyScore(){
+        try {
+            //try to get the int from the json object
+            return currentJSON.getInt(jsonEfficiencyScore);
+        }
+        //if it fails, log the exception, and return a default value of -1
+        catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
+    /**
+     * This is the method for getting the saved squares traveled
+     * @return the int that represents the number of squares traveled on the best attempt
+     */
     public int GetTotalSquaresTraveled(){
-        return sharedPreferences.getInt("totalSquaresTraveled", 0);
+        try {
+            //try to get the int from the json object
+            return currentJSON.getInt(jsonSquaresTraveled);
+        }
+        //if it fails, log the exception, and return a default value of -1
+        catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
+    /**
+     * This is the method for getting the saved difference between the current and optimal move count
+     * @return the int representing the difference between the current and optimal
+     */
     public int GetCurrentMoveDifference(){
-        return sharedPreferences.getInt("currentMoveDifference", 0);
+        try {
+            //try to get the int from the json object
+            return currentJSON.getInt(jsonCurMoveDiff);
+        }
+        //if it fails, log the exception, and return a default value of -1
+        catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
+    /**
+     * This is the method to save the difference between the best and optimal move counts
+     * @return the int representing the difference between the best and optimal
+     */
     public int GetBestMoveDifference(){
-        return sharedPreferences.getInt("bestMoveDifference", 0);
+        try {
+            //try to get the int from the json object
+            return currentJSON.getInt(jsonBestMoveDiff);
+        }
+        //if it fails, log the exception, and return a default value of -1
+        catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
+    /**
+     * This is the method to save the percentage of collectibles collected
+     * @return the int representing the percentage of collectibles the user collected
+     */
     public int GetPercentageCollectiblesCollected(){
-        return sharedPreferences.getInt("percentageCollectiblesCollected", 100);
+        try {
+            //try to get the int from the json object
+            return currentJSON.getInt(jsonPercentCollectibles);
+        }
+        //if it fails, log the exception, and return a default value of -1
+        catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
+
+    ///--------------
+    /// This is the actual save function that you need to run
+    ///--------------
+
+    /**
+     * This is the method for saving all of the sata contained within the json
+     * This should be put after any data for the save is updated
+     */
+    public void saveLevelData(){
+        //get the editor for the preferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        //put the json string into the shared prefs key for this level
+        editor.putString(sharedKey, currentJSON.toString());
+
+        //apply the changes to the shared preferences
+        editor.apply();
+    }
+
 }

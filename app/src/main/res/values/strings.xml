@@ -16,4 +16,13 @@
     <string name="level_win_button1">Retry</string>
     <string name="level_win_button2">Next Level</string>
     <string name="level_win_button3">Last Level</string>
+    <string name="save_debug_header">Save Debug</string>
+    <string name="save_debug_close">X</string>
+    <string name="save_debug_moveSeq">Move Seq:</string>
+    <string name="save_debug_numAttempts">Num Attempts:</string>
+    <string name="save_debug_effScore">Eff Score:</string>
+    <string name="save_debug_totalSquares">Sq Traveled:</string>
+    <string name="save_debug_curMoveDiff">Cur Move Diff:</string>
+    <string name="save_debug_bestMoveDiff">Best Move Diff:</string>
+    <string name="save_debug_percentColl">Percent Coll:</string>
 </resources>
