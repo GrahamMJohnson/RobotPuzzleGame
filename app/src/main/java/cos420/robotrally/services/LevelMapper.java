@@ -19,10 +19,13 @@ import cos420.robotrally.levels.LevelData;
 import cos420.robotrally.models.Collectable;
 import cos420.robotrally.models.Obstacle;
 
+// TODO javadoc for the class itself
 public class LevelMapper {
-    
+
+    // TODO javadoc
     private static final String LOG_TAG = "Level Mapper";
 
+    // TODO javadoc
     public static List<LevelData> mapLevelDataFromFile(Context context)
     {
         AssetManager assetManager = context.getAssets();
@@ -203,21 +206,25 @@ public class LevelMapper {
         return line.startsWith("//") || line.isEmpty();
     }
 
+    // TODO javadoc
     private static boolean isNewLevel(String line)
     {
         return line.startsWith("-----------------");
     }
 
+    // TODO javadoc
     private static boolean isObstacle(String line)
     {
         return line.startsWith("obstacle");
     }
 
+    // TODO javadoc
     private static boolean isCollectable(String line)
     {
         return line.startsWith("collectable");
     }
 
+    // TODO javadoc
     private static boolean isSpecialCommand(String line)
     {
         return line.startsWith("special");

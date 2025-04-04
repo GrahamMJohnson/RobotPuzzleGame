@@ -9,6 +9,7 @@ public enum SpecialCommandType {
     REPEAT,
     OTHER;
 
+    // TODO javadoc
     public static SpecialCommandType getTypeFromString(String type)
     {
         switch(type.toLowerCase().trim())

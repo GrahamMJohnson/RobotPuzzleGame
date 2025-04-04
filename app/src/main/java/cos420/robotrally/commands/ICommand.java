@@ -6,7 +6,8 @@ package cos420.robotrally.commands;
 public interface ICommand {
 
     /**
-     * Method to execute the command
+     * Executes the command.
+     * @return true if the command was successful. False indicates the roomba crashed.
      */
-    void execute();
+    boolean execute();
 }

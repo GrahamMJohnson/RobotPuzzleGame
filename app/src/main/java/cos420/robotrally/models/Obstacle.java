@@ -2,6 +2,7 @@ package cos420.robotrally.models;
 
 import cos420.robotrally.enumerations.ObstacleType;
 
+// TODO javadoc for the class itself
 public class Obstacle {
     /** Type of obstacle */
     private final ObstacleType obstacleType;

@@ -2,6 +2,7 @@ package cos420.robotrally.commands;
 
 import cos420.robotrally.models.GameBoard;
 
+// TODO javadoc for the class itself
 public class Up implements ICommand {
 
     /** reference to the game board of the level this command is initialized from */
@@ -16,18 +17,16 @@ public class Up implements ICommand {
         this.gameBoard = gameBoard;
     }
 
-    /**
-     * Method to execute the command
-     */
     @Override
-    public void execute()
+    public boolean execute()
     {
         try {
-            gameBoard.moveUp();
+            return gameBoard.moveUp();
         }
         catch (Exception e)
         {
             System.out.println(e.getMessage());
+            return false;
         }
     }
 }

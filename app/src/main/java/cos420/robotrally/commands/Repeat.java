@@ -2,6 +2,7 @@ package cos420.robotrally.commands;
 
 import cos420.robotrally.models.CommandList;
 
+// TODO javadoc for the class itself
 public class Repeat implements ICommand {
 
     /** Attribute that holds a reference to the users script for the level */
@@ -28,11 +29,8 @@ public class Repeat implements ICommand {
         this.spotInScript = script.size();
     }
 
-    /**
-     * Method to execute the command
-     */
     @Override
-    public void execute() {
+    public boolean execute() {
         // Loop to repeat commands desired number of times
         for (int i = 0; i < numLoops; i++)
         {
@@ -42,8 +40,16 @@ public class Repeat implements ICommand {
                 // We want to access the command in the script that is offset commands before the repeat command was in the script
                 int index = spotInScript - offset;
                 ICommand command = script.get(index);
-                command.execute();
+
+                // If execute returns false, the roomba crashed.
+                boolean didWeDriveSafe = command.execute();
+                if (!didWeDriveSafe) {
+                    // stop the loop and signal failure
+                    return false;
+                }
             }
         }
+        // All commands successfully executed
+        return true;
     }
 }

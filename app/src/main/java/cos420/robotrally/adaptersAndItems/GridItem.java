@@ -6,9 +6,12 @@ import android.graphics.drawable.Drawable;
  * model for adding data to a grid tile
  */
 public class GridItem {
+    // TODO javadoc
     private String text;
+    // TODO javadoc
     private Drawable color;
 
+    // TODO javadoc could be improved
     /**
      * Constructor
      * @param text
@@ -18,6 +21,7 @@ public class GridItem {
         this.color = color;
     }
 
+    // TODO javadoc could be improved
     /**
      * Getter
      * @return
@@ -26,5 +30,6 @@ public class GridItem {
         return text;
     }
 
+    // TODO javadoc
     public Drawable getColor() { return color;}
 }

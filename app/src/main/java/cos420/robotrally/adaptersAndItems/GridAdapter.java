@@ -7,16 +7,21 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 
 import cos420.robotrally.R;
 
+// TODO javadoc
 public class GridAdapter extends ArrayAdapter<GridItem> {
 
+    // TODO javadoc
     public GridAdapter(Context context, ArrayList<GridItem> list) {
         super(context, 0, list);
     }
 
+    @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View itemView = convertView;

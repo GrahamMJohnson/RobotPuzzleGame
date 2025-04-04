@@ -2,6 +2,7 @@ package cos420.robotrally.models;
 
 import cos420.robotrally.enumerations.ObstacleType;
 
+// TODO javadoc for the class itself
 public class Tile {
     /** Boolean to store if this is a goal tile */
     private boolean isGoalTile;
@@ -20,7 +21,7 @@ public class Tile {
      */
     private ObstacleType obstacleType;
 
-    //TODO: Can we get buy with constructor that has no parameters since GameBoard updates tiles after creating array?
+    //TODO: Can we get by with constructor that has no parameters since GameBoard updates tiles after creating array?
     /**
      * Constructor for Tile class
      */

@@ -6,9 +6,12 @@ import java.security.InvalidParameterException;
  * Enum for the different types of obstacles
  */
 public enum ObstacleType {
+
     CHAIR,
     WALL;
 
+
+    // TODO javadoc
     public static ObstacleType getTypeFromString(String type)
     {
         switch(type.toLowerCase().trim())

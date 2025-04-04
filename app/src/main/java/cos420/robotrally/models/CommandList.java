@@ -8,6 +8,7 @@ import java.util.LinkedList;
 
 import cos420.robotrally.commands.ICommand;
 
+// TODO javadoc for the class itself
 public class CommandList {
 
     /** Linked list to store the commands */
@@ -33,7 +34,7 @@ public class CommandList {
 
     /**
      * Method to remove the last command of the list
-     * @return the command removed
+     * @throws Exception if the list is empty
      */
     public void removeLastCommand() throws Exception {
         if (!script.isEmpty())
@@ -74,13 +75,21 @@ public class CommandList {
 
     /**
      * iterates through the script and executes each command
+     * @return true if every command was successfully executed, and false if not
+     * (which indicates roomba crash)
      */
-    public void execute()
+    public boolean execute()
     {
         for (ICommand command : script)
         {
-            command.execute();
+            boolean didWeDriveSafe = command.execute();
+            if(!didWeDriveSafe) {
+                // We crashed, quit running script
+                return false;
+            }
         }
+        // Every command executed without a crash
+        return true;
     }
 
 }

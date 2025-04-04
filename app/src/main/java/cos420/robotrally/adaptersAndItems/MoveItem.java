@@ -4,6 +4,8 @@ package cos420.robotrally.adaptersAndItems;
  * Model for adding data to a Move
  */
 public class MoveItem {
+    // TODO javadocs in here are lackluster, but they'll have to be rewritten when the moves are
+    //  switched for images. Improving them isn't high priority.
     private String text;
 
     /**

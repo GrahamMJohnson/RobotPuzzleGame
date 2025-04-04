@@ -1,5 +1,6 @@
 package cos420.robotrally.models;
 
+// TODO javadoc for class itself
 public class Collectable {
     /** Row index of the collectable */
     private final int row;

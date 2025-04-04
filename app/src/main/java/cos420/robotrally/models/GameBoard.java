@@ -4,12 +4,17 @@ import android.util.Log;
 
 import cos420.robotrally.helpers.GameBoardData;
 
+// TODO javadoc for the class itself
 public class GameBoard{
 
+    // TODO javadoc
     //this is the underlying 2d array
     private Tile[][] gameBoard;
+    // TODO javadoc
     private int currentRow;
+    // TODO javadoc
     private int currentColumn;
+    // TODO javadoc
     private final int size;
 
     /**
@@ -69,7 +74,6 @@ public class GameBoard{
         // test whether space above Roomba is blocked or out of bounds
         // if Roomba at top of grid, fail, or if space is blocked by obstacle, fail
         if (currentRow == 0 || gameBoard[currentRow-1][currentColumn].isObstacle()) {
-            //TODO display to user that command was invalid
             return false;
         }
         // else move Roomba up
@@ -96,7 +100,6 @@ public class GameBoard{
         // test whether space to the left of Roomba is blocked or out of bounds
         // if Roomba at left side of grid, fail, or if space is blocked by obstacle, fail
         if (currentColumn == 0 || gameBoard[currentRow][currentColumn-1].isObstacle()) {
-            //TODO display to user that command was invalid
             return false;
         }
         // else move Roomba left
@@ -123,7 +126,6 @@ public class GameBoard{
         // test whether space below Roomba is blocked or out of bounds
         // if Roomba at bottom of grid, fail or if space is blocked by obstacle, fail
         if (currentRow == size-1 || gameBoard[currentRow+1][currentColumn].isObstacle()) {
-            //TODO display to user that command was invalid
             return false;
         }
         // else move Roomba down
@@ -151,7 +153,6 @@ public class GameBoard{
         // test whether space to the right of Roomba is blocked or out of bounds
         // if Roomba at right side of grid, fail or if space is blocked by obstacle, fail
         if (currentColumn == size-1 || gameBoard[currentRow][currentColumn+1].isObstacle()) {
-            //TODO display to user that command was invalid
             return false;
         }
         // else move Roomba right
@@ -170,10 +171,13 @@ public class GameBoard{
         return true;
     }
 
+
+    // TODO javadoc
     public boolean destReached() {
         return gameBoard[currentRow][currentColumn].isGoalTile();
     }
 
+    // TODO javadoc
     private void logPosition()
     {
         Log.d("Moving Roomba", "Current Position: [" + currentRow + "," + currentColumn + "]");

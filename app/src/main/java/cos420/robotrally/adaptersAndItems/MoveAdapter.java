@@ -1,6 +1,5 @@
 package cos420.robotrally.adaptersAndItems;
 
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +12,14 @@ import java.util.List;
 
 import cos420.robotrally.R;
 
+
+// TODO javadoc
 public class MoveAdapter extends RecyclerView.Adapter<MoveAdapter.MyViewHolder> {
 
+    // TODO javadoc
     private List<MoveItem> list;
 
+    // TODO javadoc
     //Constructor
     public MoveAdapter(List<MoveItem> list) {
         this.list = list;
@@ -40,10 +43,13 @@ public class MoveAdapter extends RecyclerView.Adapter<MoveAdapter.MyViewHolder> 
         return list.size();
     }
 
+    // TODO javadoc
     //ViewHolder class
     static class MyViewHolder extends RecyclerView.ViewHolder {
+        // TODO javadoc
         TextView move_view;
 
+        // TODO javadoc
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 

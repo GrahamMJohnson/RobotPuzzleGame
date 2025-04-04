@@ -6,30 +6,49 @@ import android.content.SharedPreferences;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
+// TODO current javadoc doesn't explain what the class does. Does it handle the saving process?
+//  Or does it hold the save information?
 /**
  * This is the robotRallySave class
  */
+// TODO having javadocs is appreciated! Most of the ones here aren't very useful, unfortunately.
+//  Please write them for the people who have no idea what's going on. Additionally, most of the
+//  "this is" parts of the docs can be removed.
 public class RobotRallySave {
 
     ///--------------
     /// These are the global variables for the RobotRallySave class
     ///--------------
 
-    //These are the shared prefs
+    /**
+     * These are the shared prefs
+     */ // TODO What are shared prefs? What are they used for?
     private final SharedPreferences sharedPreferences;
 
-    //JSON Object and the key to use to save that JSON Object in shared prefs
+    /**
+     * JSON Object
+     */ // TODO what is this object used for?
     JSONObject currentJSON;
+    /**
+     * The key used to save <code>currentJSON</code> in <code>sharedPreferences</code>.
+     */
     String sharedKey;
 
-    //this is the name that we are going to use in the JSON name param
+    /**
+     * this is the name that we are going to use in the JSON name param
+     */ // TODO this feels like it should be helpful but I would like more context.
     String jsonMoveSequence = "move_sequence";
+    // TODO javadoc
     String jsonNumAttempts = "num_attempts";
+    // TODO javadoc
     String jsonEfficiencyScore = "efficiency_score";
+    // TODO javadoc
     String jsonSquaresTraveled = "total_squares_traveled";
+    // TODO javadoc
     String jsonCurMoveDiff = "current_move_difference";
+    // TODO javadoc
     String jsonBestMoveDiff = "best_move_difference";
+    // TODO javadoc
     String jsonPercentCollectibles = "percent_collected";
 
 

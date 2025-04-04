@@ -5,6 +5,7 @@ import java.util.List;
 import cos420.robotrally.models.Collectable;
 import cos420.robotrally.models.Obstacle;
 
+// TODO javadoc for the class itself
 public class GameBoardData {
     /** size of the game board */
     public int size;
@@ -21,9 +22,11 @@ public class GameBoardData {
     /** List of collectables for the level */
     public List<Collectable> collectables;
 
+    // TODO javadoc (or remove)
     public GameBoardData() {
     }
 
+    // TODO javadoc
     public GameBoardData(int size, int startRow, int startColumn, int goalRow, int goalColumn, List<Obstacle> obstacles, List<Collectable> collectables) {
         this.size = size;
         this.startRow = startRow;
@@ -34,6 +37,7 @@ public class GameBoardData {
         this.collectables = collectables;
     }
 
+    // TODO javadoc
     public GameBoardData(int size, int startRow, int startColumn, int goalRow, int goalColumn) {
         this.size = size;
         this.startRow = startRow;
@@ -42,29 +46,36 @@ public class GameBoardData {
         this.goalColumn = goalColumn;
     }
 
+    // TODO javadoc
     public int getSize() {
         return size;
     }
+    // TODO javadoc
     public int getStartRow() {
         return startRow;
     }
 
+    // TODO javadoc
     public int getStartColumn() {
         return startColumn;
     }
 
+    // TODO javadoc
     public int getGoalRow() {
         return goalRow;
     }
 
+    // TODO javadoc
     public int getGoalColumn() {
         return goalColumn;
     }
 
+    // TODO javadoc
     public List<Obstacle> getObstacles() {
         return obstacles;
     }
 
+    // TODO javadoc
     public List<Collectable> getCollectables() {
         return collectables;
     }

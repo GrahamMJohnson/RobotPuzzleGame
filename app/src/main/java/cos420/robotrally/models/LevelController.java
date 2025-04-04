@@ -3,9 +3,11 @@ package cos420.robotrally.models;
 import android.util.Log;
 
 import cos420.robotrally.commands.*;
+import cos420.robotrally.enumerations.EAfterExecuteCondition;
 import cos420.robotrally.levels.LevelData;
 import cos420.robotrally.services.SpecialCommandCreationService;
 
+// TODO javadoc for the class itself
 public class LevelController {
     /** attribute for the game board for this level */
     private final GameBoard gameBoard;
@@ -19,6 +21,7 @@ public class LevelController {
     /** attribute to store number of attempts on level */
     private int attempts;
 
+    // TODO javadoc
     private static final String LOG_TAG = "Level Controller";
 
 
@@ -103,8 +106,8 @@ public class LevelController {
     }
 
     /**
-     * Method to remove last command from script
-     * @return the removed command
+     * Method to remove command from end of script
+     * @throws Exception is the script is empty
      */
     public void remove() throws Exception {
         commandScript.removeLastCommand();
@@ -113,13 +116,23 @@ public class LevelController {
 
     /**
      * method to execute the script
+     * @return The end condition of the roomba, in enum form.
      */
-    public boolean executeScript()
+    public EAfterExecuteCondition executeScript()
     {
         attempts++;
         Log.v(LOG_TAG, "Executing script");
-        commandScript.execute();
-        return gameBoard.destReached();
+        boolean didWeDriveSafe = commandScript.execute();
+        if (!didWeDriveSafe) {
+            // Roomba crashed
+            return EAfterExecuteCondition.CRASHED;
+        }
+        if (gameBoard.destReached()) {
+            // Roomba arrived at destination successfully
+            return EAfterExecuteCondition.DEST_REACHED;
+        }
+        // Roomba neither crashed nor arrived at destination
+        return EAfterExecuteCondition.GOT_LOST;
     }
 
     /**

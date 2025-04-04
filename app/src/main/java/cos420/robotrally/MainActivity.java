@@ -27,6 +27,7 @@ import cos420.robotrally.adaptersAndItems.LevelAdapter;
 import cos420.robotrally.adaptersAndItems.LevelItem;
 import cos420.robotrally.adaptersAndItems.MoveAdapter;
 import cos420.robotrally.adaptersAndItems.MoveItem;
+import cos420.robotrally.enumerations.EAfterExecuteCondition;
 import cos420.robotrally.levels.LevelData;
 import cos420.robotrally.models.Collectable;
 import cos420.robotrally.models.LevelController;
@@ -34,20 +35,15 @@ import cos420.robotrally.models.Obstacle;
 import cos420.robotrally.services.LevelMapper;
 import cos420.robotrally.models.RobotRallySave;
 
+// TODO javadoc for the class itself
 public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener {
-    /** A list of levels, for use by the adapter */
-    ArrayList<LevelItem> levelDisplayList;
-    /** Adapter to allow for dynamic list elements in level select */
-    LevelAdapter levelAdapter;
 
+    // TODO javadoc
     List<MoveItem> moveList;
+    // TODO javadoc
     MoveAdapter moveAdapter;
-    LevelController levelController;
 
-    GridView gridTile;
-    ArrayList<GridItem> gridList;
-    GridAdapter gridAdapter;
-
+    // TODO javadoc
     RobotRallySave saveFunction;
 
     /**
@@ -56,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      */
     List<LevelData> levels;
 
+    // TODO javadoc
     private int selectedLevel;
 
     @Override
@@ -74,6 +71,11 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      * Generates and displays the level selection menu to the user.
      */
     private void openLevelSelect() {
+        // A list of levels, for use by the adapter
+        ArrayList<LevelItem> levelDisplayList;
+        // Adapter to allow for dynamic list elements in level select
+        LevelAdapter levelAdapter;
+
         setContentView(R.layout.level_select_dynamic);
         levelDisplayList = new ArrayList<>();
         // for each level
@@ -108,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private void openSelectedLevel(int levelID) {
         setContentView(R.layout.activity_main);
 
+        LevelController levelController;
+
         // Moves view set up
         RecyclerView recyclerView = findViewById(R.id.move_viewer);
         moveList = new ArrayList<>();
@@ -120,16 +124,16 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         recyclerView.setAdapter(moveAdapter);
 
         //GridTile  view set up
-        gridTile = findViewById(R.id.grid);
-        gridList = new ArrayList<>();
+        GridView gridTile = findViewById(R.id.grid);
+        ArrayList<GridItem> gridList = new ArrayList<>();
 
-        setupGrid(levels.get(levelID));
+        setupGrid(levels.get(levelID), gridList);
         //Set up text at top of screen
         TextView tv = findViewById(R.id.level_text);
         tv.setText(String.valueOf(levelID + 1));
 
         //Set adapter
-        gridAdapter = new GridAdapter(this, gridList);
+        GridAdapter gridAdapter = new GridAdapter(this, gridList);
         gridTile.setAdapter(gridAdapter);
 
         levelController = new LevelController(levels.get(levelID));
@@ -187,21 +191,25 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 Log.d("Button Pressed", "Attempted to remove item from empty list");
             }
         });
-        //Reset
+        // RESET
         findViewById(R.id.reset_button).setOnClickListener(v -> {
             //TODO method to reset grid
             //TODO method to reset moves
         });
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
-            boolean victory = levelC.executeScript();
-            if (victory) { // reached destination
+            EAfterExecuteCondition endStatus = levelC.executeScript();
+            if (endStatus == EAfterExecuteCondition.DEST_REACHED) {
                 showWinScreen();
-            } else {
-                // TODO crash screen
-
-                //this won't be here when we have a level fail screen, but it is here for now.
+            } else if (endStatus == EAfterExecuteCondition.CRASHED) {
                 showCollisionScreen();
+            } else if (endStatus == EAfterExecuteCondition.GOT_LOST) {
+                // TODO loss screen
+                // Temp
+                showCollisionScreen();
+            } else {
+                Log.d("End Condition Error", "Someone added a new end condition and " +
+                                "forgot to add it to the end-screen handler.");
             }
         });
         // BACK
@@ -225,43 +233,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     }
 
     /**
-     * Method that displays the win pop up to the player
-     */
-    private void showWinScreen()
-    {
-        LayoutInflater inflater = getLayoutInflater();
-        View customView = inflater.inflate(R.layout.win_dialog, null);
-
-        AlertDialog winScreen = new AlertDialog.Builder(this)
-                .setView(customView)
-                .setCancelable(false)
-                .create();
-
-        // setup button actions
-        customView.findViewById(R.id.last_level_button).setOnClickListener(v -> {
-            Log.v("Win Dialogue", "Previous level button pressed");
-            //TODO go to previous level method
-        });
-
-        customView.findViewById(R.id.RetryButton).setOnClickListener(v -> {
-            Log.v("Win Dialogue", "Retry level button pressed");
-            //TODO call method to reset the level
-            winScreen.dismiss();
-        });
-
-        customView.findViewById(R.id.next_level_button).setOnClickListener(v -> {
-            Log.v("Win Dialogue", "Next level button pressed");
-            //TODO go to next level method
-        });
-
-        winScreen.show();
-    }
-
-    /**
      * Sets up the game board grid
      * @param l the current level
      */
-    private void setupGrid(LevelData l) {
+    private void setupGrid(LevelData l, ArrayList<GridItem> gridList) {
         int size = l.gameBoardData.getSize(); //size of game board
         ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
         ColorDrawable black = new ColorDrawable(Color.parseColor("#000000"));
@@ -352,12 +327,47 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         moveAdapter.notifyDataSetChanged(); //notify adapter of change
     }
 
+    /// VICTORY / FAILURE SCREENS
+
+    /**
+     * Method that displays the win pop up to the player
+     */
+    private void showWinScreen()
+    {
+        LayoutInflater inflater = getLayoutInflater();
+        View customView = inflater.inflate(R.layout.win_dialog, null);
+
+        AlertDialog winScreen = new AlertDialog.Builder(this)
+                .setView(customView)
+                .setCancelable(false)
+                .create();
+
+        // setup button actions
+        customView.findViewById(R.id.last_level_button).setOnClickListener(v -> {
+            Log.v("Win Dialogue", "Previous level button pressed");
+            //TODO go to previous level method
+            // [Note from Bright: the button w/ the extra bar is meant to return to level select,
+            //                    but going back a level works too]
+        });
+
+        customView.findViewById(R.id.RetryButton).setOnClickListener(v -> {
+            Log.v("Win Dialogue", "Retry level button pressed");
+            //TODO call method to reset the level
+            winScreen.dismiss();
+        });
+
+        customView.findViewById(R.id.next_level_button).setOnClickListener(v -> {
+            Log.v("Win Dialogue", "Next level button pressed");
+            //TODO go to next level method
+        });
+
+        winScreen.show();
+    }
+
     /**
      * Show the collision screen
      */
     private void showCollisionScreen() {
-        //TODO: Figure out where to place this into the main activity to get it to execute
-
         //this is creating the view to be referenced
         LayoutInflater collisionInflater = getLayoutInflater();
         View collisionView = collisionInflater.inflate(R.layout.robot_hit_dialog, null);
