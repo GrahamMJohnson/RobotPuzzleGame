@@ -1,5 +1,8 @@
 package cos420.robotrally;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.SharedPreferences;
@@ -10,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -36,15 +40,19 @@ import cos420.robotrally.services.LevelMapper;
 import cos420.robotrally.models.RobotRallySave;
 
 // TODO javadoc for the class itself
-public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener {
+public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener, MoveAdapter.MoveListener{
 
     // TODO javadoc
     List<MoveItem> moveList;
     // TODO javadoc
     MoveAdapter moveAdapter;
+    int curSelectUI;
+    ObjectAnimator animator;
+    RecyclerView recyclerView;
 
-    // TODO javadoc
+    //TODO javadoc
     RobotRallySave saveFunction;
+    LevelController levelController;
 
     /**
      * 0 indexed list of the data for level layout<br>
@@ -110,17 +118,15 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private void openSelectedLevel(int levelID) {
         setContentView(R.layout.activity_main);
 
-        LevelController levelController;
-
         // Moves view set up
-        RecyclerView recyclerView = findViewById(R.id.move_viewer);
+        recyclerView = findViewById(R.id.move_viewer);
         moveList = new ArrayList<>();
 
         // Set LayoutManager
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //Set Adapter
-        moveAdapter = new MoveAdapter(moveList);
+        moveAdapter = new MoveAdapter(moveList, (MoveAdapter.MoveListener) this);
         recyclerView.setAdapter(moveAdapter);
 
         //GridTile  view set up
@@ -141,6 +147,50 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //this starts an instance of a save class based on the level number
         saveFunction = new RobotRallySave(this, levelID);
+    }
+
+    @Override
+    public void onMoveClick(int position) {
+        //set which command is selected
+        levelController.setSelected(position);
+        blinkUI();
+    }
+
+    public void blinkUI() {
+        //update UI of selected command
+        int select = levelController.getSelected();
+
+        //Remove blink from previous command
+        if (animator != null && animator.isRunning()) {
+            animator.cancel();
+            //remove background from previous selected
+            if (curSelectUI >= 0 && curSelectUI < moveList.size() && curSelectUI != select) {
+                MoveItem m = moveList.get(curSelectUI);
+                ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
+                m.setColor(gray);
+                moveList.set(curSelectUI, m);
+                moveAdapter.notifyItemChanged(curSelectUI);
+            }
+
+        }
+
+        //Set UI to blink on selected command
+        RecyclerView.ViewHolder v = recyclerView.findViewHolderForAdapterPosition(select);
+        if (v != null) {
+            View blinkV = v.itemView.findViewById(R.id.blink);
+            animator = ObjectAnimator.ofInt(blinkV,
+                    "backgroundColor",
+                    Color.rgb(211, 211, 211),
+                    Color.BLACK, Color.rgb(211, 211, 211));
+            animator.setDuration(1000);
+            animator.setEvaluator(new ArgbEvaluator());
+            animator.setRepeatMode(ValueAnimator.REVERSE);
+            animator.setRepeatCount(Animation.INFINITE);
+            animator.start();
+
+            //Set current selected command = select
+            curSelectUI = select;
+        }
     }
 
     /**
@@ -185,8 +235,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         // DELETE
         findViewById(R.id.delete_button).setOnClickListener(v -> {
             try {
+                int before = levelC.getSelected(); //The command that was deleted
                 levelC.remove();
-                removeMoveFromUI();
+                removeMoveFromUI(before);
             } catch (Exception e) {
                 Log.d("Button Pressed", "Attempted to remove item from empty list");
             }
@@ -315,16 +366,23 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             default: throw new InvalidParameterException(moveText + " is not a valid move.");
         }
 
-        moveList.add(new MoveItem(moveText));//add item
-        moveAdapter.notifyDataSetChanged();//notify adapter of change
+        int s = levelController.getSelected();
+
+        ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
+        moveList.add(s, new MoveItem(moveText, gray));//add item
+        moveAdapter.notifyItemInserted(s);
+
+        recyclerView.post(() -> blinkUI());//Delays adding animation until after view holder is set
     }
 
     /**
      * Remove the last move item from the list
+     * @param before the command that got deleted
      */
-    private void removeMoveFromUI () {
-        moveList.remove(moveList.size() - 1); //Remove Last Item
-        moveAdapter.notifyDataSetChanged(); //notify adapter of change
+    private void removeMoveFromUI (int before) {
+        moveList.remove(before);
+        moveAdapter.notifyItemRemoved(before);//notify adapter of change
+        blinkUI();
     }
 
     /// VICTORY / FAILURE SCREENS

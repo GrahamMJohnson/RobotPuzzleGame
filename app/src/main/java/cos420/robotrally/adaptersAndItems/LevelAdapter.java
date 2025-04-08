@@ -65,7 +65,7 @@ public class LevelAdapter extends ArrayAdapter<LevelItem> {
     public interface LevelSelectListener {
         /**
          * Verifies valid level number and opens level
-         * @param levelID   to try to open
+         * @param levelID to try to open
          */
         public void onLevelSelectClick(int levelID);
     }

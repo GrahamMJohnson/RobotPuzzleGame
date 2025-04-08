@@ -13,6 +13,8 @@ public class CommandList {
 
     /** Linked list to store the commands */
     private LinkedList<ICommand> script;
+    /** The position in script of the selected command*/
+    private int select;
 
     /**
      * Constructor<br>
@@ -21,6 +23,7 @@ public class CommandList {
     public CommandList()
     {
         script = new LinkedList<ICommand>();
+        select = 0;
     }
 
     /**
@@ -29,17 +32,27 @@ public class CommandList {
      */
     public void addCommand(ICommand command)
     {
-        script.add(command);
+        if(script.isEmpty()) { //list is empty, so command that's added is selected
+            script.add(command);
+        }else { //adds command in list at position
+            select = select + 1; //selects command to the right
+            script.add(select, command);
+        }
+
     }
 
     /**
-     * Method to remove the last command of the list
+     * Method to remove the selected command of the list
      * @throws Exception if the list is empty
      */
-    public void removeLastCommand() throws Exception {
+    public void remove() throws Exception {
         if (!script.isEmpty())
         {
-            script.removeLast();
+            script.remove(select);
+            //selects command to left
+            if(select > 0 ) { select = select - 1;}
+
+
         }
         else
         {
@@ -56,11 +69,24 @@ public class CommandList {
     }
 
     /**
-     * Switches a command from position "from" to position "to"
-     * @param from previous position of command
-     * @param to future position of command
+     * Getter for select
      */
-    public void switchMove(int from, int to) { Collections.swap(script, from, to); }
+    public int getSelect() {
+        return select;
+    }
+
+    /**
+     * Setter for select
+     */
+    public void setSelect(int s) {
+        // If s is already selected, and not at the end, selects the end instead
+        // resets to default position of the end
+        if(select == s && script.size() - 1 != s) {
+            select = script.size() - 1; //the end
+        }else {
+            select = s; //selects
+        }
+    }
 
     /**
      * Method to get the current size of the script

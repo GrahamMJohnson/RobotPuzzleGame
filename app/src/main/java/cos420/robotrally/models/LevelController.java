@@ -119,8 +119,23 @@ public class LevelController {
      * @throws Exception is the script is empty
      */
     public void remove() throws Exception {
-        commandScript.removeLastCommand();
+        commandScript.remove();
         Log.v(LOG_TAG, "Deleted command");
+    }
+
+    /**
+     * Passing up what command is selected(to get to UI)
+     * @return selected command
+     */
+    public int getSelected() {
+        return commandScript.getSelect();
+    }
+
+    /**
+     * Setter for what command is selected
+     */
+    public void setSelected(int s) {
+        commandScript.setSelect(s);
     }
 
     /**
@@ -143,9 +158,4 @@ public class LevelController {
         // Roomba neither crashed nor arrived at destination
         return EAfterExecuteCondition.GOT_LOST;
     }
-
-    /**
-     * Switches a command from position "from" to position "to"
-     */
-    public void switchMove(int from, int to) { commandScript.switchMove(from, to);}
 }
