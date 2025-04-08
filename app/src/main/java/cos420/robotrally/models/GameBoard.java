@@ -23,8 +23,10 @@ public class GameBoard{
      */
     public GameBoard(GameBoardData gameBoardData)
     {
-        this.size = gameBoardData.size;
-        this.makeBoard(gameBoardData);
+        size = gameBoardData.size;
+        currentRow = gameBoardData.startRow;
+        currentColumn = gameBoardData.startColumn;
+        makeBoard(gameBoardData);
     }
 
     /**

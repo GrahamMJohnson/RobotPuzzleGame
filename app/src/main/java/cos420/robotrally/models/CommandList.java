@@ -66,6 +66,7 @@ public class CommandList {
     public void clearList()
     {
         script.clear();
+        select = 0;
     }
 
     /**

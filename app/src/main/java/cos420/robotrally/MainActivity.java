@@ -1,5 +1,9 @@
 package cos420.robotrally;
 
+import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -61,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     List<LevelData> levels;
 
     // TODO javadoc
-    private int selectedLevel;
+    private int selectedLevelID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         if (levelID < 0 || levelID >= levels.size()) {
             throw new IndexOutOfBoundsException("Level " + levelID + " does not exist.");
         }
+        selectedLevelID = levelID;
         openSelectedLevel(levelID);
     }
 
@@ -245,7 +250,11 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         // RESET
         findViewById(R.id.reset_button).setOnClickListener(v -> {
             //TODO method to reset grid
+            levelController.resetLevel();
+            moveList.clear();
+            moveAdapter.notifyDataSetChanged();
             //TODO method to reset moves
+
         });
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
@@ -371,6 +380,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
         moveList.add(s, new MoveItem(moveText, gray));//add item
         moveAdapter.notifyItemInserted(s);
+        recyclerView.scrollToPosition(moveAdapter.getItemCount() - 1);
 
         recyclerView.post(() -> blinkUI());//Delays adding animation until after view holder is set
     }
@@ -403,21 +413,26 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         // setup button actions
         customView.findViewById(R.id.last_level_button).setOnClickListener(v -> {
             Log.v("Win Dialogue", "Previous level button pressed");
-            //TODO go to previous level method
-            // [Note from Bright: the button w/ the extra bar is meant to return to level select,
-            //                    but going back a level works too]
+            clearGameListeners();
+            winScreen.dismiss();
+            openLevelSelect();
         });
 
         customView.findViewById(R.id.RetryButton).setOnClickListener(v -> {
             Log.v("Win Dialogue", "Retry level button pressed");
-            //TODO call method to reset the level
+            levelController.retryLevel();
             winScreen.dismiss();
         });
 
         customView.findViewById(R.id.next_level_button).setOnClickListener(v -> {
             Log.v("Win Dialogue", "Next level button pressed");
-            //TODO go to next level method
+            clearGameListeners();
+            winScreen.dismiss();
+            openSelectedLevel(++selectedLevelID);
         });
+
+        // Only show next button if there is another level
+        customView.findViewById(R.id.next_level_button).setVisibility(selectedLevelID < levels.size() - 1 ? VISIBLE : INVISIBLE);
 
         winScreen.show();
     }

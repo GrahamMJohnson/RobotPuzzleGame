@@ -42,8 +42,16 @@ public class LevelController {
      */
     public void resetLevel()
     {
-        this.gameBoard.resetGrid(this.levelData.gameBoardData);
+        gameBoard.resetGrid(levelData.gameBoardData);
         commandScript.clearList();
+    }
+
+    /**
+     * Method to retry the level
+     */
+    public void retryLevel()
+    {
+        gameBoard.resetGrid(levelData.gameBoardData);
     }
 
     /**
