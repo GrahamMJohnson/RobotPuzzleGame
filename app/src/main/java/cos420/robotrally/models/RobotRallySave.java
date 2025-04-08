@@ -2,58 +2,58 @@ package cos420.robotrally.models;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-// TODO current javadoc doesn't explain what the class does. Does it handle the saving process?
-//  Or does it hold the save information?
 /**
- * This is the robotRallySave class
+ * The RobotRallySave class allows for parameters to be passed into JSON objects -> (strings passed in
+ * as keys to be able to reference specific pieces of data). These JSON objects are then turned into
+ * strings and stored in sharedPreferences (similar to JSON objects, but persistent [keys to
+ * reference specific pieces of data])
+ *
+ * Handles all of the saving and persistence in the RobotRally project.
  */
-// TODO having javadocs is appreciated! Most of the ones here aren't very useful, unfortunately.
-//  Please write them for the people who have no idea what's going on. Additionally, most of the
-//  "this is" parts of the docs can be removed.
 public class RobotRallySave {
 
     ///--------------
-    /// These are the global variables for the RobotRallySave class
+    /// Global Variables
     ///--------------
 
     /**
-     * These are the shared prefs
-     */ // TODO What are shared prefs? What are they used for?
+     * This is the main instance of SharedPreferences. This will be referenced to save JSON objects
+     * to, and retrieve JSON objects from the SharedPreferences functionality this project uses.
+     */
     private final SharedPreferences sharedPreferences;
 
     /**
-     * JSON Object
-     */ // TODO what is this object used for?
+     * Current JSON object being saved to and retrieved from. Each level has its own JSON file to
+     * hold all of the data that needs to be persistent, so each level will reference a different
+     * currentJSON object.
+     */
     JSONObject currentJSON;
+
     /**
-     * The key used to save <code>currentJSON</code> in <code>sharedPreferences</code>.
+     * The reference key used to save <code>currentJSON</code> in <code>sharedPreferences</code>.
      */
     String sharedKey;
 
     /**
-     * this is the name that we are going to use in the JSON name param
-     */ // TODO this feels like it should be helpful but I would like more context.
+     * This is the name that we are going to use in the JSON name param. Essentially a key to
+     * retrieve data. They are saved to avoid typos inputting keys into save/retrieval calls.
+     * The variable names are telling of what each one is used for in retrieving/saving when
+     * inputted into JSON object editing/reading calls.
+     */
     String jsonMoveSequence = "move_sequence";
-    // TODO javadoc
     String jsonNumAttempts = "num_attempts";
-    // TODO javadoc
     String jsonEfficiencyScore = "efficiency_score";
-    // TODO javadoc
     String jsonSquaresTraveled = "total_squares_traveled";
-    // TODO javadoc
     String jsonCurMoveDiff = "current_move_difference";
-    // TODO javadoc
     String jsonBestMoveDiff = "best_move_difference";
-    // TODO javadoc
     String jsonPercentCollectibles = "percent_collected";
 
 
     ///--------------
-    /// This is the constructor for the save function
+    /// Constructors
     ///--------------
 
     /**
@@ -84,7 +84,7 @@ public class RobotRallySave {
     }
 
     ///--------------
-    /// These methods are for testing purposes
+    /// Debug/Testing
     ///--------------
 
     /**
@@ -104,11 +104,11 @@ public class RobotRallySave {
     }
 
     ///--------------
-    /// These are all of the setters for all of the different values that need to be saved.
+    /// Class Setters
     ///--------------
 
     /**
-     * This is the method for saving the move sequence
+     * This is the method for saving the move sequence into the JSON Object
      * @param commandList the string for the list of commands
      */
     public void SetMoveSequence(String commandList){
@@ -127,7 +127,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for saving the number of attempts
+     * This is the method for saving the number of attempts into the JSON Object
      * @param numOfAttempts the int representing how many attempts the user has made
      */
     public void SetNumAttempts(int numOfAttempts){
@@ -142,7 +142,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for saving the efficiency score
+     * This is the method for saving the efficiency score into the JSON object
      * @param efficiencyScore the int representing the user's efficiency score
      */
     public void SetEfficiencyScore(int efficiencyScore){
@@ -157,7 +157,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for saving the number of squares that the user traveled
+     * This is the method for saving the number of squares that the user traveled into the JSON object
      * @param totalSquaresTraveled the int representing the user's number of squares traveled
      */
     public void SetTotalSquaresTraveled(int totalSquaresTraveled){
@@ -172,7 +172,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for saving the difference between the current and optimal moves
+     * This is the method for saving the difference between the current and optimal moves into the JSON object
      * @param currentMoveDifference the int representing the difference between current and optimal
      */
     public void SetCurrentMoveDifference(int currentMoveDifference) {
@@ -187,7 +187,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for saving the difference between the best and optimal moves
+     * This is the method for saving the difference between the best and optimal moves into the JSON object
      * @param bestMoveDifference the int representing the difference between best and optimal
      */
     public void SetBestMoveDifference(int bestMoveDifference){
@@ -202,7 +202,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for saving the percentage of collectibles that the user has collected
+     * This is the method for saving the percentage of collectibles that the user has collected into the JSON object
      * @param percentCollectiblesCollected the int representing the percentage
      */
     public void SetCollectiblesCollected(int percentCollectiblesCollected){
@@ -217,11 +217,11 @@ public class RobotRallySave {
     }
 
     ///--------------
-    /// These are all of the getters for all of the different values that need to be saved.
+    /// Class Getters
     ///--------------
 
     /**
-     * This is the method for getting the saved move sequence
+     * This is the method for getting the saved move sequence from the JSON object
      * @return the string that represents the current move sequence
      */
     public String GetMoveSequence(){
@@ -237,7 +237,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for getting the saved move attempts
+     * This is the method for getting the saved move attempts from the JSON object
      * @return the int that represents the amount of moves the robot took
      */
     public int GetMoveAttempts() {
@@ -253,7 +253,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for getting the saved efficiency score
+     * This is the method for getting the saved efficiency score from the JSON object
      * @return the int that represents the efficiency score of the best attempt
      */
     public int GetEfficiencyScore(){
@@ -269,7 +269,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for getting the saved squares traveled
+     * This is the method for getting the saved squares traveled from the JSON object
      * @return the int that represents the number of squares traveled on the best attempt
      */
     public int GetTotalSquaresTraveled(){
@@ -285,7 +285,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for getting the saved difference between the current and optimal move count
+     * This is the method for getting the saved difference between the current and optimal move count from the JSON object
      * @return the int representing the difference between the current and optimal
      */
     public int GetCurrentMoveDifference(){
@@ -301,7 +301,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method to save the difference between the best and optimal move counts
+     * This is the method to save the difference between the best and optimal move counts from the JSON object.
      * @return the int representing the difference between the best and optimal
      */
     public int GetBestMoveDifference(){
@@ -317,7 +317,7 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method to save the percentage of collectibles collected
+     * This is the method to save the percentage of collectibles collected from the JSON object
      * @return the int representing the percentage of collectibles the user collected
      */
     public int GetPercentageCollectiblesCollected(){
@@ -333,12 +333,12 @@ public class RobotRallySave {
     }
 
     ///--------------
-    /// This is the actual save function that you need to run
+    /// Write to Memory
     ///--------------
 
     /**
-     * This is the method for saving all of the sata contained within the json
-     * This should be put after any data for the save is updated
+     * This is the method for saving all of the data contained within the JSON (edited by this class)
+     * This should be put after ANY DATA is added to the save using the methods in this class.
      */
     public void saveLevelData(){
         //get the editor for the preferences
