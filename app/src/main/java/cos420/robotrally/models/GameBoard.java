@@ -67,6 +67,23 @@ public class GameBoard{
     }
 
     /**
+     * Resets the Roomba position to the starting position established in the level data
+     * @param gameBoardData GameBoardData object with all of the data for the game board
+     */
+    public void resetGrid(GameBoardData gameBoardData)
+    {
+        gameBoard[currentRow][currentColumn].setOccupied(false);
+        currentRow = gameBoardData.getStartRow();
+        currentColumn = gameBoardData.getStartColumn();
+        gameBoard[currentRow][currentColumn].setOccupied(true);
+
+        for (Collectable c : gameBoardData.collectables)
+        {
+            gameBoard[c.getRow()][c.getColumn()].setHasCollectable(true);
+        }
+    }
+
+    /**
      * This is the move up function written by Christian, adapted into the gameBoard class
      * @return a boolean value that represents whether the action completed or not
      */

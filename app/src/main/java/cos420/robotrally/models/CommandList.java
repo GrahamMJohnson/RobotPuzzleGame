@@ -48,6 +48,14 @@ public class CommandList {
     }
 
     /**
+     * Method to clear the list of all its commands
+     */
+    public void clearList()
+    {
+        script.clear();
+    }
+
+    /**
      * Switches a command from position "from" to position "to"
      * @param from previous position of command
      * @param to future position of command

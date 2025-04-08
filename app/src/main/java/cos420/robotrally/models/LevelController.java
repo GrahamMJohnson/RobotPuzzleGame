@@ -38,6 +38,15 @@ public class LevelController {
     }
 
     /**
+     * Method that resets the level's Roomba position and clears the command linked list
+     */
+    public void resetLevel()
+    {
+        this.gameBoard.resetGrid(this.levelData.gameBoardData);
+        commandScript.clearList();
+    }
+
+    /**
      * Method to add an Up command to script
      */
     public void addUpCommand()

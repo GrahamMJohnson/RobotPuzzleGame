@@ -42,3 +42,49 @@ specialA:
 specialB:
     type: repeat
     parameters: 1 2
+-------------------------------------
+level: 2
+size: 5
+startRow: 4
+startColumn: 0
+goalRow: 0
+goalColumn: 4
+obstacle:
+    type: wall
+    row: 0
+    column 0
+obstacle:
+    type: wall
+    row: 1
+    column: 0
+obstacle:
+    type: wall
+    row: 2
+    column: 0
+obstacle:
+    type: wall
+    row: 2
+    column: 1
+obstacle:
+    type: chair
+    row: 4
+    column: 1
+obstacle:
+    type: chair
+    row: 2
+    column: 3
+collectables:
+    row: 0
+    column: 1
+collectables:
+    row: 1
+    column: 1
+collectables:
+    row: 4
+    column: 2
+specialA:
+    type: repeat
+    parameters: 2 1
+specialB:
+    type: repeat
+    parameters: 1 2
