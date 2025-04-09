@@ -5,7 +5,7 @@ import android.util.Log;
 import cos420.robotrally.commands.*;
 import cos420.robotrally.enumerations.EAfterExecuteCondition;
 import cos420.robotrally.levels.LevelData;
-import cos420.robotrally.services.SpecialCommandCreationService;
+import cos420.robotrally.services.SpecialCommandService;
 
 // TODO javadoc for the class itself
 public class LevelController {
@@ -93,33 +93,29 @@ public class LevelController {
     /**
      * Method to add an A command to script
      */
-    public void addACommand()
-    {
-        ICommand command = SpecialCommandCreationService.getInstanceOfSpecialCommand(
-                commandScript,
-                levelData.commandAData.commandType,
-                levelData.commandAData.commandParams);
-        if (command != null)
-        {
+    public void addACommand() {
+        try {
+            ICommand command = SpecialCommandService.getInstanceOfSpecialCommand(levelData.commandAType, gameBoard);
             commandScript.addCommand(command);
+            Log.v(LOG_TAG, "Added special command A");
         }
-        Log.v(LOG_TAG, "Added special command A");
+        catch (RuntimeException e) {
+            Log.v("Adding Special Command", e.getMessage() != null ? e.getMessage() : "Error creating special command");
+        }
     }
 
     /**
      * Method to add an B command to script
      */
-    public void addBCommand()
-    {
-        ICommand command = SpecialCommandCreationService.getInstanceOfSpecialCommand(
-                commandScript,
-                levelData.commandBData.commandType,
-                levelData.commandBData.commandParams);
-        if (command != null)
-        {
+    public void addBCommand() {
+        try {
+            ICommand command = SpecialCommandService.getInstanceOfSpecialCommand(levelData.commandBType, gameBoard);
             commandScript.addCommand(command);
+            Log.v(LOG_TAG, "Added special command B");
         }
-        Log.v(LOG_TAG, "Added special command B");
+        catch (RuntimeException e) {
+            Log.v("Adding Special Command", e.getMessage() != null ? e.getMessage() : "Error creating special command");
+        }
     }
 
     /**

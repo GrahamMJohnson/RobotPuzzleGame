@@ -1,16 +1,19 @@
 package cos420.robotrally.levels;
 
+import cos420.robotrally.enumerations.SpecialCommandType;
 import cos420.robotrally.helpers.GameBoardData;
 import cos420.robotrally.helpers.SpecialCommandData;
 
-// TODO javadoc for the class itself
+/**
+ * The class that stores all data for the backend of a level
+ */
 public class LevelData {
     /** Data for the game board */
     public GameBoardData gameBoardData;
 
-    /** Data for special command A*/
-    public SpecialCommandData commandAData;
+    /** Type for special command A*/
+    public SpecialCommandType commandAType;
 
-    /** Data for special command B*/
-    public SpecialCommandData commandBData;
+    /** Type for special command B*/
+    public SpecialCommandType commandBType;
 }

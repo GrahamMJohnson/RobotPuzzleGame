@@ -453,6 +453,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //this is the button listener to close the dialog
         collisionView.findViewById(R.id.crash_dialog_retry).setOnClickListener(v -> {
+            levelController.retryLevel();
             collisionScreen.dismiss();
         });
 

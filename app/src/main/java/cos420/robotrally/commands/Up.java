@@ -20,13 +20,6 @@ public class Up implements ICommand {
     @Override
     public boolean execute()
     {
-        try {
-            return gameBoard.moveUp();
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-            return false;
-        }
+        return gameBoard.moveUp();
     }
 }

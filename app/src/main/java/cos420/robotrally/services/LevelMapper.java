@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,32 +121,24 @@ public class LevelMapper {
                         Log.v(LOG_TAG, "Start mapping special command");
 
                         // Split lines into arrays
-                        String[] typeArray = reader.readLine().trim().split(" ");
-                        String[] paramsArray = reader.readLine().trim().split(":")[1].trim().split(" ");
+                        String[] typeArray = line.trim().split(" ");
 
                         // Get value from last index of array
                         SpecialCommandType type = SpecialCommandType.getTypeFromString(typeArray[typeArray.length - 1]);
-                        int[] params = new int[paramsArray.length];
-                        for (int i = 0; i < paramsArray.length; i++)
-                        {
-                            params[i] = Integer.parseInt(paramsArray[i]);
-                        }
 
-                        // Create SpecialCommandData object and add it to the level
-                        SpecialCommandData specialCommand = new SpecialCommandData(type, params);
                         // first special command is command A
                         // second special command is command B
-                        if (level.commandAData == null)
+                        if (level.commandAType == null)
                         {
-                            level.commandAData = specialCommand;
+                            level.commandAType = type;
                         }
                         else
                         {
-                            level.commandBData = specialCommand;
+                            level.commandBType = type;
                         }
 
                         Log.v(LOG_TAG, "End mapping special command");
-                    } catch (IOException e) {
+                    } catch (InvalidParameterException e) {
                         Log.e(LOG_TAG, e.getMessage() != null ? e.getMessage() : "Error parsing special command data");
                     }
                 }

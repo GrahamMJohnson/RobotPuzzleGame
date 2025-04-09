@@ -20,13 +20,6 @@ public class Left implements ICommand {
     @Override
     public boolean execute()
     {
-        try {
-            return gameBoard.moveLeft();
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-            return false;
-        }
+        return gameBoard.moveLeft();
     }
 }

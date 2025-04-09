@@ -36,12 +36,8 @@ collectables:
 collectables:
     row: 3
     column: 4
-specialA:
-    type: repeat
-    parameters: 2 1
-specialB:
-    type: repeat
-    parameters: 1 2
+specialA: r3
+specialB: d3
 -------------------------------------
 level: 2
 size: 5
@@ -82,9 +78,5 @@ collectables:
 collectables:
     row: 4
     column: 2
-specialA:
-    type: repeat
-    parameters: 2 1
-specialB:
-    type: repeat
-    parameters: 1 2
+specialA: d3
+specialB: l2

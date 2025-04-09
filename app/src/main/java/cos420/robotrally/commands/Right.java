@@ -20,13 +20,6 @@ public class Right implements ICommand {
     @Override
     public boolean execute()
     {
-        try {
-            return gameBoard.moveRight();
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-            return false;
-        }
+        return gameBoard.moveRight();
     }
 }
