@@ -27,17 +27,15 @@ public class Right3 implements ICommand {
      */
     @Override
     public boolean execute() {
-        try {
-            // call moveRight method 3 times
-            for (int i = 0; i < 3; i++)
-            {
-                gameBoard.moveRight();
+        // Call moveDown method 3 times
+        for (int i = 0; i < 3; i++)
+        {
+            boolean success = gameBoard.moveRight();
+            if(!success) {
+                return false;
             }
-            // All commands successfully executed
-            return true;
-        } catch (Exception e) {
-            // Could not execute move down all 3 times
-            return false;
         }
+        // All commands successfully executed
+        return true;
     }
 }

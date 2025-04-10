@@ -26,7 +26,7 @@ public class Down3 implements ICommand {
      */
     @Override
     public boolean execute() {
-        // call moveDown method 3 times
+        // Call moveDown method 3 times
         for (int i = 0; i < 3; i++)
         {
             boolean success = gameBoard.moveDown();

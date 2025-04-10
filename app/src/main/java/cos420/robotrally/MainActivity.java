@@ -249,12 +249,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         });
         // RESET
         findViewById(R.id.reset_button).setOnClickListener(v -> {
-            //TODO method to reset grid
             levelController.resetLevel();
+            int moves = moveList.size();
             moveList.clear();
-            moveAdapter.notifyDataSetChanged();
-            //TODO method to reset moves
-
+            moveAdapter.notifyItemRangeRemoved(0, moves);
         });
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
@@ -264,9 +262,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             } else if (endStatus == EAfterExecuteCondition.CRASHED) {
                 showCollisionScreen();
             } else if (endStatus == EAfterExecuteCondition.GOT_LOST) {
-                // TODO loss screen
-                // Temp
-                showCollisionScreen();
+                showLostScreen();
             } else {
                 Log.d("End Condition Error", "Someone added a new end condition and " +
                                 "forgot to add it to the end-screen handler.");
@@ -382,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         moveAdapter.notifyItemInserted(s);
         recyclerView.scrollToPosition(moveAdapter.getItemCount() - 1);
 
-        recyclerView.post(() -> blinkUI());//Delays adding animation until after view holder is set
+        recyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
     }
 
     /**
@@ -458,6 +454,36 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         });
 
         collisionScreen.show();
+    }
+
+    /**
+     * Shows the got lost screen
+     */
+    private void showLostScreen() {
+        // Create the view to be referenced
+        LayoutInflater collisionInflater = getLayoutInflater();
+        View lostView = collisionInflater.inflate(R.layout.robot_lost_dialog, null);
+
+        // Set up the dialog
+        AlertDialog lostScreen = new AlertDialog.Builder(this)
+                .setView(lostView)
+                .setCancelable(false)
+                .create();
+
+        // This is the button listener to close the dialog
+        lostView.findViewById(R.id.retry_button).setOnClickListener(v -> {
+            levelController.retryLevel();
+            lostScreen.dismiss();
+        });
+
+        lostView.findViewById(R.id.main_menu_button).setOnClickListener(v -> {
+            clearGameListeners();
+            lostScreen.dismiss();
+            openLevelSelect();
+        });
+
+        // Show the dialog
+        lostScreen.show();
     }
 
     /**

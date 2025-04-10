@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350dp"
+    android:layout_height="200dp"
+    android:background="@color/light_grey"
+    android:layout_gravity="center">
+
+    <TextView
+        android:id="@+id/robot_lost_text"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/robot_lost"
+        android:textSize="25sp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:background="@color/dark_gray"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/robot_lost_description"
+        android:layout_width="wrap_content"
+        android:layout_height="75dp"
+        android:layout_below="@id/robot_lost_text"
+        android:paddingHorizontal="30dp"
+        android:text="@string/robot_lost_description"
+        android:textAlignment="center"
+        android:textSize="17sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/robot_lost_description"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="10dp">
+
+        <Space
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+        </Space>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/main_menu_button"
+            android:layout_width="0sp"
+            android:layout_height="65sp"
+            android:layout_weight="2"
+            android:background="@drawable/last_level_symbol_updated"
+            android:contentDescription="@string/last_image_description"
+            android:textSize="20sp" />
+
+        <Space
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+        </Space>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/retry_button"
+            android:layout_width="0sp"
+            android:layout_height="65sp"
+            android:layout_weight="2"
+            android:background="@drawable/restart_image"
+            android:contentDescription="@string/retry_image_description"
+            android:textSize="25sp" />
+
+        <Space
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+        </Space>
+    </LinearLayout>
+
+</RelativeLayout>
