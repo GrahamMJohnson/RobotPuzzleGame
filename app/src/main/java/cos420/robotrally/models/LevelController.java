@@ -2,6 +2,10 @@ package cos420.robotrally.models;
 
 import android.util.Log;
 
+import java.util.List;
+
+import cos420.robotrally.MainActivity;
+import cos420.robotrally.adaptersAndItems.MoveItem;
 import cos420.robotrally.commands.*;
 import cos420.robotrally.enumerations.EAfterExecuteCondition;
 import cos420.robotrally.levels.LevelData;
@@ -17,6 +21,7 @@ public class LevelController {
 
     /** attribute that is a reference to the stored level data */
     private final LevelData levelData;
+
 
     /** attribute to store number of attempts on level */
     private int attempts;
@@ -143,15 +148,10 @@ public class LevelController {
     }
 
     /**
-     * method to execute the script
-     * @return The end condition of the roomba, in enum form.
+     * @return the end status of execution for handling in MainActivity
      */
-    public EAfterExecuteCondition executeScript()
-    {
-        attempts++;
-        Log.v(LOG_TAG, "Executing script");
-        boolean didWeDriveSafe = commandScript.execute();
-        if (!didWeDriveSafe) {
+    public EAfterExecuteCondition getEndStatus() {
+        if (!commandScript.getDidWeDriveSafe()) {
             // Roomba crashed
             return EAfterExecuteCondition.CRASHED;
         }
@@ -162,4 +162,42 @@ public class LevelController {
         // Roomba neither crashed nor arrived at destination
         return EAfterExecuteCondition.GOT_LOST;
     }
+
+    /**
+     * This runs execution step by step, STOPPING IF WE CRASH, running the highlight function at the same time
+     *
+     * After execution, it determines the end status then calls something in the callback to do end of execution checking
+     *
+     * @param moveList reference to the moveList in MainActivity
+     * @param callback reference to the callback interface in MainActivity
+     * @param activity reference to MainActivity so we can manage the UI thread
+     */
+    public void executeScript(List<MoveItem> moveList, ExecutionCallback callback, MainActivity activity) {
+        attempts++;
+        new Thread(() -> {
+            for (int i = 0; i < moveList.size(); i++) {
+                int finalI = i;
+
+                // Highlight current command
+                activity.runOnUiThread(() -> callback.onStepHighlight(finalI));
+
+                commandScript.executeCommand(finalI);
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (!commandScript.getDidWeDriveSafe()) {
+                    break;
+                }
+            }
+
+
+            EAfterExecuteCondition result = getEndStatus();
+            activity.runOnUiThread(() -> callback.onExecutionEnd(result));
+        }).start();
+    }
+
 }

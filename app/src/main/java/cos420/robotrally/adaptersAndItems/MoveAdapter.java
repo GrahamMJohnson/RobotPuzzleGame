@@ -46,6 +46,7 @@ public class MoveAdapter extends RecyclerView.Adapter<MoveAdapter.MyViewHolder> 
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         MoveItem moveItem = list.get(position);
         holder.move_view.setText(moveItem.getText());
+        holder.move_view.setBackgroundColor(moveItem.getColorInt());
         holder.blink.setBackground(moveItem.getColor());
 
         holder.bind(position);

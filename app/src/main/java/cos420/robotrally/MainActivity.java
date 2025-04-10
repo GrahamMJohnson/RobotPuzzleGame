@@ -1,6 +1,5 @@
 package cos420.robotrally;
 
-import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
@@ -8,12 +7,9 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,15 +38,19 @@ import cos420.robotrally.models.LevelController;
 import cos420.robotrally.models.Obstacle;
 import cos420.robotrally.services.LevelMapper;
 import cos420.robotrally.models.RobotRallySave;
+import cos420.robotrally.models.ExecutionCallback;
 
 // TODO javadoc for the class itself
-public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener, MoveAdapter.MoveListener{
+public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener, MoveAdapter.MoveListener, ExecutionCallback{
 
     // TODO javadoc
     List<MoveItem> moveList;
     // TODO javadoc
     MoveAdapter moveAdapter;
     int curSelectUI;
+
+    /**Independent tracking of where we are in execution, in the UI*/
+    int executingMoveUI;
     ObjectAnimator animator;
     RecyclerView recyclerView;
 
@@ -152,6 +152,71 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //this starts an instance of a save class based on the level number
         saveFunction = new RobotRallySave(this, levelID);
+    }
+
+
+    /**
+     * defining ExecutionCallback Interface functions
+     * @param index index of execution
+     */
+    @Override
+    public void onStepHighlight(int index) {
+        highlightExecutionStep(index);
+    }
+
+    /**
+     * After execution callback function for getting the right menu up at the end.
+     * @param result
+     */
+    @Override
+    public void onExecutionEnd(EAfterExecuteCondition result) {
+        handleExecutionEnd(result);
+    }
+
+    /**
+     * last piece of execution run, used to show the correct screen based on execution result
+     *
+     * @param result end result determined by the execution script in level controller
+     */
+    private void handleExecutionEnd(EAfterExecuteCondition result){
+        //resetting color or last highlited move.
+        MoveItem m = moveList.get(executingMoveUI);
+        m.setButtonColor(new ColorDrawable(Color.parseColor("#D3D3D3")));
+        moveAdapter.notifyItemChanged(executingMoveUI);
+
+            if (result == EAfterExecuteCondition.DEST_REACHED) {
+                showWinScreen();
+            } else if (result == EAfterExecuteCondition.CRASHED) {
+                showCollisionScreen();
+            } else if (result == EAfterExecuteCondition.GOT_LOST) {
+                showLostScreen();
+            } else {
+                Log.d("End Condition Error", "Someone added a new end condition and " +
+                                "forgot to add it to the end-screen handler.");
+            }
+    }
+    /**
+     * Highilghts the currently executing move, graying the previous one anc yellow-ing the current one
+     *
+     * @param index of execution in list
+     */
+    public void highlightExecutionStep(int index) {
+        if (index < 0 || index >= moveList.size()) return;
+
+        // Reset previous highlight
+        if (executingMoveUI >= 0 && executingMoveUI < moveList.size() && executingMoveUI != index) {
+            MoveItem prevMove = moveList.get(executingMoveUI);
+            ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
+            prevMove.setButtonColor(gray);
+            moveAdapter.notifyItemChanged(executingMoveUI);
+        }
+
+        MoveItem currentMove = moveList.get(index);
+        ColorDrawable yellow = new ColorDrawable(Color.parseColor("#FFF176")); // or any highlight color
+        currentMove.setButtonColor(yellow);
+        moveAdapter.notifyItemChanged(index);
+
+        executingMoveUI = index;
     }
 
     @Override
@@ -256,17 +321,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         });
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
-            EAfterExecuteCondition endStatus = levelC.executeScript();
-            if (endStatus == EAfterExecuteCondition.DEST_REACHED) {
-                showWinScreen();
-            } else if (endStatus == EAfterExecuteCondition.CRASHED) {
-                showCollisionScreen();
-            } else if (endStatus == EAfterExecuteCondition.GOT_LOST) {
-                showLostScreen();
-            } else {
-                Log.d("End Condition Error", "Someone added a new end condition and " +
-                                "forgot to add it to the end-screen handler.");
-            }
+            levelC.executeScript(moveList, this, this);
         });
         // BACK
         findViewById(R.id.back_button).setOnClickListener(v -> {
@@ -373,8 +428,11 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         int s = levelController.getSelected();
 
-        ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
-        moveList.add(s, new MoveItem(moveText, gray));//add item
+        //android was getting confused when only using one gray drawable to setup move buttons.
+        ColorDrawable gray1 = new ColorDrawable(Color.parseColor("#D3D3D3"));
+        ColorDrawable gray2 = new ColorDrawable(Color.parseColor("#D3D3D3"));
+
+        moveList.add(s, new MoveItem(moveText, gray1, gray2));//add item
         moveAdapter.notifyItemInserted(s);
         recyclerView.scrollToPosition(moveAdapter.getItemCount() - 1);
 

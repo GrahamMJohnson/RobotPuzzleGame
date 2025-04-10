@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 import cos420.robotrally.commands.ICommand;
+import cos420.robotrally.enumerations.EAfterExecuteCondition;
 
 // TODO javadoc for the class itself
 public class CommandList {
@@ -15,6 +16,8 @@ public class CommandList {
     private LinkedList<ICommand> script;
     /** The position in script of the selected command*/
     private int select;
+
+    public boolean didWeDriveSafe;
 
     /**
      * Constructor<br>
@@ -25,6 +28,8 @@ public class CommandList {
         script = new LinkedList<ICommand>();
         select = 0;
     }
+
+
 
     /**
      * Method to add a new command to the list
@@ -109,22 +114,19 @@ public class CommandList {
     }
 
     /**
-     * iterates through the script and executes each command
-     * @return true if every command was successfully executed, and false if not
-     * (which indicates roomba crash)
+     *
+     * @return didWeDriveSafe, whether or not we crashed during execution
      */
-    public boolean execute()
-    {
-        for (ICommand command : script)
-        {
-            boolean didWeDriveSafe = command.execute();
-            if(!didWeDriveSafe) {
-                // We crashed, quit running script
-                return false;
-            }
-        }
-        // Every command executed without a crash
-        return true;
+    public boolean getDidWeDriveSafe() {
+        return didWeDriveSafe;
     }
 
+    /**
+     * Executes command at a specified index
+     * @param index of command to execute
+     */
+    public void executeCommand(int index) {
+        boolean result = script.get(index).execute();
+        didWeDriveSafe = result;
+    }
 }
