@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         GridView gridTile = findViewById(R.id.grid);
         gridList = new ArrayList<>();
 
-        setupGrid(levels.get(levelID), gridList);
+        setupGrid(levels.get(levelID));
         //Set up text at top of screen
         TextView tv = findViewById(R.id.level_text);
         tv.setText(String.valueOf(levelID + 1));
@@ -238,7 +238,16 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         MoveItem currentMove = moveList.get(index);
         ColorDrawable yellow = new ColorDrawable(Color.parseColor("#FFF176")); // or any highlight color
         currentMove.setButtonColor(yellow);
-        recyclerView.scrollToPosition(index);
+
+        // Keep the executing command > 1 spot above bottom of view until its the last command
+        // This was you can see what is coming next
+        int scrollIndex = index + 1;
+        if (index == 0) {
+            scrollIndex = index; // Scroll to top for first command
+        }
+
+        recyclerView.scrollToPosition(scrollIndex);
+
         moveAdapter.notifyItemChanged(index);
 
         executingMoveUI = index;
@@ -249,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      */
     public void resetGrid() {
         gridList.clear();
-        setupGrid(levels.get(selectedLevelID), gridList);
+        setupGrid(levels.get(selectedLevelID));
         gridAdapter.notifyDataSetChanged();
     }
 
@@ -275,7 +284,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 moveList.set(curSelectUI, m);
                 moveAdapter.notifyItemChanged(curSelectUI);
             }
-
         }
 
         //Set UI to blink on selected command
@@ -321,21 +329,25 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             levelC.addLeftCommand();
             addMoveToUI("LEFT");
         });
+
         // RIGHT
         findViewById(R.id.right_button).setOnClickListener(v -> {
             levelC.addRightCommand();
             addMoveToUI("RIGHT");
         });
+
         // A
         findViewById(R.id.button_a).setOnClickListener(v -> {
             levelC.addACommand();
             addMoveToUI("A");
         });
+
         // B
         findViewById(R.id.button_b).setOnClickListener(v -> {
             levelC.addBCommand();
             addMoveToUI("B");
         });
+
         // DELETE
         findViewById(R.id.delete_button).setOnClickListener(v -> {
             try {
@@ -346,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 Log.d("Button Pressed", "Attempted to remove item from empty list");
             }
         });
+
         // RESET
         findViewById(R.id.reset_button).setOnClickListener(v -> {
             levelController.resetLevel();
@@ -354,13 +367,18 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             moveAdapter.notifyItemRangeRemoved(0, moves);
             resetGrid();
         });
+
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
-            levelC.setSelected(0);
-            recyclerView.scrollToPosition(0);
-            recyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
+            setButtonsClickable(false);
+            animator.end();
+            recyclerView.smoothScrollToPosition(0);
+//            levelC.setSelected(0);
+//            recyclerView.scrollToPosition(0);
+//            recyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
             levelC.executeScript(moveList, this, this);
         });
+
         // BACK
         findViewById(R.id.back_button).setOnClickListener(v -> {
 
@@ -385,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      * Sets up the game board grid
      * @param l the current level
      */
-    private void setupGrid(LevelData l, ArrayList<GridItem> gridList) {
+    private void setupGrid(LevelData l) {
         int size = l.gameBoardData.getSize(); //size of game board
         ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
         ColorDrawable black = new ColorDrawable(Color.parseColor("#000000"));
@@ -487,6 +505,19 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         blinkUI();
     }
 
+    private void setButtonsClickable(boolean value) {
+        findViewById(R.id.up_button).setClickable(value);
+        findViewById(R.id.down_button).setClickable(value);
+        findViewById(R.id.left_button).setClickable(value);
+        findViewById(R.id.right_button).setClickable(value);
+        findViewById(R.id.button_a).setClickable(value);
+        findViewById(R.id.button_b).setClickable(value);
+        findViewById(R.id.start_button).setClickable(value);
+        findViewById(R.id.reset_button).setClickable(value);
+        findViewById(R.id.delete_button).setClickable(value);
+
+    }
+
     /// VICTORY / FAILURE SCREENS
 
     /**
@@ -505,14 +536,13 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         // setup button actions
         customView.findViewById(R.id.last_level_button).setOnClickListener(v -> {
             Log.v("Win Dialogue", "Previous level button pressed");
-            clearGameListeners();
+            mainMenuButton();
             winScreen.dismiss();
-            openLevelSelect();
         });
 
         customView.findViewById(R.id.RetryButton).setOnClickListener(v -> {
             Log.v("Win Dialogue", "Retry level button pressed");
-            levelController.retryLevel();
+            retry();
             winScreen.dismiss();
         });
 
@@ -545,7 +575,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //this is the button listener to close the dialog
         collisionView.findViewById(R.id.crash_dialog_retry).setOnClickListener(v -> {
-            levelController.retryLevel();
+            retry();
             collisionScreen.dismiss();
         });
 
@@ -568,18 +598,35 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // This is the button listener to close the dialog
         lostView.findViewById(R.id.retry_button).setOnClickListener(v -> {
-            levelController.retryLevel();
+            retry();
             lostScreen.dismiss();
         });
 
         lostView.findViewById(R.id.main_menu_button).setOnClickListener(v -> {
-            clearGameListeners();
+            mainMenuButton();
             lostScreen.dismiss();
-            openLevelSelect();
         });
 
         // Show the dialog
         lostScreen.show();
+    }
+
+    /**
+     * Common lines of code for Main Menu Buttons
+     */
+    private void mainMenuButton() {
+        clearGameListeners();
+        openLevelSelect();
+    }
+
+    /**
+     * Common list of commands used by all retry buttons
+     */
+    private void retry() {
+        levelController.retryLevel();
+        setButtonsClickable(true);
+        animator.start();
+        resetGrid();
     }
 
     /**

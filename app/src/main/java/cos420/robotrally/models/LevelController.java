@@ -172,8 +172,7 @@ public class LevelController {
     }
 
     /**
-     * This runs execution step by step, STOPPING IF WE CRASH, running the highlight function at the same time
-     *
+     * This runs execution step by step, STOPPING IF WE CRASH, running the highlight function at the same time<br><br>
      * After execution, it determines the end status then calls something in the callback to do end of execution checking
      *
      * @param moveList reference to the moveList in MainActivity
@@ -191,13 +190,20 @@ public class LevelController {
 
                 commandScript.executeCommand(finalI);
 
+                // have the highlight switch before the grid
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    Log.d(LOG_TAG, e.getMessage() != null ? e.getMessage() : "Error sleeping");
+                }
+
                 //Move grid
                 activity.runOnUiThread(() -> callback.onStepMove(finalI));
 
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(450);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Log.d(LOG_TAG, e.getMessage() != null ? e.getMessage() : "Error sleeping");
                 }
 
                 if (!commandScript.getDidWeDriveSafe()) {
