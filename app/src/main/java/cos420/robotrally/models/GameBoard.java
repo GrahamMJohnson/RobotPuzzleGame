@@ -10,6 +10,8 @@ public class GameBoard{
     // TODO javadoc
     //this is the underlying 2d array
     private Tile[][] gameBoard;
+    private int previousRow;
+    private int previousColumn;
     // TODO javadoc
     private int currentRow;
     // TODO javadoc
@@ -26,6 +28,8 @@ public class GameBoard{
         size = gameBoardData.size;
         currentRow = gameBoardData.startRow;
         currentColumn = gameBoardData.startColumn;
+        previousRow = currentRow;
+        previousColumn = currentColumn;
         makeBoard(gameBoardData);
     }
 
@@ -77,6 +81,8 @@ public class GameBoard{
         gameBoard[currentRow][currentColumn].setOccupied(false);
         currentRow = gameBoardData.getStartRow();
         currentColumn = gameBoardData.getStartColumn();
+        previousRow = currentRow;
+        previousColumn = currentColumn;
         gameBoard[currentRow][currentColumn].setOccupied(true);
 
         for (Collectable c : gameBoardData.collectables)
@@ -100,7 +106,9 @@ public class GameBoard{
             //set the current tile to roomba is not there
             gameBoard[currentRow][currentColumn].setOccupied(false);
             //change the current row that the roomba is in
+            previousRow = currentRow;
             currentRow -= 1;
+            previousColumn = currentColumn;
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
         }
@@ -126,7 +134,9 @@ public class GameBoard{
             //set the current tile to roomba is not there
             gameBoard[currentRow][currentColumn].setOccupied(false);
             //change the current column that the roomba is in
+            previousColumn = currentColumn;
             currentColumn -= 1;
+            previousRow = currentRow;
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
         }
@@ -152,7 +162,9 @@ public class GameBoard{
             //set the current tile to roomba is not there
             gameBoard[currentRow][currentColumn].setOccupied(false);
             //change the current row that the roomba is in
+            previousRow = currentRow;
             currentRow += 1;
+            previousColumn = currentColumn;
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
         }
@@ -179,7 +191,9 @@ public class GameBoard{
             //set the current tile to roomba is not there
             gameBoard[currentRow][currentColumn].setOccupied(false);
             //change the current column that the roomba is in
+            previousColumn = currentColumn;
             currentColumn += 1;
+            previousRow = currentRow;
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
         }
@@ -202,4 +216,43 @@ public class GameBoard{
         Log.d("Moving Roomba", "Current Position: [" + currentRow + "," + currentColumn + "]");
     }
 
+    /**
+     * Getter
+     * @return row before last move
+     */
+    public int getPreviousRow() {
+        return previousRow;
+    }
+
+    /**
+     * Getter
+     * @return column before last move
+     */
+    public int getPreviousColumn() {
+        return previousColumn;
+    }
+
+    /**
+     * Getter
+     * @return row after last move
+     */
+    public int getCurrentRow() {
+        return currentRow;
+    }
+
+    /**
+     * Getter
+     * @return column after last move
+     */
+    public int getCurrentColumn() {
+        return currentColumn;
+    }
+
+    /**
+     * Getter
+     * @return size of game board
+     */
+    public int getSize() {
+        return size;
+    }
 }

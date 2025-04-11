@@ -34,6 +34,7 @@ import cos420.robotrally.adaptersAndItems.MoveItem;
 import cos420.robotrally.enumerations.EAfterExecuteCondition;
 import cos420.robotrally.levels.LevelData;
 import cos420.robotrally.models.Collectable;
+import cos420.robotrally.models.GameBoard;
 import cos420.robotrally.models.LevelController;
 import cos420.robotrally.models.Obstacle;
 import cos420.robotrally.services.LevelMapper;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     // TODO javadoc
     MoveAdapter moveAdapter;
     int curSelectUI;
+    GridAdapter gridAdapter;
+    ArrayList<GridItem> gridList;
 
     /**Independent tracking of where we are in execution, in the UI*/
     int executingMoveUI;
@@ -136,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //GridTile  view set up
         GridView gridTile = findViewById(R.id.grid);
-        ArrayList<GridItem> gridList = new ArrayList<>();
+        gridList = new ArrayList<>();
 
         setupGrid(levels.get(levelID), gridList);
         //Set up text at top of screen
@@ -144,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         tv.setText(String.valueOf(levelID + 1));
 
         //Set adapter
-        GridAdapter gridAdapter = new GridAdapter(this, gridList);
+        gridAdapter = new GridAdapter(this, gridList);
         gridTile.setAdapter(gridAdapter);
 
         levelController = new LevelController(levels.get(levelID));
@@ -165,8 +168,29 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     }
 
     /**
+     * Move tiles in the grid UI
+     * @param index
+     */
+    @Override
+    public void onStepMove(int index) {
+        GameBoard g = levelController.getGameBoard();
+
+        int previousIndex = (g.getPreviousRow() * g.getSize()) + g.getPreviousColumn();
+        GridItem previous = gridList.get(previousIndex);
+
+        int currentIndex = (g.getCurrentRow() * g.getSize()) + g.getCurrentColumn();
+        GridItem current = gridList.get(currentIndex);
+
+        if (current.getText().equals("C") || current.getText().equals("D")) {
+            current.setText("");
+        }
+        gridList.set(previousIndex, current);
+        gridList.set(currentIndex, previous);
+        gridAdapter.notifyDataSetChanged();
+    }
+
+    /**
      * After execution callback function for getting the right menu up at the end.
-     * @param result
      */
     @Override
     public void onExecutionEnd(EAfterExecuteCondition result) {
@@ -214,9 +238,19 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         MoveItem currentMove = moveList.get(index);
         ColorDrawable yellow = new ColorDrawable(Color.parseColor("#FFF176")); // or any highlight color
         currentMove.setButtonColor(yellow);
+        recyclerView.scrollToPosition(index);
         moveAdapter.notifyItemChanged(index);
 
         executingMoveUI = index;
+    }
+
+    /**
+     * Resets the grid of the UI game board
+     */
+    public void resetGrid() {
+        gridList.clear();
+        setupGrid(levels.get(selectedLevelID), gridList);
+        gridAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -318,9 +352,13 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             int moves = moveList.size();
             moveList.clear();
             moveAdapter.notifyItemRangeRemoved(0, moves);
+            resetGrid();
         });
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
+            levelC.setSelected(0);
+            recyclerView.scrollToPosition(0);
+            recyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
             levelC.executeScript(moveList, this, this);
         });
         // BACK
@@ -434,7 +472,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         moveList.add(s, new MoveItem(moveText, gray1, gray2));//add item
         moveAdapter.notifyItemInserted(s);
-        recyclerView.scrollToPosition(moveAdapter.getItemCount() - 1);
+        recyclerView.scrollToPosition(s);
 
         recyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
     }

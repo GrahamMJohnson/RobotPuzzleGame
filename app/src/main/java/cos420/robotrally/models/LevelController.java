@@ -148,6 +148,14 @@ public class LevelController {
     }
 
     /**
+     * Getter
+     * @return the game board
+     */
+    public GameBoard getGameBoard() {
+        return gameBoard;
+    }
+
+    /**
      * @return the end status of execution for handling in MainActivity
      */
     public EAfterExecuteCondition getEndStatus() {
@@ -182,6 +190,9 @@ public class LevelController {
                 activity.runOnUiThread(() -> callback.onStepHighlight(finalI));
 
                 commandScript.executeCommand(finalI);
+
+                //Move grid
+                activity.runOnUiThread(() -> callback.onStepMove(finalI));
 
                 try {
                     Thread.sleep(500);

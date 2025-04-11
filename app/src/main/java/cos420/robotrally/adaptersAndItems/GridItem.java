@@ -30,6 +30,14 @@ public class GridItem {
         return text;
     }
 
+    /**
+     * Setter
+     * @param text
+     */
+    public void setText(String text) {
+        this.text = text;
+    }
+
     // TODO javadoc
     public Drawable getColor() { return color;}
 }
