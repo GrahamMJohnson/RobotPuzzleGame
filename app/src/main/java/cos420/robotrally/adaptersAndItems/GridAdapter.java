@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
@@ -32,12 +32,10 @@ public class GridAdapter extends ArrayAdapter<GridItem> {
         }
 
         GridItem gridItem = getItem(position);
-
-        TextView textView = itemView.findViewById(R.id.tile_view);
+        ImageView imageView = itemView.findViewById(R.id.tile_view);
 
         if (gridItem != null) {
-            textView.setText(gridItem.getText());
-            textView.setBackground(gridItem.getColor());
+            imageView.setImageResource(gridItem.getImage());
         }
 
         return itemView;

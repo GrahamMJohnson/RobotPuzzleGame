@@ -7,6 +7,7 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -14,7 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
+import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import cos420.robotrally.adaptersAndItems.GridAdapter;
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     // TODO javadoc
     MoveAdapter moveAdapter;
     int curSelectUI;
+    GridView gridView;
     GridAdapter gridAdapter;
     ArrayList<GridItem> gridList;
 
@@ -138,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         recyclerView.setAdapter(moveAdapter);
 
         //GridTile  view set up
-        GridView gridTile = findViewById(R.id.grid);
+        gridView = findViewById(R.id.grid);
         gridList = new ArrayList<>();
 
         setupGrid(levels.get(levelID));
@@ -148,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //Set adapter
         gridAdapter = new GridAdapter(this, gridList);
-        gridTile.setAdapter(gridAdapter);
+        gridView.setAdapter(gridAdapter);
 
         levelController = new LevelController(levels.get(levelID));
         setupGUIButtons(levelController);
@@ -176,17 +181,67 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         GameBoard g = levelController.getGameBoard();
 
         int previousIndex = (g.getPreviousRow() * g.getSize()) + g.getPreviousColumn();
-        GridItem previous = gridList.get(previousIndex);
 
         int currentIndex = (g.getCurrentRow() * g.getSize()) + g.getCurrentColumn();
         GridItem current = gridList.get(currentIndex);
 
-        if (current.getText().equals("C") || current.getText().equals("D")) {
-            current.setText("");
+        if(current.getImage() == R.drawable.coin_image || current.getImage() == R.drawable.flag) {
+            current.setImage(R.drawable.empty);
         }
-        gridList.set(previousIndex, current);
-        gridList.set(currentIndex, previous);
+        animateTileMove(previousIndex, currentIndex);
+    }
+
+    /**
+     * Animate the tile moving
+     * @param from current position in list
+     * @param to future position in list
+     */
+    public void animateTileMove(int from, int to) {
+        GridItem pre = gridList.get(from);
+        //Tiles
+        View fromView = gridView.getChildAt(from);
+        View toView = gridView.getChildAt(to);
+
+        //Coordinate holders
+        int[] fromPlace = new int[2];
+        int[] toPlace = new int[2];
+
+        //Get coordinates of tiles on the screen
+        fromView.getLocationOnScreen(fromPlace);
+        toView.getLocationOnScreen(toPlace);
+
+        float x = toPlace[0] - fromPlace[0];
+        float y = toPlace[1] - fromPlace[1];
+
+        //Create a temporary view for the animation
+        Context context = this;
+        ImageView moving = new ImageView(context);
+        moving.setImageDrawable(((ImageView) fromView.findViewById(R.id.tile_view)).getDrawable());
+
+        //Layout for temporary view
+        FrameLayout root = findViewById(android.R.id.content);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(fromView.getWidth(), fromView.getHeight());
+        params.leftMargin = fromPlace[0];
+        params.topMargin = fromPlace[1];
+        root.addView(moving, params);
+
+        //Set previous
+        gridList.set(from, gridList.get(to));
         gridAdapter.notifyDataSetChanged();
+
+        //Animating the temporary view
+        moving.animate()
+                .translationX(x)
+                .translationY(y)
+                .setDuration(300)
+                .withEndAction(() -> {
+                    //Set current
+                    gridList.set(to, pre);
+                    gridAdapter.notifyDataSetChanged();
+                    //Remove temporary view
+                    root.removeView(moving);
+                })
+                .start();
     }
 
     /**
@@ -411,15 +466,15 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         for (int i = 0; i < size; i++) { // Row
             for (int j = 0; j < size; j++) { //Column
                 if (i == l.gameBoardData.getStartRow() && j == l.gameBoardData.getStartColumn()) { //Check if start tile
-                    gridList.add(new GridItem("R", gray));
+                    gridList.add(new GridItem(R.drawable.circle_image)); //Placeholder for roomba
                 }else if (i == l.gameBoardData.getGoalRow() && j == l.gameBoardData.getGoalColumn()) { //Check if Goal tile
-                    gridList.add(new GridItem("D", gray));
+                    gridList.add(new GridItem(R.drawable.flag)); //Placeholder for destination
                 }else if(isObstacle(l.gameBoardData.getObstacles(), i, j)) {
-                    gridList.add(new GridItem("", black));
+                    gridList.add(new GridItem(R.drawable.fire_image)); //Placeholder for obstacle
                 }else if(isCollectable(l.gameBoardData.getCollectables(), i, j)) {
-                    gridList.add(new GridItem("C", gray));
+                    gridList.add(new GridItem(R.drawable.coin_image)); //Placeholder for collectable
                 } else {// Blank Tile
-                    gridList.add(new GridItem("", gray));
+                    gridList.add(new GridItem(R.drawable.empty)); //Placeholder for empty tile
                 }
             }
         }
