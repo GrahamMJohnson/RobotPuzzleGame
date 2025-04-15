@@ -629,8 +629,14 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 .create();
 
         //this is the button listener to close the dialog
-        collisionView.findViewById(R.id.crash_dialog_retry).setOnClickListener(v -> {
+        collisionView.findViewById(R.id.CrashDialogRetryButton).setOnClickListener(v -> {
             retry();
+            collisionScreen.dismiss();
+        });
+
+        //this is the button listener to bring the dialog back to the main menu
+        collisionView.findViewById(R.id.CrashDialogMenuButton).setOnClickListener(v -> {
+            mainMenuButton();
             collisionScreen.dismiss();
         });
 
@@ -652,12 +658,12 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 .create();
 
         // This is the button listener to close the dialog
-        lostView.findViewById(R.id.retry_button).setOnClickListener(v -> {
+        lostView.findViewById(R.id.LostDialogRetryButton).setOnClickListener(v -> {
             retry();
             lostScreen.dismiss();
         });
 
-        lostView.findViewById(R.id.main_menu_button).setOnClickListener(v -> {
+        lostView.findViewById(R.id.LostDialogMenuButton).setOnClickListener(v -> {
             mainMenuButton();
             lostScreen.dismiss();
         });

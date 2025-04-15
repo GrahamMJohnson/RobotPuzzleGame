@@ -1,40 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="350dp"
-    android:layout_height="200dp"
+    android:layout_width="350sp"
+    android:layout_height="430sp"
     android:background="@color/light_grey"
     android:layout_gravity="center">
 
+    <!-- this is the win screen. -->
     <TextView
-        android:id="@+id/robot_hit_text"
+        android:id="@+id/Dialog_Header"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="@string/obstacle_hit"
-        android:textSize="25dp"
+        android:layout_height="50sp"
+        android:text="Collision!"
+        android:textSize="40sp"
         android:textColor="@color/black"
         android:textStyle="bold"
         android:background="@color/dark_gray"
         android:gravity="center" />
 
     <TextView
-        android:id="@+id/robot_hit_description"
-        android:layout_below="@id/robot_hit_text"
-        android:layout_width="300dp"
-        android:layout_height="75dp"
-        android:layout_marginLeft="25dp"
+        android:id="@+id/Best_Run_Label"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:layout_below="@id/Dialog_Header"
+        android:text="Best Run:"
         android:gravity="center"
-        android:text="@string/obstacle_hit_description"
-        android:textAlignment="center"
-        android:textSize="17dp"/>
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/Best_Run_Move_Count"
+        android:layout_below="@id/Best_Run_Label"
+        android:layout_width="100sp"
+        android:layout_height="70sp"
+        android:textSize="50sp"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:id="@+id/Best_Run_Secondary_Label"
+        android:layout_below="@id/Best_Run_Move_Count"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="Moves"
+        android:gravity="center"
+        android:textSize="20sp"
+        />
+
+    <TextView
+        android:id="@+id/Best_Run_Collectibles_Count"
+        android:layout_below="@id/Best_Run_Secondary_Label"
+        android:layout_width="100sp"
+        android:layout_height="70sp"
+        android:textSize="50sp"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:id="@+id/Best_Run_Collectibles_Label"
+        android:layout_below="@id/Best_Run_Collectibles_Count"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="Collectibles"
+        android:gravity="center"
+        android:textSize="18sp"
+        />
+
+    <TextView
+        android:id="@+id/This_Run_Label"
+        android:layout_below="@id/Dialog_Header"
+        android:layout_toEndOf="@id/Best_Run_Collectibles_Label"
+        android:layout_marginHorizontal="25sp"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="This Run:"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/This_Run_Move_Count"
+        android:layout_below="@id/This_Run_Label"
+        android:layout_toEndOf="@id/Best_Run_Move_Count"
+        android:layout_width="100sp"
+        android:layout_height="70sp"
+        android:layout_marginHorizontal="25sp"
+        android:textSize="50sp"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:id="@+id/This_Run_Secondary_Label"
+        android:layout_below="@id/This_Run_Move_Count"
+        android:layout_toEndOf="@id/Best_Run_Secondary_Label"
+        android:layout_marginHorizontal="25sp"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="@string/total_moves_text"
+        android:gravity="center"
+        android:textSize="18sp"
+        />
+
+    <TextView
+        android:id="@+id/This_Run_Collectibles_Count"
+        android:layout_below="@id/This_Run_Secondary_Label"
+        android:layout_toEndOf="@id/Best_Run_Move_Count"
+        android:layout_width="100sp"
+        android:layout_height="70sp"
+        android:layout_marginHorizontal="25sp"
+        android:textSize="50sp"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:id="@+id/This_Run_Collectibles_Label"
+        android:layout_below="@id/This_Run_Collectibles_Count"
+        android:layout_toEndOf="@id/Best_Run_Collectibles_Label"
+        android:layout_marginHorizontal="25sp"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="Collectibles"
+        android:gravity="center"
+        android:textSize="18sp"
+        />
+
+    <TextView
+        android:id="@+id/Goal_Label"
+        android:layout_below="@id/Dialog_Header"
+        android:layout_toEndOf="@id/This_Run_Secondary_Label"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="Goal:"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textSize="20sp"
+        />
+
+    <TextView
+        android:id="@+id/Goal_Move_Count"
+        android:layout_below="@id/Goal_Label"
+        android:layout_toEndOf="@id/This_Run_Move_Count"
+        android:layout_width="100sp"
+        android:layout_height="70sp"
+        android:textSize="50sp"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:id="@+id/Goal_Secondary_Label"
+        android:layout_below="@id/Goal_Move_Count"
+        android:layout_toEndOf="@id/This_Run_Secondary_Label"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="Moves"
+        android:gravity="center"
+        android:textSize="20sp"
+        />
+
+    <TextView
+        android:id="@+id/Goal_Collectibles_Count"
+        android:layout_below="@id/Goal_Secondary_Label"
+        android:layout_toEndOf="@id/This_Run_Move_Count"
+        android:layout_width="100sp"
+        android:layout_height="70sp"
+        android:textSize="50sp"
+        android:gravity="center_horizontal"
+        />
+
+    <TextView
+        android:id="@+id/Goal_Collectibles_Label"
+        android:layout_below="@id/Goal_Collectibles_Count"
+        android:layout_toEndOf="@id/This_Run_Secondary_Label"
+        android:layout_width="100sp"
+        android:layout_height="25sp"
+        android:text="Collectibles"
+        android:gravity="center"
+        android:textSize="18sp"
+        />
+
+    <ImageView
+        android:id="@+id/status_bar_background"
+        android:layout_width="300sp"
+        android:layout_height="40sp"
+        android:layout_marginVertical="20sp"
+        android:layout_marginHorizontal="25sp"
+        android:background="@color/gray"
+        android:layout_below="@id/Goal_Collectibles_Label"
+        android:contentDescription="@string/background_status_bar_description"/>
+    <ImageView
+        android:id="@+id/status_bar_inside_295dpTotal"
+        android:layout_width="250sp"
+        android:layout_height="35sp"
+        android:layout_below="@id/Goal_Collectibles_Label"
+        android:layout_marginVertical="22.5sp"
+        android:layout_marginHorizontal="27.5sp"
+        android:contentDescription="@string/status_bar_description"
+        android:background="@color/light_grey"/>
+
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/crash_dialog_retry"
-        android:layout_width="250dp"
-        android:layout_height="65dp"
-        android:layout_below="@id/robot_hit_description"
-        android:layout_marginHorizontal="50dp"
-        android:text="Retry"
-        android:textSize="35dp"
-        android:background="@color/snow"/>
+        android:id="@+id/CrashDialogMenuButton"
+        android:layout_width="100sp"
+        android:layout_height="65sp"
+        android:layout_below="@id/status_bar_background"
+        android:background="@drawable/last_level_symbol_updated"
+        android:textSize="20sp"
+        android:contentDescription="@string/last_image_description"
+        android:layout_marginHorizontal="37.5dp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/CrashDialogRetryButton"
+        android:layout_width="100sp"
+        android:layout_height="65sp"
+        android:layout_below="@id/status_bar_background"
+        android:layout_marginHorizontal="37.5dp"
+        android:textSize="25sp"
+        android:layout_toEndOf="@id/CrashDialogMenuButton"
+        android:contentDescription="@string/retry_image_description"
+        android:background="@drawable/restart_image"/>
 
 </RelativeLayout>
