@@ -3,6 +3,8 @@ package cos420.robotrally;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -10,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -60,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     /**Independent tracking of where we are in execution, in the UI*/
     int executingMoveUI;
     ObjectAnimator animator;
+    private final List<View> ghostList = new ArrayList<>();
     RecyclerView recyclerView;
 
     //TODO javadoc
@@ -214,8 +218,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         float y = toPlace[1] - fromPlace[1];
 
         //Create a temporary view for the animation
-        Context context = this;
-        ImageView moving = new ImageView(context);
+        ImageView moving = new ImageView(this);
         moving.setImageDrawable(((ImageView) fromView.findViewById(R.id.tile_view)).getDrawable());
 
         //Layout for temporary view
@@ -229,19 +232,89 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         gridList.set(from, gridList.get(to));
         gridAdapter.notifyDataSetChanged();
 
-        //Animating the temporary view
-        moving.animate()
-                .translationX(x)
-                .translationY(y)
-                .setDuration(300)
-                .withEndAction(() -> {
-                    //Set current
-                    gridList.set(to, pre);
-                    gridAdapter.notifyDataSetChanged();
-                    //Remove temporary view
-                    root.removeView(moving);
-                })
+        //Animator for movement
+        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
+        animator.setDuration(300);
+        final long[] lastGhostTime = {0}; //Time when last ghost was created
+        final long ghostInterval = 20; //How long until another ghost is created
+
+        animator.addUpdateListener(animation -> {
+            float progress = (float) animation.getAnimatedValue();
+            float curX = fromPlace[0] + x * progress;
+            float curY = fromPlace[1] + y * progress;
+
+            moving.setTranslationX(curX - fromPlace[0]);
+            moving.setTranslationY(curY - fromPlace[1]);
+
+            long curTime = System.currentTimeMillis(); //Actual time
+            if (curTime - lastGhostTime[0] > ghostInterval) { //Is it time to create another ghost?
+                addGhostTrailAt(curX, curY, fromView.getWidth(), fromView.getHeight());
+                lastGhostTime[0] = curTime;
+            }
+        });
+
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                //Set current
+                gridList.set(to, pre);
+                gridAdapter.notifyDataSetChanged();
+                //Remove temporary view for movement
+                root.removeView(moving);
+            }
+        });
+
+        animator.start();
+    }
+
+    /**
+     * Adds a new ghost to the trail
+     * @param x the current x coordinate
+     * @param y the current y coordinate
+     * @param tileW width of current tile
+     * @param tileH width of current tile
+     */
+    private void addGhostTrailAt(float x, float y, int tileW, int tileH) {
+        //Create view for ghost with parameters
+        View ghost = new View(this);
+        int ghostSize = (int) (tileW / 1.5);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ghostSize, ghostSize);
+        params.leftMargin = (int) (x + (tileW / 2) - (ghostSize / 2));
+        params.topMargin = (int) (y + (tileH / 2) - (ghostSize / 2));
+
+        //Create drawable, which is a white circle
+        GradientDrawable draw = new GradientDrawable();
+        draw.setShape(GradientDrawable.OVAL);
+        draw.setColor(Color.parseColor("#44FFFFFF"));
+
+        //Set ghost
+        ghost.setLayoutParams(params);
+        ghost.setBackground(draw);
+        ghost.setAlpha(0f);//to fade in later
+        ghostList.add(ghost);
+
+        //Add ghost to root
+        FrameLayout root = findViewById(android.R.id.content);
+        root.addView(ghost);
+
+        //Animate ghost to fade in over 150 milliseconds
+        ghost.animate()
+                .alpha(1f)
+                .setDuration(150)
                 .start();
+    }
+
+    /**
+     * Clears the ghost trail
+     */
+    public void clearGhost() {
+        FrameLayout root = findViewById(android.R.id.content);
+
+        for (View ghost : ghostList) {
+            root.removeView(ghost);
+        }
+
+        ghostList.clear();
     }
 
     /**
@@ -421,6 +494,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             moveList.clear();
             moveAdapter.notifyItemRangeRemoved(0, moves);
             resetGrid();
+            clearGhost();
         });
 
         // START
@@ -708,6 +782,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         setButtonsClickable(true);
         animator.start();
         resetGrid();
+        clearGhost();
     }
 
     /**
