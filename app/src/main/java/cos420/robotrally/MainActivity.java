@@ -667,6 +667,26 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     }
 
     /**
+     * Show the settings screen
+     */
+    private void showSettingsMenu(){
+        //Create the view to be referenced
+        LayoutInflater settingsInflater = getLayoutInflater();
+        View settingsView = settingsInflater.inflate(R.layout.settings_screen, null);
+
+        AlertDialog settingsScreen = new AlertDialog.Builder(this)
+                .setView(settingsView)
+                .setCancelable(false)
+                .create();
+
+        settingsView.findViewById(R.id.settingsCloseButton).setOnClickListener(v -> {
+            settingsScreen.dismiss();
+        });
+
+        settingsScreen.show();
+    }
+
+    /**
      * Common lines of code for Main Menu Buttons
      */
     private void mainMenuButton() {

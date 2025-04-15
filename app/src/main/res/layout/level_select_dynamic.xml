@@ -25,4 +25,16 @@
         android:gravity="center"
         tools:listitem="@layout/level_select_level_tile"/>
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/settingsButton"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/dynamicLevelLayout"
+        android:layout_marginStart="131.5dp"
+        android:layout_marginTop="20dp"
+        android:text="Settings"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:textStyle="bold"/>
+
 </RelativeLayout>
