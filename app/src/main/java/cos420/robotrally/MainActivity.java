@@ -526,6 +526,11 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             clearGameListeners();
             openLevelSelect();
         });
+
+        // gameboard settings/info
+        findViewById(R.id.settings_info_button).setOnClickListener(v -> {
+            showSettingsInfoMenu();
+        });
     }
 
     /**
@@ -748,7 +753,28 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     }
 
     /**
-     * Show the settings screen
+     * Show the settings/info screen for the gameboard instance of the settings menu
+     */
+    private void showSettingsInfoMenu(){
+        //TODO: make this bring up level information too, make it scrollable, with the information above the settigns.
+        //Create the view to be referenced
+        LayoutInflater settingsInflater = getLayoutInflater();
+        View settingsView = settingsInflater.inflate(R.layout.settings_screen, null);
+
+        AlertDialog settingsScreen = new AlertDialog.Builder(this)
+                .setView(settingsView)
+                .setCancelable(false)
+                .create();
+
+        settingsView.findViewById(R.id.settingsCloseButton).setOnClickListener(v -> {
+            settingsScreen.dismiss();
+        });
+
+        settingsScreen.show();
+    }
+
+    /**
+     * Show the settings menu, (FOR LEVEL SELECT MENU)
      */
     private void showSettingsMenu(){
         //Create the view to be referenced

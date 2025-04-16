@@ -33,6 +33,16 @@
             android:gravity="center"
             android:textColor="@color/black"
             android:text="-1"/>
+        <ImageButton
+            android:id="@+id/settings_info_button"
+            android:layout_width="70dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="30dp"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/black"
+            android:src="@drawable/settings_gear"
+            android:scaleType="fitCenter"
+            android:contentDescription="Settings"/>
     </LinearLayout>
 
     <GridView
