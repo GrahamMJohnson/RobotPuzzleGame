@@ -644,6 +644,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         findViewById(R.id.start_button).setClickable(value);
         findViewById(R.id.reset_button).setClickable(value);
         findViewById(R.id.delete_button).setClickable(value);
+        findViewById(R.id.back_button).setClickable(value);
 
     }
 
