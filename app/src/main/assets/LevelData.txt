@@ -80,3 +80,57 @@ collectables:
     column: 2
 specialA: d3
 specialB: l2
+-------------------------------------
+level: 3
+size: 5
+startRow: 4
+startColumn: 4
+goalRow: 0
+goalColumn: 0
+obstacle:
+    type: chair
+    row: 4
+    column 3
+obstacle:
+    type: chair
+    row: 3
+    column 3
+obstacle:
+    type: chair
+    row: 2
+    column 3
+obstacle:
+    type: chair
+    row: 1
+    column 3
+obstacle:
+    type: chair
+    row: 3
+    column 2
+obstacle:
+    type: wall
+    row: 0
+    column: 1
+obstacle:
+    type: wall
+    row: 1
+    column: 1
+obstacle:
+    type: wall
+    row: 3
+    column: 1
+collectables:
+    row: 1
+    column: 2
+collectables:
+    row: 3
+    column: 0
+collectables:
+    row: 4
+    column: 2
+specialA:
+    type: repeat
+    parameters: 2 1
+specialB:
+    type: repeat
+    parameters: 1 2
