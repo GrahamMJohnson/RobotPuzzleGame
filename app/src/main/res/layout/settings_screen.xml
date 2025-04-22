@@ -58,12 +58,13 @@
             android:layout_height="50dp"
             android:layout_below="@id/Accessibility_Bar"
             android:layout_marginStart="35dp"
-            android:text="Play animations"
+            android:text="Turn off animations"
             android:textSize="20sp"
             android:gravity="center_vertical"
             android:paddingStart="30sp"/>
 
         <CheckBox
+            android:id="@+id/checkAnimations"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_toEndOf="@id/Play_Animations"

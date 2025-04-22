@@ -9,7 +9,6 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
@@ -18,6 +17,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -78,12 +79,17 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
     // TODO javadoc
     private int selectedLevelID;
+    private boolean animationIsOff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // list of data for all the levels
         levels = LevelMapper.mapLevelDataFromFile(this);
+
+        //Sets animations to "ON" by default
+        animationIsOff = false;
+
         openLevelSelect();
     }
 
@@ -102,6 +108,11 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         setContentView(R.layout.level_select_dynamic);
         levelDisplayList = new ArrayList<>();
+
+        findViewById(R.id.settingsButton).setOnClickListener(v -> {
+            showSettingsMenu();
+        });
+
         // for each level
         for (int i = 0; i < levels.size(); i++) {
             // TODO Calc percentage
@@ -192,7 +203,15 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         if(current.getImage() == R.drawable.coin_image || current.getImage() == R.drawable.flag) {
             current.setImage(R.drawable.empty);
         }
-        animateTileMove(previousIndex, currentIndex);
+        if (!animationIsOff) { //Animation is on
+            //Animate tile move
+            animateTileMove(previousIndex, currentIndex);
+        }else { //Animation is off
+            //Swap the two tiles
+            Collections.swap(gridList, previousIndex, currentIndex);
+            gridAdapter.notifyDataSetChanged();
+        }
+
     }
 
     /**
@@ -502,9 +521,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             setButtonsClickable(false);
             animator.end();
             recyclerView.smoothScrollToPosition(0);
-//            levelC.setSelected(0);
-//            recyclerView.scrollToPosition(0);
-//            recyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
             levelC.executeScript(moveList, this, this);
         });
 
@@ -770,6 +786,21 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             settingsScreen.dismiss();
         });
 
+        //Checkbox for animations
+        CheckBox check = settingsView.findViewById(R.id.checkAnimations);
+
+        //Load current state of checkbox
+        check.setChecked(animationIsOff);
+
+        //Check box listener
+        check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                //Animation turns off if true, turns on if false
+                animationIsOff = isChecked;
+            }
+        });
+
         settingsScreen.show();
     }
 
@@ -788,6 +819,21 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         settingsView.findViewById(R.id.settingsCloseButton).setOnClickListener(v -> {
             settingsScreen.dismiss();
+        });
+
+        //Checkbox for animations
+        CheckBox check = settingsView.findViewById(R.id.checkAnimations);
+
+        //Load current state of checkbox
+        check.setChecked(animationIsOff);
+
+        //Check box listener
+        check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                //Animation turns off if true, turns on if false
+                animationIsOff = isChecked;
+            }
         });
 
         settingsScreen.show();
