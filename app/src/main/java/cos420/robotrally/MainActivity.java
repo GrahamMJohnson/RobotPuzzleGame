@@ -97,6 +97,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     /** Attribute to track if subroutines are being edited */
     private ListName activeListName = ListName.MAIN;
     private ListName lastSubroutineEdited;
+    private int obstacleImage;
+    private int collectableImage;
+    private boolean isObstacleGif;
+    private boolean isCollectableGif;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //Sets animations to "ON" by default
         animationIsOff = false;
+        setObstacle();
+        setCollectable();
 
         openLevelSelect();
     }
@@ -227,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         int currentIndex = (g.getCurrentRow() * g.getSize()) + g.getCurrentColumn();
         GridItem current = gridList.get(currentIndex);
 
-        if(current.getImage() == R.drawable.coin_image || current.getImage() == R.drawable.flag) {
+        if(current.getImage() == collectableImage || current.getImage() == R.drawable.flag) {
             current.setImage(R.drawable.empty);
         }
         if (!animationIsOff) { //Animation is on
@@ -592,22 +598,34 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      */
     private void setupGrid(LevelData l) {
         int size = l.gameBoardData.getSize(); //size of game board
-        ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
-        ColorDrawable black = new ColorDrawable(Color.parseColor("#000000"));
 
         for (int i = 0; i < size; i++) { // Row
             for (int j = 0; j < size; j++) { //Column
                 if (i == l.gameBoardData.getStartRow() && j == l.gameBoardData.getStartColumn()) { //Check if start tile
-                    gridList.add(new GridItem(R.drawable.circle_image)); //Placeholder for roomba
+                    gridList.add(new GridItem(R.drawable.circle_image, false)); //Placeholder for roomba
                 }else if (i == l.gameBoardData.getGoalRow() && j == l.gameBoardData.getGoalColumn()) { //Check if Goal tile
-                    gridList.add(new GridItem(R.drawable.flag)); //Placeholder for destination
+                    gridList.add(new GridItem(R.drawable.flag, false)); //Placeholder for destination
                 }else if(isObstacle(l.gameBoardData.getObstacles(), i, j)) {
-                    gridList.add(new GridItem(R.drawable.fire_image)); //Placeholder for obstacle
+                    gridList.add(new GridItem(obstacleImage, isObstacleGif)); //Placeholder for obstacle
                 }else if(isCollectable(l.gameBoardData.getCollectables(), i, j)) {
-                    gridList.add(new GridItem(R.drawable.coin_image)); //Placeholder for collectable
+                    gridList.add(new GridItem(collectableImage, isCollectableGif)); //Placeholder for collectable
                 } else {// Blank Tile
-                    gridList.add(new GridItem(R.drawable.empty)); //Placeholder for empty tile
+                    gridList.add(new GridItem(R.drawable.empty, false)); //Placeholder for empty tile
                 }
+            }
+        }
+    }
+
+    /**
+     * Changes the grid based on if animations are on or off
+     */
+    private void changeGridForGif() {
+        for (int i = 0; i < gridList.size(); i++) {
+            int image = gridList.get(i).getImage();
+            if (image == R.drawable.coin_image || image == R.drawable.coin_gif) { //is a collectable
+                gridList.set(i, new GridItem(collectableImage, isCollectableGif));
+            }else if (image == R.drawable.fire_image || image == R.drawable.cat_gif) {//is a obstacle
+                gridList.set(i, new GridItem(obstacleImage, isObstacleGif));
             }
         }
     }
@@ -995,6 +1013,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 //Animation turns off if true, turns on if false
                 animationIsOff = isChecked;
+                setObstacle();
+                setCollectable();
+                changeGridForGif();
+                gridAdapter.notifyDataSetChanged();
             }
         });
 
@@ -1030,6 +1052,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 //Animation turns off if true, turns on if false
                 animationIsOff = isChecked;
+                setObstacle();
+                setCollectable();
             }
         });
 
@@ -1053,6 +1077,32 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         animator.start();
         resetGrid();
         clearGhost();
+    }
+
+    /**
+     * Sets the obstacle image based on if animation is on or off
+     */
+    public void setObstacle() {
+        if (animationIsOff) {//animation is off
+            obstacleImage = R.drawable.fire_image;
+            isObstacleGif = false;
+        }else { //animation is on
+            obstacleImage = R.drawable.cat_gif;
+            isObstacleGif = true;
+        }
+    }
+
+    /**
+     * Sets the collectable image based on if animation is on or off
+     */
+    public void setCollectable() {
+        if (animationIsOff) {//animation is off
+            collectableImage = R.drawable.coin_image;
+            isCollectableGif = false;
+        }else {//animation is on
+            collectableImage = R.drawable.coin_gif;
+            isCollectableGif = true;
+        }
     }
 
     /**

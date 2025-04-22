@@ -9,8 +9,11 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
+import cos420.robotrally.MainActivity;
 import cos420.robotrally.R;
 
 // TODO javadoc
@@ -35,7 +38,17 @@ public class GridAdapter extends ArrayAdapter<GridItem> {
         ImageView imageView = itemView.findViewById(R.id.tile_view);
 
         if (gridItem != null) {
-            imageView.setImageResource(gridItem.getImage());
+            //imageView.setImageResource(gridItem.getImage());
+            if (gridItem.isGif()) { //is a gif
+                Glide.with(this.getContext())
+                        .asGif()
+                        .load(gridItem.getImage())
+                        .into(imageView);
+            }else {//not a gif
+                Glide.with(this.getContext())
+                        .load(gridItem.getImage())
+                        .into(imageView);
+            }
         }
 
         return itemView;
