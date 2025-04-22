@@ -50,6 +50,11 @@ public class RobotRallySave {
     String jsonCurMoveDiff = "current_move_difference";
     String jsonBestMoveDiff = "best_move_difference";
     String jsonPercentCollectibles = "percent_collected";
+    String jsonSavedMoveSequence = "saved_move_sequence";
+    String jsonBeginningMoveSequences = "number_saved_move_sequences";
+    String jsonEndMoveSequences = "start_point";
+    String jsonNumberMoveSequences = "number_saved_moves";
+
 
 
     ///--------------
@@ -75,6 +80,7 @@ public class RobotRallySave {
         //it will then use the key to try to construct a JSON Object
         try{
             currentJSON = new JSONObject(jsonString);
+            currentJSON.put(jsonBeginningMoveSequences, 0);
         }
         //if bad JSON string, it will create a new JSON file
         catch(JSONException e){
@@ -106,6 +112,28 @@ public class RobotRallySave {
     ///--------------
     /// Class Setters
     ///--------------
+
+
+    /**
+     * This is the method to save level attempts
+     * @param moveSequence the string representation of the move sequence that you want to save.
+     */
+    public void saveLevelAttempt(String moveSequence) throws Exception{
+        //Finds the current key that is next to be saved to based on how many have already been saved
+        String currentKey = jsonSavedMoveSequence + (currentJSON.getInt(jsonBeginningMoveSequences));
+        //Saves the desired move sequence to the correct slot
+        currentJSON.put(currentKey, moveSequence);
+
+        //If there are the full amount of move sequences saved, iterate the start point by one each time you save
+        if(currentJSON.getInt(jsonNumberMoveSequences) > 14){
+            currentJSON.put(jsonBeginningMoveSequences, ((currentJSON.getInt(jsonBeginningMoveSequences) + 1) % 15));
+        }
+        //Add one to the end index of the move sequence save
+        currentJSON.put(jsonEndMoveSequences, ((currentJSON.getInt(jsonEndMoveSequences) + 1) % 15));
+
+        //Add one more to the current number of move sequences being saved
+        currentJSON.put(jsonNumberMoveSequences, (currentJSON.getInt(jsonNumberMoveSequences) + 1));
+    }
 
     /**
      * This is the method for saving the move sequence into the JSON Object
@@ -329,6 +357,24 @@ public class RobotRallySave {
         catch (JSONException e) {
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    /**
+     * This is the method to get the move sequences from memory
+     * @param attemptNumber the how many attempts have gone by since that one was saved
+     */
+    public String getPastMoveSequence(int attemptNumber){
+        try{
+            //Find the key for the attempt x times ago
+            String currentKey = jsonMoveSequence + (currentJSON.getInt(jsonEndMoveSequences) - attemptNumber);
+            //return that attempt
+            return currentJSON.getString(currentKey);
+        }
+        //if it fails to retrieve the data, return N/A if no data is found
+        catch (JSONException e) {
+            e.printStackTrace();
+            return "N/A";
         }
     }
 

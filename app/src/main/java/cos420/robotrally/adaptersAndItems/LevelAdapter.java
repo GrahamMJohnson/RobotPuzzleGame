@@ -6,6 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.ViewAnimator;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
@@ -53,7 +56,8 @@ public class LevelAdapter extends ArrayAdapter<LevelItem> {
             button.setOnClickListener(v -> {
                 listener.onLevelSelectClick(levelItem.getID());
             });
-            // TODO Set percentage bar
+            ProgressBar progressBar = itemView.findViewById(R.id.levelRatingDynamic);
+            progressBar.setProgress((int) (levelItem.getPercent() * 100));
         }
 
         return itemView;

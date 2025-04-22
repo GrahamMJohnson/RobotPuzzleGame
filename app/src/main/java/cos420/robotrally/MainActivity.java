@@ -48,6 +48,7 @@ import cos420.robotrally.models.Collectable;
 import cos420.robotrally.models.GameBoard;
 import cos420.robotrally.models.LevelController;
 import cos420.robotrally.models.Obstacle;
+import cos420.robotrally.models.StatManager;
 import cos420.robotrally.services.LevelMapper;
 import cos420.robotrally.models.RobotRallySave;
 import cos420.robotrally.models.ExecutionCallback;
@@ -138,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // for each level
         for (int i = 0; i < levels.size(); i++) {
-            // TODO Calc percentage
-            double percentage = .5;
+            StatManager thisLevel = new StatManager(this, i + 1);
+            double percentage = 0.75;
             // Create LevelItem
             levelDisplayList.add(new LevelItem(i, percentage));
         }
