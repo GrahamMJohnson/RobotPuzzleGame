@@ -140,13 +140,13 @@
                 android:text="B"
                 android:textSize="25sp"
                 android:clickable="true"
-                android:backgroundTint="@color/red"/>
+                android:backgroundTint="@color/green"/>
 
         </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/move_viewer"
-            android:contentDescription="List of moves"
+            android:contentDescription="@string/move_list"
             android:layout_width="110dp"
             android:layout_height="match_parent" />
 
@@ -166,13 +166,13 @@
             android:backgroundTint="@color/dim_gray" />
 
         <Button
-            android:id="@+id/reset_button"
-            android:layout_width="110dp"
+            android:id="@+id/subroutine_button"
+            android:layout_width="130dp"
             android:layout_height="50dp"
-            android:text="Reset"
-            android:textSize="23sp"
-            android:layout_marginStart="35dp"
-            android:layout_marginEnd="35dp"
+            android:text="Edit A/B"
+            android:textSize="22sp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
             android:backgroundTint="@color/dim_gray"/>
 
         <Button

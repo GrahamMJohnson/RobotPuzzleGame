@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350sp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/outline_not_transparent"
+    android:layout_gravity="center">
+
+    <!-- this is the subroutine editor screen. -->
+
+    <TextView
+        android:id="@+id/Dialog_Header"
+        android:layout_width="match_parent"
+        android:layout_height="50sp"
+        android:background="@color/dark_gray"
+        android:gravity="center"
+        android:layout_marginTop="2dp"
+        android:layout_marginHorizontal="2dp"
+        android:text="@string/subroutine_title"
+        android:textColor="@color/black"
+        android:textSize="40sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/views_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Dialog_Header"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="25dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/a_subroutine_label"
+                android:textSize="30sp"
+                android:textColor="@color/red">
+
+            </TextView>
+
+            <FrameLayout
+                android:layout_width="130dp"
+                android:layout_height="220dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/subroutine_a_viewer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:background="@drawable/rounded_outline"
+                    android:contentDescription="@string/move_list" />
+
+                <View
+                    android:id="@+id/empty_a_click_area"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/b_subroutine_label"
+                android:textSize="30sp"
+                android:textColor="@color/green">
+
+            </TextView>
+
+            <FrameLayout
+                android:layout_width="130dp"
+                android:layout_height="220dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/subroutine_b_viewer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:background="@drawable/rounded_outline"
+                    android:contentDescription="@string/move_list" />
+
+                <View
+                    android:id="@+id/empty_b_click_area"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/views_container"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/close_button"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:backgroundTint="@color/dim_gray"
+            android:text="Close"
+            android:textSize="23sp" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

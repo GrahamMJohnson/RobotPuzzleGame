@@ -13,12 +13,14 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 import cos420.robotrally.R;
+import cos420.robotrally.enumerations.ListName;
 
 
 // TODO javadoc
@@ -27,12 +29,14 @@ public class MoveAdapter extends RecyclerView.Adapter<MoveAdapter.MyViewHolder> 
     // TODO javadoc
     private List<MoveItem> list;
     MoveListener listener;
+    ListName listName;
 
     // TODO javadoc
     //Constructor
-    public MoveAdapter(List<MoveItem> list, MoveListener listener) {
+    public MoveAdapter(List<MoveItem> list, MoveListener listener, ListName listName) {
         this.list = list;
         this.listener = listener;
+        this.listName = listName;
     }
 
     @NonNull
@@ -40,7 +44,7 @@ public class MoveAdapter extends RecyclerView.Adapter<MoveAdapter.MyViewHolder> 
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater
                 .from(parent.getContext()).inflate(R.layout.moves, parent, false);
-        return new MyViewHolder(view);
+        return new MyViewHolder(view, listName);
     }
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
@@ -62,22 +66,24 @@ public class MoveAdapter extends RecyclerView.Adapter<MoveAdapter.MyViewHolder> 
      * Interface to interact with listener in main class
      */
     public interface MoveListener {
-        void onMoveClick(int position);
+        void onMoveClick(int position, ListName listName);
     }
 
 
     //ViewHolder class
-    class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder {
         LinearLayout move;
         Button move_view;
         TextView blink;
+        ListName listName;
 
         // TODO javadoc
-        public MyViewHolder(@NonNull View itemView) {
+        public MyViewHolder(@NonNull View itemView, ListName listName) {
             super(itemView);
             move = itemView.findViewById(R.id.move);
             move_view = itemView.findViewById(R.id.move_view);
             blink = itemView.findViewById(R.id.blink);
+            this.listName = listName;
         }
 
         /**
@@ -88,7 +94,7 @@ public class MoveAdapter extends RecyclerView.Adapter<MoveAdapter.MyViewHolder> 
             move_view.setOnClickListener(v -> {
                 int adapterPosition = getAdapterPosition();
                 if (adapterPosition != RecyclerView.NO_POSITION) {
-                    listener.onMoveClick(adapterPosition);
+                    listener.onMoveClick(adapterPosition, listName);
                 }
             });
         }

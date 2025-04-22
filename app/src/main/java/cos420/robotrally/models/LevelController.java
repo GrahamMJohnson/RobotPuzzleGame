@@ -8,8 +8,8 @@ import cos420.robotrally.MainActivity;
 import cos420.robotrally.adaptersAndItems.MoveItem;
 import cos420.robotrally.commands.*;
 import cos420.robotrally.enumerations.EAfterExecuteCondition;
+import cos420.robotrally.enumerations.ListName;
 import cos420.robotrally.levels.LevelData;
-import cos420.robotrally.services.SpecialCommandService;
 
 // TODO javadoc for the class itself
 public class LevelController {
@@ -18,6 +18,12 @@ public class LevelController {
 
     /** attribute for the user input of commands */
     private final CommandList commandScript;
+
+    /** attribute to store the a sub-routine */
+    private final CommandList subroutineA;
+
+    /** attribute to store the a sub-routine */
+    private final CommandList subroutineB;
 
     /** attribute that is a reference to the stored level data */
     private final LevelData levelData;
@@ -39,16 +45,10 @@ public class LevelController {
         levelData = level;
         gameBoard = new GameBoard(level.gameBoardData);
         commandScript = new CommandList();
-        attempts = 0;
-    }
+        subroutineA = new CommandList();
+        subroutineB = new CommandList();
 
-    /**
-     * Method that resets the level's Roomba position and clears the command linked list
-     */
-    public void resetLevel()
-    {
-        gameBoard.resetGrid(levelData.gameBoardData);
-        commandScript.clearList();
+        attempts = 0;
     }
 
     /**
@@ -61,90 +61,122 @@ public class LevelController {
 
     /**
      * Method to add an Up command to script
+     * @param list The list to add command to
      */
-    public void addUpCommand()
+    public void addUpCommand(ListName list)
     {
-        commandScript.addCommand(new Up(gameBoard));
-        Log.v(LOG_TAG, "Added up command");
+        switch(list) {
+            case MAIN: commandScript.addCommand(new Up(gameBoard)); break;
+            case A: subroutineA.addCommand(new Up(gameBoard)); break;
+            case B: subroutineB.addCommand(new Up(gameBoard)); break;
+        }
     }
 
     /**
-     * Method to add a Down command to script
+     * Method to add a Down command
+     * @param list The list to add command to
      */
-    public void addDownCommand()
+    public void addDownCommand(ListName list)
     {
-        commandScript.addCommand(new Down(gameBoard));
-        Log.v(LOG_TAG, "Added down command");
+        switch(list) {
+            case MAIN: commandScript.addCommand(new Down(gameBoard)); break;
+            case A: subroutineA.addCommand(new Down(gameBoard)); break;
+            case B: subroutineB.addCommand(new Down(gameBoard)); break;
+        }
     }
 
     /**
-     * Method to add a Left command to script
+     * Method to add a Left command
+     * @param list The list to add command to
      */
-    public void addLeftCommand()
+    public void addLeftCommand(ListName list)
     {
-        commandScript.addCommand(new Left(gameBoard));
-        Log.v(LOG_TAG, "Added left command");
+        switch(list) {
+            case MAIN: commandScript.addCommand(new Left(gameBoard)); break;
+            case A: subroutineA.addCommand(new Left(gameBoard)); break;
+            case B: subroutineB.addCommand(new Left(gameBoard)); break;
+        }
     }
 
     /**
-     * Method to add a Right command to script
+     * Method to add a Right command
+     * @param list The list to add command to
      */
-    public void addRightCommand()
+    public void addRightCommand(ListName list)
     {
-        commandScript.addCommand(new Right(gameBoard));
-        Log.v(LOG_TAG, "Added right command");
+        switch(list) {
+            case MAIN: commandScript.addCommand(new Right(gameBoard)); break;
+            case A: subroutineA.addCommand(new Right(gameBoard)); break;
+            case B: subroutineB.addCommand(new Right(gameBoard)); break;
+        }
     }
 
     /**
      * Method to add an A command to script
+     * @param list The list to add command to
      */
-    public void addACommand() {
-        try {
-            ICommand command = SpecialCommandService.getInstanceOfSpecialCommand(levelData.commandAType, gameBoard);
-            commandScript.addCommand(command);
-            Log.v(LOG_TAG, "Added special command A");
-        }
-        catch (RuntimeException e) {
-            Log.v("Adding Special Command", e.getMessage() != null ? e.getMessage() : "Error creating special command");
+    public void addSubroutineA(ListName list)
+    {
+        switch(list) {
+            case MAIN: commandScript.addSubroutine(subroutineA); break;
+            case A: break; // Can't add to itself
+            case B: ;break; // A can only be added to main to prevent loops
         }
     }
 
     /**
      * Method to add an B command to script
+     * @param list The list to add command to
      */
-    public void addBCommand() {
-        try {
-            ICommand command = SpecialCommandService.getInstanceOfSpecialCommand(levelData.commandBType, gameBoard);
-            commandScript.addCommand(command);
-            Log.v(LOG_TAG, "Added special command B");
-        }
-        catch (RuntimeException e) {
-            Log.v("Adding Special Command", e.getMessage() != null ? e.getMessage() : "Error creating special command");
+    public void addSubroutineB(ListName list)
+    {
+        switch(list) {
+            case MAIN: commandScript.addSubroutine(subroutineB); break;
+            case A: subroutineA.addSubroutine(subroutineB); break;
+            case B: ; break; // Can't add to itself
         }
     }
 
     /**
      * Method to remove command from end of script
+     * @param list The list to remove command from
+     * @return int value of how many commands were deleted
      * @throws Exception is the script is empty
      */
-    public void remove() throws Exception {
-        commandScript.remove();
-        Log.v(LOG_TAG, "Deleted command");
+    public int remove(ListName list) throws Exception {
+        switch(list) {
+            case MAIN: return commandScript.remove();
+            case A: return subroutineA.remove();
+            case B: return subroutineB.remove();
+            default: return 0;
+        }
     }
 
     /**
      * Passing up what command is selected(to get to UI)
+     * @param list The list to get selected from
      * @return selected command
      */
-    public int getSelected() {
-        return commandScript.getSelect();
+    public int getSelected(ListName list) {
+        switch(list) {
+            case MAIN: return commandScript.getSelect();
+            case A: return subroutineA.getSelect();
+            case B: return subroutineB.getSelect();
+            default: return 0;
+        }
     }
 
     /**
      * Setter for what command is selected
+     * @param s The index of selected command
+     * @param list The list to set selected for
      */
-    public void setSelected(int s) {
-        commandScript.setSelect(s);
+    public void setSelected(int s, ListName list) {
+        switch(list) {
+            case MAIN: commandScript.setSelect(s); break;
+            case A: subroutineA.setSelect(s); break;
+            case B: subroutineB.setSelect(s); break;
+        }
     }
 
     /**
@@ -216,5 +248,4 @@ public class LevelController {
             activity.runOnUiThread(() -> callback.onExecutionEnd(result));
         }).start();
     }
-
 }

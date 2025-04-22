@@ -15,6 +15,7 @@ public class MoveItem {
     private Drawable color;
 
     private Drawable buttonColor;
+    private Drawable defaultButtonColor;
 
     /**
      * Constructor
@@ -25,6 +26,7 @@ public class MoveItem {
         this.text = text;
         this.color = color;
         this.buttonColor = buttonColor;
+        this.defaultButtonColor = buttonColor;
     }
 
     /**
@@ -49,5 +51,9 @@ public class MoveItem {
 
     public void setButtonColor(Drawable buttonColor) {
         this.buttonColor = buttonColor;
+    }
+
+    public void clearHighlight() {
+        buttonColor = defaultButtonColor;
     }
 }

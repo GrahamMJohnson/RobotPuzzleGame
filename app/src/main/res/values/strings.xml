@@ -29,4 +29,8 @@
     <string name="save_debug_curMoveDiff">Cur Move Diff:</string>
     <string name="save_debug_bestMoveDiff">Best Move Diff:</string>
     <string name="save_debug_percentColl">Percent Coll:</string>
+    <string name="subroutine_title">Edit Subroutines</string>
+    <string name="move_list">List of moves</string>
+    <string name="a_subroutine_label">A</string>
+    <string name="b_subroutine_label">B</string>
 </resources>

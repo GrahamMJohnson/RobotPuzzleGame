@@ -27,9 +27,3 @@ obstacle:
 collectables:
     row: 0
     column: 3
-specialA:
-    type: repeat
-    parameters: 2 1
-specialB:
-    type: repeat
-    parameters: 1 2

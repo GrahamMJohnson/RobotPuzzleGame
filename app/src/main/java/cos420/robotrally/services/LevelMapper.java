@@ -8,14 +8,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
 import cos420.robotrally.enumerations.ObstacleType;
-import cos420.robotrally.enumerations.SpecialCommandType;
 import cos420.robotrally.helpers.GameBoardData;
-import cos420.robotrally.helpers.SpecialCommandData;
 import cos420.robotrally.levels.LevelData;
 import cos420.robotrally.models.Collectable;
 import cos420.robotrally.models.Obstacle;
@@ -113,35 +110,6 @@ public class LevelMapper {
                         Log.e(LOG_TAG, e.getMessage() != null ? e.getMessage() : "Error parsing collectable data");
                     }
                 }
-                // Checking if we are reading in a special command
-                else if (isSpecialCommand(line))
-                {
-                    // Using try catch because integer parsing could fail
-                    try {
-                        Log.v(LOG_TAG, "Start mapping special command");
-
-                        // Split lines into arrays
-                        String[] typeArray = line.trim().split(" ");
-
-                        // Get value from last index of array
-                        SpecialCommandType type = SpecialCommandType.getTypeFromString(typeArray[typeArray.length - 1]);
-
-                        // first special command is command A
-                        // second special command is command B
-                        if (level.commandAType == null)
-                        {
-                            level.commandAType = type;
-                        }
-                        else
-                        {
-                            level.commandBType = type;
-                        }
-
-                        Log.v(LOG_TAG, "End mapping special command");
-                    } catch (InvalidParameterException e) {
-                        Log.e(LOG_TAG, e.getMessage() != null ? e.getMessage() : "Error parsing special command data");
-                    }
-                }
                 // Reading in general game board data
                 else
                 {
@@ -215,11 +183,5 @@ public class LevelMapper {
     private static boolean isCollectable(String line)
     {
         return line.startsWith("collectable");
-    }
-
-    // TODO javadoc
-    private static boolean isSpecialCommand(String line)
-    {
-        return line.startsWith("special");
     }
 }

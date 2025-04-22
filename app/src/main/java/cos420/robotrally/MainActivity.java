@@ -14,8 +14,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -40,6 +42,7 @@ import cos420.robotrally.adaptersAndItems.LevelItem;
 import cos420.robotrally.adaptersAndItems.MoveAdapter;
 import cos420.robotrally.adaptersAndItems.MoveItem;
 import cos420.robotrally.enumerations.EAfterExecuteCondition;
+import cos420.robotrally.enumerations.ListName;
 import cos420.robotrally.levels.LevelData;
 import cos420.robotrally.models.Collectable;
 import cos420.robotrally.models.GameBoard;
@@ -53,9 +56,20 @@ import cos420.robotrally.models.ExecutionCallback;
 public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener, MoveAdapter.MoveListener, ExecutionCallback{
 
     // TODO javadoc
-    List<MoveItem> moveList;
+    List<MoveItem> activeMoveList;
+    List<MoveItem> moveListMain;
+    List<MoveItem> moveListA;
+    List<MoveItem> moveListB;
     // TODO javadoc
-    MoveAdapter moveAdapter;
+    MoveAdapter activeMoveAdapter;
+    MoveAdapter moveAdapterMain;
+    MoveAdapter moveAdapterA;
+    MoveAdapter moveAdapterB;
+    RecyclerView activeRecyclerView;
+    RecyclerView recyclerViewMain;
+    RecyclerView recyclerViewA;
+    RecyclerView recyclerViewB;
+    View subroutineEditView;
     int curSelectUI;
     GridView gridView;
     GridAdapter gridAdapter;
@@ -65,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     int executingMoveUI;
     ObjectAnimator animator;
     private final List<View> ghostList = new ArrayList<>();
-    RecyclerView recyclerView;
 
     //TODO javadoc
     RobotRallySave saveFunction;
@@ -80,6 +93,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     // TODO javadoc
     private int selectedLevelID;
     private boolean animationIsOff;
+
+    /** Attribute to track if subroutines are being edited */
+    private ListName activeListName = ListName.MAIN;
+    private ListName lastSubroutineEdited;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,16 +163,24 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private void openSelectedLevel(int levelID) {
         setContentView(R.layout.activity_main);
 
+        // Set up al of the lists
+        moveListMain = new ArrayList<>();
+        moveListA = new ArrayList<>();
+        moveListB = new ArrayList<>();
+
         // Moves view set up
-        recyclerView = findViewById(R.id.move_viewer);
-        moveList = new ArrayList<>();
+        recyclerViewMain = findViewById(R.id.move_viewer);
 
         // Set LayoutManager
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewMain.setLayoutManager(new LinearLayoutManager(this));
 
-        //Set Adapter
-        moveAdapter = new MoveAdapter(moveList, (MoveAdapter.MoveListener) this);
-        recyclerView.setAdapter(moveAdapter);
+        // Set Adapters
+        moveAdapterMain = new MoveAdapter(moveListMain, this, ListName.MAIN);
+        moveAdapterA = new MoveAdapter(moveListA, this, ListName.A);
+        moveAdapterB = new MoveAdapter(moveListB, this, ListName.B);
+
+        // Connect adapter to recycler
+        recyclerViewMain.setAdapter(moveAdapterMain);
 
         //GridTile  view set up
         gridView = findViewById(R.id.grid);
@@ -172,6 +197,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         levelController = new LevelController(levels.get(levelID));
         setupGUIButtons(levelController);
+
+        setActiveList(ListName.MAIN);
 
         //this starts an instance of a save class based on the level number
         saveFunction = new RobotRallySave(this, levelID);
@@ -350,10 +377,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      * @param result end result determined by the execution script in level controller
      */
     private void handleExecutionEnd(EAfterExecuteCondition result){
-        //resetting color or last highlited move.
-        MoveItem m = moveList.get(executingMoveUI);
-        m.setButtonColor(new ColorDrawable(Color.parseColor("#D3D3D3")));
-        moveAdapter.notifyItemChanged(executingMoveUI);
+        //resetting color of last highlighted move.
+        MoveItem m = moveListMain.get(executingMoveUI);
+        m.clearHighlight();
+        moveAdapterMain.notifyItemChanged(executingMoveUI);
 
             if (result == EAfterExecuteCondition.DEST_REACHED) {
                 showWinScreen();
@@ -372,17 +399,16 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      * @param index of execution in list
      */
     public void highlightExecutionStep(int index) {
-        if (index < 0 || index >= moveList.size()) return;
+        if (index < 0 || index >= moveListMain.size()) return;
 
         // Reset previous highlight
-        if (executingMoveUI >= 0 && executingMoveUI < moveList.size() && executingMoveUI != index) {
-            MoveItem prevMove = moveList.get(executingMoveUI);
-            ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
-            prevMove.setButtonColor(gray);
-            moveAdapter.notifyItemChanged(executingMoveUI);
+        if (executingMoveUI >= 0 && executingMoveUI < moveListMain.size() && executingMoveUI != index) {
+            MoveItem prevMove = moveListMain.get(executingMoveUI);
+            prevMove.clearHighlight();
+            moveAdapterMain.notifyItemChanged(executingMoveUI);
         }
 
-        MoveItem currentMove = moveList.get(index);
+        MoveItem currentMove = moveListMain.get(index);
         ColorDrawable yellow = new ColorDrawable(Color.parseColor("#FFF176")); // or any highlight color
         currentMove.setButtonColor(yellow);
 
@@ -393,9 +419,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             scrollIndex = index; // Scroll to top for first command
         }
 
-        recyclerView.scrollToPosition(scrollIndex);
+        recyclerViewMain.scrollToPosition(scrollIndex);
 
-        moveAdapter.notifyItemChanged(index);
+        moveAdapterMain.notifyItemChanged(index);
 
         executingMoveUI = index;
     }
@@ -410,31 +436,40 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     }
 
     @Override
-    public void onMoveClick(int position) {
-        //set which command is selected
-        levelController.setSelected(position);
-        blinkUI();
+    public void onMoveClick(int position, ListName list) {
+        if (activeListName == list) {
+            //set which command is selected
+            levelController.setSelected(position, activeListName);
+            blinkUI();
+        }
+        // editing sub commands and clicking on A or B (whichever isn't currently active
+        else if (list != ListName.MAIN) {
+            setActiveList(list);
+            levelController.setSelected(position, activeListName);
+            blinkUI();
+        }
     }
 
     public void blinkUI() {
+
         //update UI of selected command
-        int select = levelController.getSelected();
+        int select = levelController.getSelected(activeListName);
 
         //Remove blink from previous command
         if (animator != null && animator.isRunning()) {
             animator.cancel();
             //remove background from previous selected
-            if (curSelectUI >= 0 && curSelectUI < moveList.size() && curSelectUI != select) {
-                MoveItem m = moveList.get(curSelectUI);
+            if (curSelectUI >= 0 && curSelectUI < activeMoveList.size() && curSelectUI != select) {
+                MoveItem m = activeMoveList.get(curSelectUI);
                 ColorDrawable gray = new ColorDrawable(Color.parseColor("#D3D3D3"));
                 m.setColor(gray);
-                moveList.set(curSelectUI, m);
-                moveAdapter.notifyItemChanged(curSelectUI);
+                activeMoveList.set(curSelectUI, m);
+                activeMoveAdapter.notifyItemChanged(curSelectUI);
             }
         }
 
         //Set UI to blink on selected command
-        RecyclerView.ViewHolder v = recyclerView.findViewHolderForAdapterPosition(select);
+        RecyclerView.ViewHolder v = activeRecyclerView.findViewHolderForAdapterPosition(select);
         if (v != null) {
             View blinkV = v.itemView.findViewById(R.id.blink);
             animator = ObjectAnimator.ofInt(blinkV,
@@ -447,10 +482,13 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             animator.setRepeatCount(Animation.INFINITE);
             animator.start();
 
+
+
             //Set current selected command = select
             curSelectUI = select;
         }
     }
+
 
     /**
      * Adds new moves to the back-end, and adds them to the UI if no errors occur.
@@ -461,67 +499,66 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private void setupGUIButtons(LevelController levelC) {
         // UP
         findViewById(R.id.up_button).setOnClickListener(v -> {
-            levelC.addUpCommand();
+            levelC.addUpCommand(activeListName);
             addMoveToUI("UP");
         });
 
         // DOWN
         findViewById(R.id.down_button).setOnClickListener(v -> {
-            levelC.addDownCommand();
+            levelC.addDownCommand(activeListName);
             addMoveToUI("DOWN");
         });
 
         // LEFT
         findViewById(R.id.left_button).setOnClickListener(v -> {
-            levelC.addLeftCommand();
+            levelC.addLeftCommand(activeListName);
             addMoveToUI("LEFT");
         });
 
         // RIGHT
         findViewById(R.id.right_button).setOnClickListener(v -> {
-            levelC.addRightCommand();
+            levelC.addRightCommand(activeListName);
             addMoveToUI("RIGHT");
         });
 
         // A
         findViewById(R.id.button_a).setOnClickListener(v -> {
-            levelC.addACommand();
-            addMoveToUI("A");
+            levelC.addSubroutineA(activeListName);
+            addSubsequenceToUI("A");
         });
 
         // B
         findViewById(R.id.button_b).setOnClickListener(v -> {
-            levelC.addBCommand();
-            addMoveToUI("B");
+            levelC.addSubroutineB(activeListName);
+            addSubsequenceToUI("B");
         });
 
         // DELETE
         findViewById(R.id.delete_button).setOnClickListener(v -> {
             try {
-                int before = levelC.getSelected(); //The command that was deleted
-                levelC.remove();
-                removeMoveFromUI(before);
+                int before = levelC.getSelected(activeListName); //The command that was deleted
+                int number = levelC.remove(activeListName);
+                removeMoveFromUI(before, number);
             } catch (Exception e) {
                 Log.d("Button Pressed", "Attempted to remove item from empty list");
             }
         });
 
-        // RESET
-        findViewById(R.id.reset_button).setOnClickListener(v -> {
-            levelController.resetLevel();
-            int moves = moveList.size();
-            moveList.clear();
-            moveAdapter.notifyItemRangeRemoved(0, moves);
-            resetGrid();
-            clearGhost();
+        // Edit Subroutines
+        findViewById(R.id.subroutine_button).setOnClickListener(v -> {
+            showSubroutineEditScreen();
+            // Edit subroutine A the first time, otherwise the last subroutine being edited
+            ListName listName = lastSubroutineEdited == null ? ListName.A : lastSubroutineEdited;
+            setActiveList(listName);
+            activeRecyclerView.post(this::blinkUI);
         });
 
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
             setButtonsClickable(false);
             animator.end();
-            recyclerView.smoothScrollToPosition(0);
-            levelC.executeScript(moveList, this, this);
+            recyclerViewMain.smoothScrollToPosition(0);
+            levelC.executeScript(moveListMain, this, this);
         });
 
         // BACK
@@ -543,7 +580,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             openLevelSelect();
         });
 
-        // gameboard settings/info
+        // gameBoard settings/info
         findViewById(R.id.settings_info_button).setOnClickListener(v -> {
             showSettingsInfoMenu();
         });
@@ -626,32 +663,81 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             case "DOWN":
             case "LEFT":
             case "RIGHT":
-            case "A":
-            case "B":
                 break;
             default: throw new InvalidParameterException(moveText + " is not a valid move.");
         }
 
-        int s = levelController.getSelected();
+        int s = levelController.getSelected(activeListName);
 
         //android was getting confused when only using one gray drawable to setup move buttons.
         ColorDrawable gray1 = new ColorDrawable(Color.parseColor("#D3D3D3"));
         ColorDrawable gray2 = new ColorDrawable(Color.parseColor("#D3D3D3"));
 
-        moveList.add(s, new MoveItem(moveText, gray1, gray2));//add item
-        moveAdapter.notifyItemInserted(s);
-        recyclerView.scrollToPosition(s);
+        activeMoveList.add(s, new MoveItem(moveText, gray1, gray2));//add item
+        activeMoveAdapter.notifyItemInserted(s);
+        updateEmptyClickAreaVisibility();
 
-        recyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
+//        activeRecyclerView.post(this::scrollUI);
+        activeRecyclerView.scrollToPosition(s);
+        activeRecyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
+    }
+
+    private void addSubsequenceToUI(String moveText) {
+        List<MoveItem> subsequenceToAdd;
+        ColorDrawable color1;
+        ColorDrawable color2;
+        switch(moveText){
+            case "A":
+                color1 = new ColorDrawable(getResources().getColor(R.color.light_grey, null));
+                color2 = new ColorDrawable(getResources().getColor(R.color.indian_red, null));
+                subsequenceToAdd = moveListA;
+                break;
+            case "B":
+                color1 = new ColorDrawable(getResources().getColor(R.color.light_grey, null));
+                color2 = new ColorDrawable(getResources().getColor(R.color.sea_green, null));
+                subsequenceToAdd = moveListB;
+                break;
+            default: throw new InvalidParameterException(moveText + " is not a valid move.");
+        }
+
+        //TODO
+        // Will have to think about what we want to happen when a subsequence is edited.
+        //    Should it update the main list? Remove subsequence from main list???
+
+
+        int s = levelController.getSelected(activeListName);
+        // Have to get back to the index for first command that was added to list.
+        s = s - subsequenceToAdd.size();
+        int start = s + 1;
+        // Add all moves from designated subsequence
+        for (var move : subsequenceToAdd) {
+            s++;
+            var text = move.getText();
+            activeMoveList.add(s, new MoveItem(text, color1, color2)); //add item
+        }
+
+        activeMoveAdapter.notifyItemRangeInserted(start, subsequenceToAdd.size());
+        activeRecyclerView.scrollToPosition(s);
+        activeRecyclerView.post(() -> {
+            blinkUI();
+            activeMoveAdapter.notifyItemChanged(levelController.getSelected(activeListName));
+        });
     }
 
     /**
      * Remove the last move item from the list
      * @param before the command that got deleted
+     * @param number The number of commands to be deleted
      */
-    private void removeMoveFromUI (int before) {
-        moveList.remove(before);
-        moveAdapter.notifyItemRemoved(before);//notify adapter of change
+    private void removeMoveFromUI (int before, int number) {
+        // Remove specified number of commands
+        int index = before;
+        for (int i = 0; i < number; i++) {
+            activeMoveList.remove(index);
+            index--;
+        }
+        activeMoveAdapter.notifyItemRangeRemoved(before - number + 1, number); //notify adapter of change
+        updateEmptyClickAreaVisibility();
         blinkUI();
     }
 
@@ -663,10 +749,44 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         findViewById(R.id.button_a).setClickable(value);
         findViewById(R.id.button_b).setClickable(value);
         findViewById(R.id.start_button).setClickable(value);
-        findViewById(R.id.reset_button).setClickable(value);
+        findViewById(R.id.subroutine_button).setClickable(value);
         findViewById(R.id.delete_button).setClickable(value);
         findViewById(R.id.back_button).setClickable(value);
+    }
 
+    /**
+     * Method to change which list is being edited
+     * @param listToEdit ListName enum for the list to edit
+     */
+    private void setActiveList(ListName listToEdit) {
+
+        if (activeMoveList != null && !activeMoveList.isEmpty()){
+            animator.end();
+        }
+
+        activeListName = listToEdit;
+        switch(listToEdit) {
+            case MAIN:
+                activeMoveList = moveListMain;
+                activeMoveAdapter = moveAdapterMain;
+                activeRecyclerView = recyclerViewMain;
+                blinkUI();
+                break;
+            case A:
+                activeMoveList = moveListA;
+                lastSubroutineEdited = ListName.A;
+                activeMoveAdapter = moveAdapterA;
+                activeRecyclerView = recyclerViewA;
+                activeRecyclerView.post(this::blinkUI);
+                break;
+            case B:
+                activeMoveList = moveListB;
+                lastSubroutineEdited = ListName.B;
+                activeMoveAdapter = moveAdapterB;
+                activeRecyclerView = recyclerViewB;
+                activeRecyclerView.post(this::blinkUI);
+                break;
+        }
     }
 
     /// VICTORY / FAILURE SCREENS
@@ -766,6 +886,83 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // Show the dialog
         lostScreen.show();
+    }
+
+    private void showSubroutineEditScreen() {
+        ViewGroup rootLayout = findViewById(android.R.id.content);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        subroutineEditView = inflater.inflate(R.layout.subroutine_edit_dialog, rootLayout, false);
+
+        View grid = findViewById(R.id.grid);
+        int height = grid.getHeight();
+        int topLocation = grid.getTop();
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                height
+        );
+        params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
+        params.setMargins(2, topLocation, 2, 0); // Margin from bottom-right
+        subroutineEditView.setLayoutParams(params);
+
+        // Set up recyclers
+        recyclerViewA = subroutineEditView.findViewById(R.id.subroutine_a_viewer);
+        recyclerViewB = subroutineEditView.findViewById(R.id.subroutine_b_viewer);
+
+        // Set LayoutManagers
+        recyclerViewA.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewB.setLayoutManager(new LinearLayoutManager(this));
+
+        // Connect adapters to recyclers
+        recyclerViewA.setAdapter(moveAdapterA);
+        recyclerViewB.setAdapter(moveAdapterB);
+
+        subroutineEditView.findViewById(R.id.empty_a_click_area).setOnClickListener(v -> {
+            setActiveList(ListName.A);
+        });
+
+        subroutineEditView.findViewById(R.id.empty_b_click_area).setOnClickListener(v -> {
+            setActiveList(ListName.B);
+        });
+
+        updateEmptyClickAreaVisibility();
+
+        // Add it to root
+        rootLayout.addView(subroutineEditView);
+
+
+        // Handle button press inside the floating panel
+        subroutineEditView.findViewById(R.id.close_button).setOnClickListener(v -> {
+            setActiveList(ListName.MAIN);
+            rootLayout.removeView(subroutineEditView);
+        });
+    }
+
+    /**
+     * Method that makes the empty clickable views for subroutines visible or not
+     */
+    private void updateEmptyClickAreaVisibility() {
+
+        if (subroutineEditView == null) {
+            return;
+        }
+
+        View aView = subroutineEditView.findViewById(R.id.empty_a_click_area);
+
+        if (moveAdapterA.getItemCount() == 0) {
+            aView.setVisibility(View.VISIBLE);
+        }
+        else if (aView.getVisibility() == VISIBLE){
+            aView.setVisibility(View.GONE);
+        }
+
+        View bView = subroutineEditView.findViewById(R.id.empty_b_click_area);
+
+        if (moveAdapterB.getItemCount() == 0) {
+            bView.setVisibility(View.VISIBLE);
+        }
+        else if (bView.getVisibility() == VISIBLE){
+            bView.setVisibility(View.GONE);
+        }
     }
 
     /**
