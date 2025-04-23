@@ -114,27 +114,31 @@ public class LevelController {
     /**
      * Method to add an A command to script
      * @param list The list to add command to
+     * @return Whether or not the subroutine was able to be added
      */
-    public void addSubroutineA(ListName list)
+    public boolean addSubroutineA(ListName list)
     {
         switch(list) {
-            case MAIN: commandScript.addSubroutine(subroutineA); break;
-            case A: break; // Can't add to itself
-            case B: ;break; // A can only be added to main to prevent loops
+            case MAIN: commandScript.addSubroutine(subroutineA); return true;
+            case A: ; // Can't add to itself
+            case B: ; // A can only be added to main to prevent loops
         }
+        return false;
     }
 
     /**
      * Method to add an B command to script
      * @param list The list to add command to
+     * @return Whether or not the subroutine was able to be added
      */
-    public void addSubroutineB(ListName list)
+    public boolean addSubroutineB(ListName list)
     {
         switch(list) {
-            case MAIN: commandScript.addSubroutine(subroutineB); break;
-            case A: subroutineA.addSubroutine(subroutineB); break;
-            case B: ; break; // Can't add to itself
+            case MAIN: commandScript.addSubroutine(subroutineB); return true;
+            case A: subroutineA.addSubroutine(subroutineB); return true;
+            case B: ; // Can't add to itself
         }
+        return false;
     }
 
     /**

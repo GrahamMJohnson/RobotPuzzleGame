@@ -1,5 +1,11 @@
 package cos420.robotrally;
 
+//TODO
+// When A/B are clicked, add A/B to list
+// When Start is clicked, have method that goes through and adds moves for A/B to main list
+// When execution finishes, collapse subroutines back into a single A/B command
+// Logic for adding A/B to themselves, make sure it doesn't crash
+
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
@@ -530,14 +536,18 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // A
         findViewById(R.id.button_a).setOnClickListener(v -> {
-            levelC.addSubroutineA(activeListName);
-            addSubsequenceToUI("A");
+            // only update UI if subroutine was successfully added
+            if (levelC.addSubroutineA(activeListName)) {
+                addSubsequenceToUI("A");
+            };
         });
 
         // B
         findViewById(R.id.button_b).setOnClickListener(v -> {
-            levelC.addSubroutineB(activeListName);
-            addSubsequenceToUI("B");
+            // only update UI if subroutine was successfully added
+            if (levelC.addSubroutineB(activeListName)) {
+                addSubsequenceToUI("B");
+            }
         });
 
         // DELETE
@@ -555,8 +565,11 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         findViewById(R.id.subroutine_button).setOnClickListener(v -> {
             showSubroutineEditScreen();
             // Edit subroutine A the first time, otherwise the last subroutine being edited
-            ListName listName = lastSubroutineEdited == null ? ListName.A : lastSubroutineEdited;
-            setActiveList(listName);
+            setActiveList(ListName.A);
+            int lastIndex = activeMoveList.size() - 1;
+            if (lastIndex > 0) {
+                levelController.setSelected(lastIndex, activeListName);
+            }
             activeRecyclerView.post(this::blinkUI);
         });
 
@@ -793,14 +806,12 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 break;
             case A:
                 activeMoveList = moveListA;
-                lastSubroutineEdited = ListName.A;
                 activeMoveAdapter = moveAdapterA;
                 activeRecyclerView = recyclerViewA;
                 activeRecyclerView.post(this::blinkUI);
                 break;
             case B:
                 activeMoveList = moveListB;
-                lastSubroutineEdited = ListName.B;
                 activeMoveAdapter = moveAdapterB;
                 activeRecyclerView = recyclerViewB;
                 activeRecyclerView.post(this::blinkUI);
