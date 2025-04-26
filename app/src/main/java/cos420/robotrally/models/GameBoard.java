@@ -19,6 +19,9 @@ public class GameBoard{
     // TODO javadoc
     private final int size;
 
+    /**The number of collectibles the user collected on this run*/
+    int collectiblesCollected;
+
     /**
      * Constructor
      * @param gameBoardData GameBoardData object with all of the data for the game board
@@ -31,6 +34,7 @@ public class GameBoard{
         previousRow = currentRow;
         previousColumn = currentColumn;
         makeBoard(gameBoardData);
+        collectiblesCollected = 0;
     }
 
     /**
@@ -111,6 +115,11 @@ public class GameBoard{
             previousColumn = currentColumn;
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
+
+            if(gameBoard[currentRow][currentColumn].hasCollectable()){
+                collectiblesCollected += 1;
+                gameBoard[currentRow][currentColumn].setHasCollectable(false);
+            }
         }
 
         logPosition();
@@ -139,6 +148,11 @@ public class GameBoard{
             previousRow = currentRow;
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
+
+            if(gameBoard[currentRow][currentColumn].hasCollectable()){
+                collectiblesCollected += 1;
+                gameBoard[currentRow][currentColumn].setHasCollectable(false);
+            }
         }
 
         logPosition();
@@ -167,6 +181,11 @@ public class GameBoard{
             previousColumn = currentColumn;
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
+
+            if(gameBoard[currentRow][currentColumn].hasCollectable()){
+                collectiblesCollected += 1;
+                gameBoard[currentRow][currentColumn].setHasCollectable(false);
+            }
         }
 
         logPosition();
@@ -196,6 +215,11 @@ public class GameBoard{
             previousRow = currentRow;
             //set the tile at that position to have the roomba
             gameBoard[currentRow][currentColumn].setOccupied(true);
+
+            if(gameBoard[currentRow][currentColumn].hasCollectable()){
+                collectiblesCollected += 1;
+                gameBoard[currentRow][currentColumn].setHasCollectable(false);
+            }
         }
 
         logPosition();

@@ -43,13 +43,16 @@ public class RobotRallySave {
      * The variable names are telling of what each one is used for in retrieving/saving when
      * inputted into JSON object editing/reading calls.
      */
-    String jsonMoveSequence = "move_sequence";
+    String jsonCurrentMoveSequence = "current_move_sequence";
+    String jsonBestMoveSequence = "best_move_sequence";
     String jsonNumAttempts = "num_attempts";
+    String jsonBestNumMoves = "best_num_moves";
+    String jsonCurrentNumMoves = "current_num_moves";
     String jsonEfficiencyScore = "efficiency_score";
-    String jsonSquaresTraveled = "total_squares_traveled";
-    String jsonCurMoveDiff = "current_move_difference";
-    String jsonBestMoveDiff = "best_move_difference";
-    String jsonPercentCollectibles = "percent_collected";
+    String jsonCurrentNumCollectibles = "current_num_collectibles";
+    String jsonBestNumCollectibles = "best_num_collectibles";
+    String jsonBestCollectiblesPercentage = "best_collectibles_percentage";
+
     String jsonSavedMoveSequence = "saved_move_sequence";
     String jsonBeginningMoveSequences = "number_saved_move_sequences";
     String jsonEndMoveSequences = "start_point";
@@ -100,25 +103,26 @@ public class RobotRallySave {
     public void ClearSave() throws Exception {
 
         //edit all of the values of the passed in JSON object
-        currentJSON.put(jsonMoveSequence, "");
-        currentJSON.put(jsonNumAttempts, -1);
+        currentJSON.put(jsonCurrentMoveSequence, "");
+        currentJSON.put(jsonBestMoveSequence, "");
+        currentJSON.put(jsonNumAttempts, 0);
+        currentJSON.put(jsonBestNumMoves, 1000);
+        currentJSON.put(jsonCurrentNumMoves, 1000);
         currentJSON.put(jsonEfficiencyScore, -1);
-        currentJSON.put(jsonSquaresTraveled, -1);
-        currentJSON.put(jsonCurMoveDiff, -1);
-        currentJSON.put(jsonBestMoveDiff, -1);
-        currentJSON.put(jsonPercentCollectibles, -1);
+        currentJSON.put(jsonCurrentNumCollectibles, -1);
+        currentJSON.put(jsonBestNumCollectibles, -1);
+        currentJSON.put(jsonBestCollectiblesPercentage, -100);
     }
 
     ///--------------
     /// Class Setters
     ///--------------
 
-
     /**
      * This is the method to save level attempts
      * @param moveSequence the string representation of the move sequence that you want to save.
      */
-    public void saveLevelAttempt(String moveSequence) throws Exception{
+    public void saveLevelAttempts(String moveSequence) throws Exception{
         //Finds the current key that is next to be saved to based on how many have already been saved
         String currentKey = jsonSavedMoveSequence + (currentJSON.getInt(jsonBeginningMoveSequences));
         //Saves the desired move sequence to the correct slot
@@ -136,17 +140,36 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for saving the move sequence into the JSON Object
+     * This is the method for saving the current move sequence into the JSON Object
      * @param commandList the string for the list of commands
      */
-    public void SetMoveSequence(String commandList){
+    public void SetCurrentMoveSequence(String commandList){
         //this is to catch passing in a null string (it was giving me an error for this)
         if(commandList == null){
             return;
         }
         try {
             //try putting the string into the json object
-            currentJSON.put(jsonMoveSequence, commandList);
+            currentJSON.put(jsonCurrentMoveSequence, commandList);
+        }
+        //if it fails, log the exception, and do nothing else
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This is the method for saving the best move sequence into the JSON Object
+     * @param commandList the string for the list of commands
+     */
+    public void SetBestMoveSequence(String commandList){
+        //this is to catch passing in a null string (it was giving me an error for this)
+        if(commandList == null){
+            return;
+        }
+        try {
+            //try putting the string into the json object
+            currentJSON.put(jsonBestMoveSequence, commandList);
         }
         //if it fails, log the exception, and do nothing else
         catch (JSONException e) {
@@ -170,10 +193,40 @@ public class RobotRallySave {
     }
 
     /**
+     * This is the method for saving the best number of moves into the JSON Object
+     * @param numOfMoves the number of moves
+     */
+    public void SetBestNumMoves(int numOfMoves){
+        try {
+            //try putting the string into the json object
+            currentJSON.put(jsonBestNumMoves, numOfMoves);
+        }
+        //if it fails, log the exception, and do nothing else
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This is the method for saving the current number of moves into the JSON Object
+     * @param numOfMoves the number of moves
+     */
+    public void SetCurrentNumMoves(int numOfMoves){
+        try {
+            //try putting the string into the json object
+            currentJSON.put(jsonCurrentNumMoves, numOfMoves);
+        }
+        //if it fails, log the exception, and do nothing else
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * This is the method for saving the efficiency score into the JSON object
      * @param efficiencyScore the int representing the user's efficiency score
      */
-    public void SetEfficiencyScore(int efficiencyScore){
+    public void SetEfficiencyScore(double efficiencyScore){
         try {
             //try putting the int into the json object
             currentJSON.put(jsonEfficiencyScore, efficiencyScore);
@@ -185,13 +238,13 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for saving the number of squares that the user traveled into the JSON object
-     * @param totalSquaresTraveled the int representing the user's number of squares traveled
+     * This is the method for saving the current number of collectibles into the JSON Object
+     * @param numOfCollectibles the number of collectibles
      */
-    public void SetTotalSquaresTraveled(int totalSquaresTraveled){
+    public void SetCurrentNumCollectibles(int numOfCollectibles){
         try {
-            //try putting the int into the json object
-            currentJSON.put(jsonSquaresTraveled, totalSquaresTraveled);
+            //try putting the string into the json object
+            currentJSON.put(jsonCurrentNumCollectibles, numOfCollectibles);
         }
         //if it fails, log the exception, and do nothing else
         catch (JSONException e) {
@@ -200,28 +253,13 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for saving the difference between the current and optimal moves into the JSON object
-     * @param currentMoveDifference the int representing the difference between current and optimal
+     * This is the method for saving the best number of collectibles into the JSON Object
+     * @param numOfCollectibles the number of collectibles
      */
-    public void SetCurrentMoveDifference(int currentMoveDifference) {
+    public void SetBestNumCollectibles(int numOfCollectibles){
         try {
-            //try putting the int into the json object
-            currentJSON.put(jsonCurMoveDiff, currentMoveDifference);
-        }
-        //if it fails, log the exception, and do nothing else
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * This is the method for saving the difference between the best and optimal moves into the JSON object
-     * @param bestMoveDifference the int representing the difference between best and optimal
-     */
-    public void SetBestMoveDifference(int bestMoveDifference){
-        try {
-            //try putting the int into the JSON object
-            currentJSON.put(jsonBestMoveDiff, bestMoveDifference);
+            //try putting the string into the json object
+            currentJSON.put(jsonBestNumCollectibles, numOfCollectibles);
         }
         //if it fails, log the exception, and do nothing else
         catch (JSONException e) {
@@ -233,10 +271,10 @@ public class RobotRallySave {
      * This is the method for saving the percentage of collectibles that the user has collected into the JSON object
      * @param percentCollectiblesCollected the int representing the percentage
      */
-    public void SetCollectiblesCollected(int percentCollectiblesCollected){
+    public void SetBestCollectiblesPercentage(double percentCollectiblesCollected){
         try {
             //try putting the int into the json object
-            currentJSON.put(jsonPercentCollectibles, percentCollectiblesCollected);
+            currentJSON.put(jsonBestCollectiblesPercentage, percentCollectiblesCollected);
         }
         //if it fails, log the exception, and do nothing else
         catch (JSONException e) {
@@ -249,13 +287,29 @@ public class RobotRallySave {
     ///--------------
 
     /**
-     * This is the method for getting the saved move sequence from the JSON object
+     * This is the method for getting the current move sequence from the JSON object
      * @return the string that represents the current move sequence
      */
-    public String GetMoveSequence(){
+    public String GetCurrentMoveSequence(){
         try {
             //try to get the string from the json object
-            return currentJSON.getString(jsonMoveSequence);
+            return currentJSON.getString(jsonCurrentMoveSequence);
+        }
+        //if it fails, log the exception, and return an empty string
+        catch (JSONException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    /**
+     * This is the method for getting the best move sequence from the JSON object
+     * @return the string that represents the best move sequence
+     */
+    public String GetBestMoveSequence(){
+        try {
+            //try to get the string from the json object
+            return currentJSON.getString(jsonBestMoveSequence);
         }
         //if it fails, log the exception, and return an empty string
         catch (JSONException e) {
@@ -266,9 +320,9 @@ public class RobotRallySave {
 
     /**
      * This is the method for getting the saved move attempts from the JSON object
-     * @return the int that represents the amount of moves the robot took
+     * @return the int that represents the number of tries the user has taken
      */
-    public int GetMoveAttempts() {
+    public int GetNumAttempts() {
         try {
             //try to get the int from the json object
             return currentJSON.getInt(jsonNumAttempts);
@@ -281,13 +335,45 @@ public class RobotRallySave {
     }
 
     /**
+     * This is the method for getting the best number of moves from the JSON object
+     * @return the int that represents the amount of moves the user took on their best attempt
+     */
+    public int GetBestNumMoves() {
+        try {
+            //try to get the int from the json object
+            return currentJSON.getInt(jsonBestNumMoves);
+        }
+        //if it fails, log the exception, and return a default value of -1
+        catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    /**
+     * This is the method for getting the best number of moves from the JSON object
+     * @return the int that represents the amount of moves the user took on their current attempt
+     */
+    public int GetCurrentNumMoves() {
+        try {
+            //try to get the int from the json object
+            return currentJSON.getInt(jsonCurrentNumMoves);
+        }
+        //if it fails, log the exception, and return a default value of -1
+        catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    /**
      * This is the method for getting the saved efficiency score from the JSON object
      * @return the int that represents the efficiency score of the best attempt
      */
-    public int GetEfficiencyScore(){
+    public double GetEfficiencyScore(){
         try {
             //try to get the int from the json object
-            return currentJSON.getInt(jsonEfficiencyScore);
+            return currentJSON.getDouble(jsonEfficiencyScore);
         }
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
@@ -297,13 +383,13 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for getting the saved squares traveled from the JSON object
-     * @return the int that represents the number of squares traveled on the best attempt
+     * This is the method for getting the current number of collectibles from the JSON object
+     * @return the int that represents the number of collectibles the user got on their current attempt
      */
-    public int GetTotalSquaresTraveled(){
+    public int GetCurrentNumCollectibles() {
         try {
             //try to get the int from the json object
-            return currentJSON.getInt(jsonSquaresTraveled);
+            return currentJSON.getInt(jsonCurrentNumCollectibles);
         }
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
@@ -313,29 +399,13 @@ public class RobotRallySave {
     }
 
     /**
-     * This is the method for getting the saved difference between the current and optimal move count from the JSON object
-     * @return the int representing the difference between the current and optimal
+     * This is the method for getting the best number of collectibles from the JSON object
+     * @return the int that represents the number of collectibles the user got on their best attempt
      */
-    public int GetCurrentMoveDifference(){
+    public int GetBestNumCollectibles() {
         try {
             //try to get the int from the json object
-            return currentJSON.getInt(jsonCurMoveDiff);
-        }
-        //if it fails, log the exception, and return a default value of -1
-        catch (JSONException e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    /**
-     * This is the method to save the difference between the best and optimal move counts from the JSON object.
-     * @return the int representing the difference between the best and optimal
-     */
-    public int GetBestMoveDifference(){
-        try {
-            //try to get the int from the json object
-            return currentJSON.getInt(jsonBestMoveDiff);
+            return currentJSON.getInt(jsonBestNumCollectibles);
         }
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
@@ -348,10 +418,10 @@ public class RobotRallySave {
      * This is the method to save the percentage of collectibles collected from the JSON object
      * @return the int representing the percentage of collectibles the user collected
      */
-    public int GetPercentageCollectiblesCollected(){
+    public double GetBestCollectiblesPercentage(){
         try {
             //try to get the int from the json object
-            return currentJSON.getInt(jsonPercentCollectibles);
+            return currentJSON.getDouble(jsonBestCollectiblesPercentage);
         }
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
@@ -367,7 +437,7 @@ public class RobotRallySave {
     public String getPastMoveSequence(int attemptNumber){
         try{
             //Find the key for the attempt x times ago
-            String currentKey = jsonMoveSequence + (currentJSON.getInt(jsonEndMoveSequences) - attemptNumber);
+            String currentKey = jsonSavedMoveSequence + (currentJSON.getInt(jsonEndMoveSequences) - attemptNumber);
             //return that attempt
             return currentJSON.getString(currentKey);
         }

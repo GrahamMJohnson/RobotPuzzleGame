@@ -220,6 +220,7 @@ public class LevelController {
         new Thread(() -> {
             for (int i = 0; i < moveList.size(); i++) {
                 int finalI = i;
+                int collectiblesCollected;
 
                 // Highlight current command
                 activity.runOnUiThread(() -> callback.onStepHighlight(finalI));
@@ -251,5 +252,21 @@ public class LevelController {
             EAfterExecuteCondition result = getEndStatus();
             activity.runOnUiThread(() -> callback.onExecutionEnd(result));
         }).start();
+    }
+
+    /**
+     * Gets the number of collectibles collected from the game board
+     * Through this, you can get the number in main
+     * @return int for number of collectibles that the user collected
+     */
+    public int getCollectiblesCollected(){
+        return gameBoard.collectiblesCollected;
+    }
+
+    /**
+     * Resets the number of collectibles collected for each run.
+     */
+    public void resetCollectiblesCollected(){
+        gameBoard.collectiblesCollected = 0;
     }
 }

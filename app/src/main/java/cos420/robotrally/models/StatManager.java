@@ -30,9 +30,8 @@ public class StatManager {
     ///This is the number of attempts that the user currently has on the level
     public int currentNumAttempts;
 
-    //TODO: Find where ideal number of moves are stored and connect
     ///This is the number of moves that is ideal for the level
-    private int idealNumMoves;
+    public int idealNumMoves;
 
     ///This is the number of moves that the user used in their best attempt
     private int bestNumMoves;
@@ -41,17 +40,19 @@ public class StatManager {
     public int currentNumMoves;
 
     ///This is the efficiency score of the user's best attempt
-    public int efficiencyScore;
+    private double efficiencyScore;
 
-    //TODO: Find where possible number of collectibles are stored and connect
     ///This is the number of collectibles possible for the current level
     private int numberPossibleCollectibles;
 
     ///This is the number of collectibles that the user collected on their current attempt
     public int currentNumberCollectibles;
 
+    ///This is the number of collectibles that the user collected on their best attempt
+    private int bestNumberCollectibles;
+
     ///This is the percentage of collectibles that the user collected
-    public int bestCollectiblesPercentage;
+    private double bestCollectiblesPercentage;
 
     ///This is the current RobotRallySave instance that is being saved to
     private RobotRallySave currentSave;
@@ -70,24 +71,43 @@ public class StatManager {
         //This creates a new save instance with the given context and levelID
         currentSave = new RobotRallySave(thisContext, levelID);
 
-        //This is updating all of the "best" variables in this class with the save data
-        bestMoveSequence = currentSave.GetMoveSequence();
-        bestNumMoves = currentSave.GetMoveAttempts();
+        //This is updating all of the variables in this class with the save data
+        currentMoveSequence = currentSave.GetCurrentMoveSequence();
+        bestMoveSequence = currentSave.GetBestMoveSequence();
+        currentNumAttempts = currentSave.GetNumAttempts();
+        bestNumMoves = currentSave.GetBestNumMoves();
+        currentNumMoves = currentSave.GetCurrentNumMoves();
         efficiencyScore = currentSave.GetEfficiencyScore();
-        bestCollectiblesPercentage = currentSave.GetPercentageCollectiblesCollected();
+        currentNumberCollectibles = currentSave.GetCurrentNumCollectibles();
+        bestNumberCollectibles = currentSave.GetBestNumCollectibles();
+        bestCollectiblesPercentage = currentSave.GetBestCollectiblesPercentage();
+
+        if(levelID + 1 == 1){
+            numberPossibleCollectibles = 3;
+            idealNumMoves = 8;
+        }
+        else if(levelID + 1 == 2){
+            numberPossibleCollectibles = 3;
+            idealNumMoves = 8;
+        }
+        else if(levelID + 1 == 3){
+            numberPossibleCollectibles = 3;
+            idealNumMoves = 12;
+        }
     }
 
     /**
      * This is the method to check if the data saved on the last attempt was the best attempt
      */
-    public void checkBest(){
+    public void checkBest(boolean levelCompleted){
         //If this attempt is the best attempt
-        if(currentNumMoves > bestNumMoves){
+        if(currentNumMoves < bestNumMoves && levelCompleted){
             //Update all of the "best" variables with the current variables
             bestMoveSequence = currentMoveSequence;
             bestNumMoves = currentNumMoves;
-            bestCollectiblesPercentage = currentNumberCollectibles/numberPossibleCollectibles;
-            //TODO: Figure out how to calculate efficiency score
+            efficiencyScore = (double) idealNumMoves / (double) currentNumMoves;
+            bestNumberCollectibles = currentNumberCollectibles;
+            bestCollectiblesPercentage = (double) currentNumberCollectibles/ (double) numberPossibleCollectibles;
         }
     }
 
@@ -97,29 +117,35 @@ public class StatManager {
      */
     public void saveCurrent(){
 
-        //Saves the move sequence
-        currentSave.SetMoveSequence(bestMoveSequence);
+        //Saves the current move sequence
+        currentSave.SetCurrentMoveSequence(currentMoveSequence);
+
+        //Saves the best move sequence
+        currentSave.SetBestMoveSequence(bestMoveSequence);
 
         //Saves the number of attempts
         currentSave.SetNumAttempts(currentNumAttempts);
 
+        //Saves the current number of moves
+        currentSave.SetCurrentNumMoves(currentNumMoves);
+
+        //Saves the best number of moves
+        currentSave.SetBestNumMoves(bestNumMoves);
+
         //Saves the efficiency score
-        currentSave.SetEfficiencyScore((currentNumMoves/idealNumMoves)*100);
+        currentSave.SetEfficiencyScore(efficiencyScore);
 
-        //Saves the total squares traveled
-        currentSave.SetTotalSquaresTraveled(bestNumMoves);
+        //Saves the current number of collectibles
+        currentSave.SetCurrentNumCollectibles(currentNumberCollectibles);
 
-        //Calculates and saves the current move difference
-        int currentMoveDifference = currentNumMoves - idealNumMoves;
-        currentSave.SetCurrentMoveDifference(currentMoveDifference);
+        //Saves the best number of collectibles
+        currentSave.SetBestNumCollectibles(bestNumberCollectibles);
 
-        //Calculates and saves the best move difference
-        int bestMoveDifference = bestNumMoves - idealNumMoves;
-        currentSave.SetBestMoveDifference(bestMoveDifference);
+        //Saves the best collectibles percentage
+        currentSave.SetBestCollectiblesPercentage(bestCollectiblesPercentage);
 
-        //Calculates and saves the percentage collectibles collected
-        int percentCollectiblesCollected = currentNumberCollectibles/numberPossibleCollectibles;
-        currentSave.SetCollectiblesCollected(percentCollectiblesCollected);
+        //Saves the updated data to the shared preferences
+        currentSave.saveLevelData();
     }
 
     /**
@@ -139,6 +165,114 @@ public class StatManager {
 
         //returns the move sequence as a string
         return moveSequenceString;
+    }
+
+    /**
+     * Calculates the number of moves based on the move sequence
+     * @return number of moves
+     */
+    public int calcNumMoves(){
+        String thisMoveSequence = currentMoveSequence;
+        String[] moves = thisMoveSequence.split(" ");
+        int numMoves = 0;
+
+        for(int i = 0; i < moves.length; i++){
+            numMoves += 1;
+        }
+
+        return numMoves;
+    }
+
+    /**
+     * Gets current move sequence
+     * @return move sequence string
+     */
+    public String GetCurrentMoveSequence(){
+        return currentMoveSequence;
+    }
+
+    /**
+     * Gets best move sequence
+     * @return move sequence string
+     */
+    public String GetBestMoveSequence(){
+        return bestMoveSequence;
+    }
+
+
+    /**
+     * Gets number of attempts
+     * @return number of attempts int
+     */
+    public int GetCurrentNumAttempts(){
+        return currentNumAttempts;
+    }
+
+    /**
+     * Gets best number of moves
+     * @return best number of moves int
+     */
+    public int GetBestNumMoves(){
+        return bestNumMoves;
+    }
+
+    /**
+     * Gets current number of moves
+     * @return current number of moves int
+     */
+    public int GetCurrentNumMoves(){
+        return currentNumMoves;
+    }
+
+    /**
+     * Gets efficiency score
+     * @return efficiency score double
+     */
+    public double GetEfficiencyScore(){
+        return efficiencyScore;
+    }
+
+    /**
+     * Gets the current number of collectibles
+     * @return the current number of collectibles collected
+     */
+    public int getCurrentNumberCollectibles(){
+        return currentNumberCollectibles;
+    }
+
+    /**
+     * Gets the best number of collectibles
+     * @return the best number of collectibles collected
+     */
+    public int getBestNumberCollectibles(){
+        return bestNumberCollectibles;
+    }
+
+    /**
+     * Gets the best collectibles percentage recorded
+     * @return best collectibles percentage
+     */
+    public double getBestCollectiblesPercentage(){
+        return bestCollectiblesPercentage;
+    }
+
+    /**
+     * Gives engineer functionality to reset to default values
+     */
+    public void resetSave(){
+        try{
+            currentSave.ClearSave();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        currentMoveSequence = "";
+        bestMoveSequence = "";
+        currentNumAttempts = 0;
+        bestNumMoves = 1000;
+        currentNumMoves = 1000;
+        efficiencyScore = 0;
+        currentNumberCollectibles = 0;
+        bestCollectiblesPercentage = 0;
     }
 
 }

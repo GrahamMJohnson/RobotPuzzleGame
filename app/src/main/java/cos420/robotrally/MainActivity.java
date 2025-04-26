@@ -56,7 +56,6 @@ import cos420.robotrally.models.LevelController;
 import cos420.robotrally.models.Obstacle;
 import cos420.robotrally.models.StatManager;
 import cos420.robotrally.services.LevelMapper;
-import cos420.robotrally.models.RobotRallySave;
 import cos420.robotrally.models.ExecutionCallback;
 
 // TODO javadoc for the class itself
@@ -87,9 +86,16 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     ObjectAnimator animator;
     private final List<View> ghostList = new ArrayList<>();
 
-    //TODO javadoc
-    RobotRallySave saveFunction;
+    /**Creates the stat manager for the level*/
+    StatManager saveFunction;
+
     LevelController levelController;
+
+    /**Tells whether the level has been completed (primarily for save function)*/
+    boolean levelComplete;
+
+    /**Used to make sure changes don't get saved if a run has not been completed*/
+    boolean changesMade;
 
     /**
      * 0 indexed list of the data for level layout<br>
@@ -213,8 +219,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         setActiveList(ListName.MAIN);
 
-        //this starts an instance of a save class based on the level number
-        saveFunction = new RobotRallySave(this, levelID);
+        //this starts an instance of a stat manager class based on the level number
+        saveFunction = new StatManager(this, levelID);
+        changesMade = false;
     }
 
 
@@ -382,6 +389,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     @Override
     public void onExecutionEnd(EAfterExecuteCondition result) {
         handleExecutionEnd(result);
+        saveFunction.currentNumberCollectibles = levelController.getCollectiblesCollected();
+        saveFunction.checkBest(levelComplete);
     }
 
     /**
@@ -396,6 +405,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         moveAdapterMain.notifyItemChanged(executingMoveUI);
 
             if (result == EAfterExecuteCondition.DEST_REACHED) {
+                levelComplete = true;
                 showWinScreen();
             } else if (result == EAfterExecuteCondition.CRASHED) {
                 showCollisionScreen();
@@ -575,34 +585,35 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
+            levelController.resetCollectiblesCollected();
+            levelComplete = false;
             setButtonsClickable(false);
             animator.end();
             recyclerViewMain.smoothScrollToPosition(0);
             levelC.executeScript(moveListMain, this, this);
+
+            //these are the edits that need to be made to the save function each time it is run
+            saveFunction.currentMoveSequence = saveFunction.MoveSequenceConverter(moveListMain);
+            saveFunction.currentNumAttempts += 1;
+            saveFunction.currentNumMoves = saveFunction.calcNumMoves();
+            changesMade = true;
         });
 
         // BACK
         findViewById(R.id.back_button).setOnClickListener(v -> {
-
-            //This is currently holding placeholder values.
-            //When we begin storing level data, we can replace the values here.
-            saveFunction.SetMoveSequence("test");
-            saveFunction.SetNumAttempts(10);
-            saveFunction.SetEfficiencyScore(100);
-            saveFunction.SetTotalSquaresTraveled(15);
-            saveFunction.SetCurrentMoveDifference(12);
-            saveFunction.SetBestMoveDifference(6);
-            saveFunction.SetCollectiblesCollected(100);
-            saveFunction.saveLevelData();
-            //showSaveDebug();
-
             clearGameListeners();
             openLevelSelect();
+            if(changesMade) {
+                saveFunction.saveCurrent();
+            }
         });
 
         // gameBoard settings/info
         findViewById(R.id.settings_info_button).setOnClickListener(v -> {
             showSettingsInfoMenu();
+            if(changesMade) {
+                saveFunction.saveCurrent();
+            }
         });
     }
 
@@ -843,12 +854,18 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             Log.v("Win Dialogue", "Previous level button pressed");
             mainMenuButton();
             winScreen.dismiss();
+            if(changesMade) {
+                saveFunction.saveCurrent();
+            }
         });
 
         customView.findViewById(R.id.RetryButton).setOnClickListener(v -> {
             Log.v("Win Dialogue", "Retry level button pressed");
             retry();
             winScreen.dismiss();
+            if(changesMade) {
+                saveFunction.saveCurrent();
+            }
         });
 
         customView.findViewById(R.id.next_level_button).setOnClickListener(v -> {
@@ -856,6 +873,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             clearGameListeners();
             winScreen.dismiss();
             openSelectedLevel(++selectedLevelID);
+            if(changesMade) {
+                saveFunction.saveCurrent();
+            }
         });
 
         // Only show next button if there is another level
@@ -1135,31 +1155,31 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //This is setting the move sequence text to the current move sequence save value
         TextView moveSequence = (TextView) saveDebug.findViewById(R.id.save_content_moveSequence);
-        moveSequence.setText(saveFunction.GetMoveSequence()+"");
+        moveSequence.setText(saveFunction.GetBestMoveSequence() + "");
 
         //This is setting the number of attempts text to the current number of attempts save value
         TextView numberOfAttempts = (TextView) saveDebug.findViewById(R.id.save_content_numberOfAttempts);
-        numberOfAttempts.setText(saveFunction.GetMoveAttempts()+"");
+        numberOfAttempts.setText(saveFunction.GetCurrentNumAttempts() + "");
 
         //This is setting the efficiency score text to the current efficiency score save value
         TextView efficiencyScore = (TextView) saveDebug.findViewById(R.id.save_content_efficiencyScore);
-        efficiencyScore.setText(saveFunction.GetEfficiencyScore()+"");
+        efficiencyScore.setText(saveFunction.GetEfficiencyScore() + "");
 
         //This is setting the total squares traveled text to the current total squares traveled save value
         TextView totalSquaresTraveled = (TextView) saveDebug.findViewById(R.id.save_content_totalSquaresTraveled);
-        totalSquaresTraveled.setText(saveFunction.GetTotalSquaresTraveled()+"");
+        totalSquaresTraveled.setText(saveFunction.GetBestNumMoves() + "");
 
         //This is setting the current move difference text to the current move difference save value
         TextView currentMoveDifference = (TextView) saveDebug.findViewById(R.id.save_content_currentMoveDifference);
-        currentMoveDifference.setText(saveFunction.GetCurrentMoveDifference()+"");
+        currentMoveDifference.setText((saveFunction.GetCurrentNumMoves() - saveFunction.idealNumMoves) + "");
 
         //This is setting the best move difference text to the best move difference save value
         TextView bestMoveDifference = (TextView) saveDebug.findViewById(R.id.save_content_bestMoveDifference);
-        bestMoveDifference.setText(saveFunction.GetBestMoveDifference()+"");
+        bestMoveDifference.setText((saveFunction.GetBestNumMoves() - saveFunction.idealNumMoves) + "");
 
         //This is setting the percentage collectibles collected text to the current percentage collectibles collected save value
         TextView percentageCollectiblesCollected = (TextView) saveDebug.findViewById(R.id.save_content_percentageCollectiblesCollected);
-        percentageCollectiblesCollected.setText(saveFunction.GetPercentageCollectiblesCollected()+"");
+        percentageCollectiblesCollected.setText(saveFunction.getBestCollectiblesPercentage() + " ");
 
         saveDebugScreen.show();
     }
