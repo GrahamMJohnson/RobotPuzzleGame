@@ -623,6 +623,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      */
     private void setupGrid(LevelData l) {
         int size = l.gameBoardData.getSize(); //size of game board
+        //Set column number for grid
+        gridView.setNumColumns(size);
 
         for (int i = 0; i < size; i++) { // Row
             for (int j = 0; j < size; j++) { //Column

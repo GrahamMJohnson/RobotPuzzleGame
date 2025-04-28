@@ -4,8 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="HardcodedText"
     android:id="@+id/tile_view"
-    android:layout_width="80dp"
-    android:layout_height="78dp"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:adjustViewBounds="true"
+    android:scaleType="centerCrop"
 
     android:background="@color/light_grey"
     android:gravity="center"

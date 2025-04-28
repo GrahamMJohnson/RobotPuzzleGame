@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -50,6 +51,17 @@ public class GridAdapter extends ArrayAdapter<GridItem> {
                         .into(imageView);
             }
         }
+
+        //Dynamically resize tiles
+        GridView gridView = (GridView) parent;
+        int totalSpacing = gridView.getHorizontalSpacing() * (gridView.getNumColumns() - 1);
+        int availWidth = gridView.getWidth() - gridView.getPaddingLeft() - gridView.getPaddingRight() - totalSpacing;
+        int tileSize = availWidth / gridView.getNumColumns();
+
+        ViewGroup.LayoutParams params = imageView.getLayoutParams();
+        params.width = tileSize;
+        params.height = tileSize;
+        imageView.setLayoutParams(params);
 
         return itemView;
     }

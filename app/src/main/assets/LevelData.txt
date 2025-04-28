@@ -5,6 +5,27 @@
 //      you want to add comments in this file it works (but not block comments)
 
 -------------------------------------
+level: 0
+size: 3
+startRow: 0
+startColumn: 0
+goalRow: 2
+goalColumn: 0
+obstacle:
+    type: wall
+    row: 1
+    column 1
+obstacle:
+    type: wall
+    row: 1
+    column: 0
+collectables:
+    row: 2
+    column: 2
+collectables:
+    row: 0
+    column: 2
+-------------------------------------
 level: 1
 size: 5
 startRow: 0
@@ -123,4 +144,87 @@ collectables:
     column: 0
 collectables:
     row: 4
+    column: 2
+-------------------------------------
+level: 4
+size: 7
+startRow: 0
+startColumn: 0
+goalRow: 4
+goalColumn: 4
+obstacle:
+    type: wall
+    row: 1
+    column 1
+obstacle:
+    type: wall
+    row: 1
+    column 2
+obstacle:
+    type: wall
+    row: 1
+    column 3
+obstacle:
+    type: wall
+    row: 1
+    column 4
+obstacle:
+    type: wall
+    row: 2
+    column 1
+obstacle:
+    type: wall
+    row: 3
+    column 1
+obstacle:
+    type: wall
+    row: 3
+    column 2
+obstacle:
+    type: wall
+    row: 3
+    column 4
+obstacle:
+    type: wall
+    row: 3
+    column 5
+obstacle:
+    type: wall
+    row: 4
+    column 1
+obstacle:
+    type: wall
+    row: 4
+    column 5
+obstacle:
+    type: wall
+    row: 5
+    column 1
+obstacle:
+    type: wall
+    row: 5
+    column 2
+obstacle:
+    type: wall
+    row: 5
+    column 3
+obstacle:
+    type: wall
+    row: 5
+    column 4
+obstacle:
+    type: wall
+    row: 5
+    column 5
+collectables:
+    row: 6
+    column: 0
+collectables:
+    row: 6
+    column: 6
+collectables:
+    row: 4
+    column: 2
+collectables:
+    row: 2
     column: 2
