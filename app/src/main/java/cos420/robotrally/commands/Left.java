@@ -1,6 +1,6 @@
 package cos420.robotrally.commands;
 
-import cos420.robotrally.enumerations.LocationInSubroutine;
+import cos420.robotrally.enumerations.SubroutineType;
 import cos420.robotrally.models.GameBoard;
 
 /**
@@ -12,7 +12,7 @@ public class Left implements ICommand {
     private final GameBoard gameBoard;
 
     /** Stores where a command is in a subroutine */
-    private LocationInSubroutine locationInSubroutine;
+    private SubroutineType subroutineType;
 
     /**
      * Constructor
@@ -21,7 +21,7 @@ public class Left implements ICommand {
     public Left(GameBoard gameBoard)
     {
         this.gameBoard = gameBoard;
-        locationInSubroutine = null;
+        subroutineType = null;
     }
 
     /**
@@ -39,8 +39,8 @@ public class Left implements ICommand {
      * @param location The location in subroutine
      */
     @Override
-    public void setLocationInSubroutine(LocationInSubroutine location) {
-        locationInSubroutine = location;
+    public void setSubroutine(SubroutineType location) {
+        subroutineType = location;
     }
 
     /**
@@ -49,8 +49,8 @@ public class Left implements ICommand {
      *<br> - it can return null which means command isn't in a subroutine
      */
     @Override
-    public LocationInSubroutine getLocationInSubroutine() {
-        return locationInSubroutine;
+    public SubroutineType getSubroutine() {
+        return subroutineType;
     }
 
     /**

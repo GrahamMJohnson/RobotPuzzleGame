@@ -1,15 +1,9 @@
 package cos420.robotrally.models;
 
-import android.location.Location;
-import android.util.Log;
-import android.widget.RemoteViews;
-
-import java.util.Collections;
 import java.util.LinkedList;
 
 import cos420.robotrally.commands.*;
-import cos420.robotrally.enumerations.EAfterExecuteCondition;
-import cos420.robotrally.enumerations.LocationInSubroutine;
+import cos420.robotrally.enumerations.SubroutineType;
 
 /**
  * Class that stores a list of commands and deals with editing them
@@ -20,9 +14,10 @@ public class CommandList {
     private final LinkedList<ICommand> script;
     /** The position in script of the selected command*/
     private int select;
-
+    /** Tracks if the roomba crashed or not */
     public boolean didWeDriveSafe;
 
+    /// Constructor
 
     /**
      * Constructor<br>
@@ -30,11 +25,11 @@ public class CommandList {
      */
     public CommandList()
     {
-        script = new LinkedList<ICommand>();
+        script = new LinkedList<>();
         select = 0;
     }
 
-
+    /// Public methods
 
     /**
      * Method to add a new command to the list
@@ -44,18 +39,18 @@ public class CommandList {
     {
         if(script.isEmpty()) { //list is empty, so command that's added is selected
             script.add(command);
-        }else { //adds command in list at position
+        } else { //adds command in list at position
             select = select + 1; //selects command to the right
             script.add(select, command);
         }
-
     }
 
     /**
-     * Method to add a subroutine of commands to the list
-     * @param commands The list of commands to add
+     * Method to add a subroutine to a script<br> used at runtime to expand out the subroutines
+     * @param commands The list of commands to be added
+     * @param subroutineType Enum for which subroutine is being added
      */
-    public void addSubroutine(CommandList commands)
+    public void addSubroutine(CommandList commands, SubroutineType subroutineType)
     {
         // Can only add a subroutine to another script if there at least 2 commands in the subroutine
         if (commands.size() < 2) {
@@ -78,70 +73,30 @@ public class CommandList {
                 newCommand = new Right(c.getGameBoard());
             }
 
-                // Check if it is first command
-            if(i == 0) {
-                newCommand.setLocationInSubroutine(LocationInSubroutine.START);
-            }
-            // Check if it is last command
-            else if (i == commands.size() - 1) {
-                newCommand.setLocationInSubroutine(LocationInSubroutine.END);
-            }
-            // Command is in middle
-            else {
-                newCommand.setLocationInSubroutine(LocationInSubroutine.MIDDLE);
-            }
+            // Check if it is first command
+            newCommand.setSubroutine(subroutineType);
             addCommand(newCommand);
         }
     }
 
     /**
-     * Method to remove the selected command/subroutine of the list
-     * @return int - The number of commands that were removed
+     * Method to remove the selected command of the list
      * @throws Exception if the list is empty
      */
-    public int remove() throws Exception {
-        int count = 0;
+    public void remove() throws Exception {
         if (!script.isEmpty())
         {
-            int inSubroutine = 0;
-
-            // Keep deleting as long as we are in a subroutine
-            while (true) {
-                ICommand c = script.get(select);
-                LocationInSubroutine l = c.getLocationInSubroutine();
-
-                script.remove(select);
-                //selects command to left
-                if (select > 0) {
-                    select--;
-                }
-                count++;
-
-                if(l == null || l == LocationInSubroutine.START) {
-                    inSubroutine--;
-                    if (inSubroutine <= 0) {
-                        break;
-                    }
-                }
-                else if (l == LocationInSubroutine.END) {
-                    inSubroutine++;
-                }
+            script.remove(select);
+            //selects command to left
+            if(select > 0 )
+            {
+                select = select - 1;
             }
         }
         else
         {
             throw new Exception("Cannot remove from empty list");
         }
-        return count;
-    }
-
-    /**
-     * Method to clear the list of all its commands
-     */
-    public void clearList()
-    {
-        script.clear();
-        select = 0;
     }
 
     /**
@@ -155,13 +110,6 @@ public class CommandList {
      * Setter for select
      */
     public void setSelect(int s) {
-
-        // Clicking on command in subroutine selects last command of subroutine
-        LocationInSubroutine l = script.get(s).getLocationInSubroutine();
-        while (l == LocationInSubroutine.START || l == LocationInSubroutine.MIDDLE) {
-            l = script.get(++s).getLocationInSubroutine();
-        }
-
         // If s is already selected, and not at the end, selects the end instead
         // resets to default position of the end
         if(select == s && script.size() - 1 != s) {
@@ -191,11 +139,11 @@ public class CommandList {
     }
 
     /**
-     *
-     * @return didWeDriveSafe, whether or not we crashed during execution
+     * Method to get if we crashed or not
+     * @return the opposite of didWeDriveSafe, whether or not we crashed during execution
      */
-    public boolean getDidWeDriveSafe() {
-        return didWeDriveSafe;
+    public boolean didWeCrash() {
+        return !didWeDriveSafe;
     }
 
     /**

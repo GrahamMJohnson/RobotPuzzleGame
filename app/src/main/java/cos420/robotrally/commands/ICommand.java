@@ -1,6 +1,6 @@
 package cos420.robotrally.commands;
 
-import cos420.robotrally.enumerations.LocationInSubroutine;
+import cos420.robotrally.enumerations.SubroutineType;
 import cos420.robotrally.models.GameBoard;
 
 /**
@@ -14,9 +14,9 @@ public interface ICommand {
      */
     boolean execute();
 
-    void setLocationInSubroutine(LocationInSubroutine location);
+    void setSubroutine(SubroutineType location);
 
-    LocationInSubroutine getLocationInSubroutine();
+    SubroutineType getSubroutine();
 
     public GameBoard getGameBoard();
 }

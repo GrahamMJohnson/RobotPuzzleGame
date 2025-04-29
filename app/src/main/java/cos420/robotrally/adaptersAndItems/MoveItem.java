@@ -16,6 +16,7 @@ public class MoveItem {
 
     private Drawable buttonColor;
     private Drawable defaultButtonColor;
+    private String subroutineType;
 
     /**
      * Constructor
@@ -27,6 +28,7 @@ public class MoveItem {
         this.color = color;
         this.buttonColor = buttonColor;
         this.defaultButtonColor = buttonColor;
+        this.subroutineType = null;
     }
 
     /**
@@ -56,4 +58,28 @@ public class MoveItem {
     public void clearHighlight() {
         buttonColor = defaultButtonColor;
     }
+
+    /**
+     * Method to get the subroutine command is associated to
+     * @return String with A or B, null if part of main list
+     */
+    public String getSubroutineType() {
+        return subroutineType;
+    }
+
+    /**
+     * Method to set the subroutine this command is associated with
+     * @param subroutine String, either A or B, for subroutine
+     *                   <br>will be set to null if not a or b
+     */
+    public void setSubroutine(String subroutine) {
+        switch (subroutine) {
+            case "A":
+            case "B":
+                this.subroutineType = subroutine;
+                break;
+            default: break;
+        }
+    }
+
 }

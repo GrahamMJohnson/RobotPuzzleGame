@@ -1,11 +1,5 @@
 package cos420.robotrally;
 
-//TODO
-// When A/B are clicked, add A/B to list
-// When Start is clicked, have method that goes through and adds moves for A/B to main list
-// When execution finishes, collapse subroutines back into a single A/B command
-// Logic for adding A/B to themselves, make sure it doesn't crash
-
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
@@ -109,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
     /** Attribute to track if subroutines are being edited */
     private ListName activeListName = ListName.MAIN;
-    private ListName lastSubroutineEdited;
     private int obstacleImage;
     private int collectableImage;
     private int destinationImage;
@@ -404,20 +397,22 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         m.clearHighlight();
         moveAdapterMain.notifyItemChanged(executingMoveUI);
 
-            if (result == EAfterExecuteCondition.DEST_REACHED) {
-                levelComplete = true;
-                showWinScreen();
-            } else if (result == EAfterExecuteCondition.CRASHED) {
-                showCollisionScreen();
-            } else if (result == EAfterExecuteCondition.GOT_LOST) {
-                showLostScreen();
-            } else {
-                Log.d("End Condition Error", "Someone added a new end condition and " +
-                                "forgot to add it to the end-screen handler.");
-            }
+        if (result == EAfterExecuteCondition.DEST_REACHED) {
+            levelComplete = true;
+            showWinScreen();
+        } else if (result == EAfterExecuteCondition.CRASHED) {
+            showCollisionScreen();
+        } else if (result == EAfterExecuteCondition.GOT_LOST) {
+            showLostScreen();
+        } else {
+            Log.d("End Condition Error", "Someone added a new end condition and " +
+                            "forgot to add it to the end-screen handler.");
+        }
+        collapseSubroutinesInUI();
+
     }
     /**
-     * Highilghts the currently executing move, graying the previous one anc yellow-ing the current one
+     * Highlights the currently executing move, graying the previous one anc yellow-ing the current one
      *
      * @param index of execution in list
      */
@@ -548,15 +543,15 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         findViewById(R.id.button_a).setOnClickListener(v -> {
             // only update UI if subroutine was successfully added
             if (levelC.addSubroutineA(activeListName)) {
-                addSubsequenceToUI("A");
-            };
+                addMoveToUI("A");
+            }
         });
 
         // B
         findViewById(R.id.button_b).setOnClickListener(v -> {
             // only update UI if subroutine was successfully added
             if (levelC.addSubroutineB(activeListName)) {
-                addSubsequenceToUI("B");
+                addMoveToUI("B");
             }
         });
 
@@ -564,8 +559,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         findViewById(R.id.delete_button).setOnClickListener(v -> {
             try {
                 int before = levelC.getSelected(activeListName); //The command that was deleted
-                int number = levelC.remove(activeListName);
-                removeMoveFromUI(before, number);
+                levelC.remove(activeListName);
+                removeMoveFromUI(before);
             } catch (Exception e) {
                 Log.d("Button Pressed", "Attempted to remove item from empty list");
             }
@@ -573,6 +568,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // Edit Subroutines
         findViewById(R.id.subroutine_button).setOnClickListener(v -> {
+            findViewById(R.id.start_button).setClickable(false);
             showSubroutineEditScreen();
             // Edit subroutine A the first time, otherwise the last subroutine being edited
             setActiveList(ListName.A);
@@ -590,13 +586,18 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             setButtonsClickable(false);
             animator.end();
             recyclerViewMain.smoothScrollToPosition(0);
-            levelC.executeScript(moveListMain, this, this);
 
             //these are the edits that need to be made to the save function each time it is run
             saveFunction.currentMoveSequence = saveFunction.MoveSequenceConverter(moveListMain);
             saveFunction.currentNumAttempts += 1;
             saveFunction.currentNumMoves = saveFunction.calcNumMoves();
             changesMade = true;
+
+            expandSubroutinesInUI();
+
+            recyclerViewMain.post(() -> {
+                levelC.executeScript(moveListMain, this, this);
+            });
         });
 
         // BACK
@@ -705,6 +706,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      * @param moveText The designator of the move; must be "UP", "DOWN", LEFT", "RIGHT", "A", or "B"
      */
     private void addMoveToUI (String moveText) {
+
+        //android was getting confused when only using one gray drawable to setup move buttons.
+        ColorDrawable color1 = new ColorDrawable(Color.parseColor("#D3D3D3"));
+        ColorDrawable backgroundColor;
         // Using a switch w/ fallthrough rather than if-statement in order to make future work
         // easier. Each type of move will need to access a different image.
         switch (moveText) {
@@ -712,26 +717,29 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             case "DOWN":
             case "LEFT":
             case "RIGHT":
+                backgroundColor = new ColorDrawable(Color.parseColor("#D3D3D3"));
+                break;
+            case "A":
+                backgroundColor = new ColorDrawable(getResources().getColor(R.color.indian_red, null));
+                break;
+            case "B":
+                backgroundColor = new ColorDrawable(getResources().getColor(R.color.sea_green, null));
                 break;
             default: throw new InvalidParameterException(moveText + " is not a valid move.");
         }
 
         int s = levelController.getSelected(activeListName);
 
-        //android was getting confused when only using one gray drawable to setup move buttons.
-        ColorDrawable gray1 = new ColorDrawable(Color.parseColor("#D3D3D3"));
-        ColorDrawable gray2 = new ColorDrawable(Color.parseColor("#D3D3D3"));
 
-        activeMoveList.add(s, new MoveItem(moveText, gray1, gray2));//add item
+        activeMoveList.add(s, new MoveItem(moveText, color1, backgroundColor));//add item
         activeMoveAdapter.notifyItemInserted(s);
         updateEmptyClickAreaVisibility();
 
-//        activeRecyclerView.post(this::scrollUI);
         activeRecyclerView.scrollToPosition(s);
         activeRecyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
     }
 
-    private void addSubsequenceToUI(String moveText) {
+    private void addSubroutineToUI(String moveText, int location) {
         List<MoveItem> subsequenceToAdd;
         ColorDrawable color1;
         ColorDrawable color2;
@@ -749,43 +757,104 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             default: throw new InvalidParameterException(moveText + " is not a valid move.");
         }
 
-        //TODO
-        // Will have to think about what we want to happen when a subsequence is edited.
-        //    Should it update the main list? Remove subsequence from main list???
-
-
-        int s = levelController.getSelected(activeListName);
-        // Have to get back to the index for first command that was added to list.
-        s = s - subsequenceToAdd.size();
-        int start = s + 1;
+        int s = location;
+        int start = s;
         // Add all moves from designated subsequence
         for (var move : subsequenceToAdd) {
-            s++;
             var text = move.getText();
-            activeMoveList.add(s, new MoveItem(text, color1, color2)); //add item
+            MoveItem m = new MoveItem(text, color1, color2);
+            m.setSubroutine(moveText);
+            moveListMain.add(s, m); //add item
+            s++;
         }
 
-        activeMoveAdapter.notifyItemRangeInserted(start, subsequenceToAdd.size());
-        activeRecyclerView.scrollToPosition(s);
-        activeRecyclerView.post(() -> {
-            blinkUI();
-            activeMoveAdapter.notifyItemChanged(levelController.getSelected(activeListName));
-        });
+        moveAdapterMain.notifyItemRangeInserted(start, subsequenceToAdd.size());
+    }
+
+    /**
+     * Method to expand the A/B command into the full subroutine on execution
+     */
+    private void expandSubroutinesInUI() {
+        for (int i = 0; i < moveListMain.size(); i++) {
+            MoveItem m = moveListMain.get(i);
+            String subroutine = m.getText();
+            if (!(subroutine.equals("A") || subroutine.equals("B"))) {
+                continue;
+            }
+
+            levelController.setSelected(i, ListName.MAIN);
+
+            // remove the a command
+            moveListMain.remove(i);
+            moveAdapterMain.notifyItemRemoved(i);
+
+            // add the commands from a to main script
+            addSubroutineToUI(subroutine, i);
+            i = levelController.getSelected(ListName.MAIN);
+        }
+        levelController.setSelected(0, ListName.MAIN);
+    }
+
+
+    /**
+     * Method to collapse subroutine back into A/B command when execution is complete
+     */
+    private void collapseSubroutinesInUI() {
+        for (int i = 0; i < moveListMain.size(); i++) {
+            MoveItem m = moveListMain.get(i);
+            List<MoveItem> subroutineToCollapse;
+            MoveItem newMoveItem;
+
+            String subroutine = m.getSubroutineType();
+
+            if (subroutine == null) {
+                continue;
+            }
+
+            ColorDrawable color1 = new ColorDrawable(getResources().getColor(R.color.light_grey, null));
+            ColorDrawable color2;
+
+            switch (subroutine) {
+                case "A":
+                    subroutineToCollapse = moveListA;
+                    color2 = new ColorDrawable(getResources().getColor(R.color.indian_red, null));
+                    newMoveItem = new MoveItem("A", color1, color2);
+                    break;
+                case "B":
+                    subroutineToCollapse = moveListB;
+                    color2 = new ColorDrawable(getResources().getColor(R.color.sea_green, null));
+                    newMoveItem = new MoveItem("B", color1, color2);
+                    break;
+                default: continue;
+            }
+
+            // Remove commands from the script based off of how many commands are in subroutine
+            for (int j = 0; j < subroutineToCollapse.size(); j++) {
+                moveListMain.remove(i);
+            }
+
+            moveAdapterMain.notifyItemRangeRemoved(i, subroutineToCollapse.size());
+
+            // Add placeholder subroutine command back to script
+            moveListMain.add(i, newMoveItem);
+            moveAdapterMain.notifyItemInserted(i);
+        }
+    }
+
+    private void restartBlinkAfterRun() {
+        int lastIndex = moveListMain.size() - 1;
+        levelController.setSelected(lastIndex, ListName.MAIN);
+        blinkUI();
+        moveAdapterMain.notifyItemChanged(lastIndex);
     }
 
     /**
      * Remove the last move item from the list
      * @param before the command that got deleted
-     * @param number The number of commands to be deleted
      */
-    private void removeMoveFromUI (int before, int number) {
-        // Remove specified number of commands
-        int index = before;
-        for (int i = 0; i < number; i++) {
-            activeMoveList.remove(index);
-            index--;
-        }
-        activeMoveAdapter.notifyItemRangeRemoved(before - number + 1, number); //notify adapter of change
+    private void removeMoveFromUI (int before) {
+        activeMoveList.remove(before);
+        activeMoveAdapter.notifyItemRemoved(before); //notify adapter of change
         updateEmptyClickAreaVisibility();
         blinkUI();
     }
@@ -868,6 +937,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             if(changesMade) {
                 saveFunction.saveCurrent();
             }
+            restartBlinkAfterRun();
         });
 
         customView.findViewById(R.id.next_level_button).setOnClickListener(v -> {
@@ -904,6 +974,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         collisionView.findViewById(R.id.CrashDialogRetryButton).setOnClickListener(v -> {
             retry();
             collisionScreen.dismiss();
+            restartBlinkAfterRun();
         });
 
         //this is the button listener to bring the dialog back to the main menu
@@ -933,6 +1004,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         lostView.findViewById(R.id.LostDialogRetryButton).setOnClickListener(v -> {
             retry();
             lostScreen.dismiss();
+            restartBlinkAfterRun();
         });
 
         lostView.findViewById(R.id.LostDialogMenuButton).setOnClickListener(v -> {
@@ -990,6 +1062,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         subroutineEditView.findViewById(R.id.close_button).setOnClickListener(v -> {
             setActiveList(ListName.MAIN);
             rootLayout.removeView(subroutineEditView);
+            findViewById(R.id.start_button).setClickable(true);
         });
     }
 
@@ -1022,10 +1095,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     }
 
     /**
-     * Show the settings/info screen for the gameboard instance of the settings menu
+     * Show the settings/info screen for the gameBoard instance of the settings menu
      */
     private void showSettingsInfoMenu(){
-        //TODO: make this bring up level information too, make it scrollable, with the information above the settigns.
+        //TODO: make this bring up level information too, make it scrollable, with the information above the settings.
         //Create the view to be referenced
         LayoutInflater settingsInflater = getLayoutInflater();
         View settingsView = settingsInflater.inflate(R.layout.settings_screen, null);

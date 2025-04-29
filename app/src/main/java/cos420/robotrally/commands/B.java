@@ -4,9 +4,9 @@ import cos420.robotrally.enumerations.SubroutineType;
 import cos420.robotrally.models.GameBoard;
 
 /**
- * Command to move up
+ * Command to move down
  */
-public class Up implements ICommand {
+public class B implements ICommand {
 
     /** reference to the game board of the level this command is initialized from */
     private final GameBoard gameBoard;
@@ -18,10 +18,10 @@ public class Up implements ICommand {
      * Constructor
      * @param gameBoard the game board tied to the level creating this command
      */
-    public Up(GameBoard gameBoard)
+    public B(GameBoard gameBoard)
     {
         this.gameBoard = gameBoard;
-        subroutineType = null;
+        subroutineType = SubroutineType.B;
     }
 
     /**
@@ -31,7 +31,7 @@ public class Up implements ICommand {
     @Override
     public boolean execute()
     {
-        return gameBoard.moveUp();
+        return false;
     }
 
     /**

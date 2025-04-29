@@ -9,9 +9,12 @@ import cos420.robotrally.adaptersAndItems.MoveItem;
 import cos420.robotrally.commands.*;
 import cos420.robotrally.enumerations.EAfterExecuteCondition;
 import cos420.robotrally.enumerations.ListName;
+import cos420.robotrally.enumerations.SubroutineType;
 import cos420.robotrally.levels.LevelData;
 
-// TODO javadoc for the class itself
+/**
+ * Class that contains the lists of moves, and handles execution for a level
+ */
 public class LevelController {
     /** attribute for the game board for this level */
     private final GameBoard gameBoard;
@@ -28,11 +31,10 @@ public class LevelController {
     /** attribute that is a reference to the stored level data */
     private final LevelData levelData;
 
-
     /** attribute to store number of attempts on level */
     private int attempts;
 
-    // TODO javadoc
+    /** String used for the tag for log messages in this class */
     private static final String LOG_TAG = "Level Controller";
 
 
@@ -119,7 +121,7 @@ public class LevelController {
     public boolean addSubroutineA(ListName list)
     {
         switch(list) {
-            case MAIN: commandScript.addSubroutine(subroutineA); return true;
+            case MAIN: commandScript.addCommand(new A(gameBoard)); return true;
             case A: ; // Can't add to itself
             case B: ; // A can only be added to main to prevent loops
         }
@@ -127,15 +129,15 @@ public class LevelController {
     }
 
     /**
-     * Method to add an B command to script
+     * Method to add B command to script
      * @param list The list to add command to
      * @return Whether or not the subroutine was able to be added
      */
     public boolean addSubroutineB(ListName list)
     {
         switch(list) {
-            case MAIN: commandScript.addSubroutine(subroutineB); return true;
-            case A: subroutineA.addSubroutine(subroutineB); return true;
+            case MAIN: commandScript.addCommand(new B(gameBoard)); return true;
+            case A: subroutineA.addCommand(new B(gameBoard)); return true;
             case B: ; // Can't add to itself
         }
         return false;
@@ -144,15 +146,13 @@ public class LevelController {
     /**
      * Method to remove command from end of script
      * @param list The list to remove command from
-     * @return int value of how many commands were deleted
-     * @throws Exception is the script is empty
+     * @throws Exception if the script is empty
      */
-    public int remove(ListName list) throws Exception {
+    public void remove(ListName list) throws Exception {
         switch(list) {
-            case MAIN: return commandScript.remove();
-            case A: return subroutineA.remove();
-            case B: return subroutineB.remove();
-            default: return 0;
+            case MAIN: commandScript.remove(); break;
+            case A: subroutineA.remove(); break;
+            case B: subroutineB.remove(); break;
         }
     }
 
@@ -184,7 +184,7 @@ public class LevelController {
     }
 
     /**
-     * Getter
+     * Getter for the gameBoard object
      * @return the game board
      */
     public GameBoard getGameBoard() {
@@ -192,10 +192,11 @@ public class LevelController {
     }
 
     /**
+     * Method to get the end status after execution is complete
      * @return the end status of execution for handling in MainActivity
      */
     public EAfterExecuteCondition getEndStatus() {
-        if (!commandScript.getDidWeDriveSafe()) {
+        if (commandScript.didWeCrash()) {
             // Roomba crashed
             return EAfterExecuteCondition.CRASHED;
         }
@@ -216,6 +217,9 @@ public class LevelController {
      * @param activity reference to MainActivity so we can manage the UI thread
      */
     public void executeScript(List<MoveItem> moveList, ExecutionCallback callback, MainActivity activity) {
+
+        expandSubroutines();
+
         attempts++;
         new Thread(() -> {
             for (int i = 0; i < moveList.size(); i++) {
@@ -243,14 +247,17 @@ public class LevelController {
                     Log.d(LOG_TAG, e.getMessage() != null ? e.getMessage() : "Error sleeping");
                 }
 
-                if (!commandScript.getDidWeDriveSafe()) {
+                if (commandScript.didWeCrash()) {
                     break;
                 }
             }
 
 
             EAfterExecuteCondition result = getEndStatus();
-            activity.runOnUiThread(() -> callback.onExecutionEnd(result));
+            activity.runOnUiThread(() -> {
+                callback.onExecutionEnd(result);
+                collapseSubroutines();
+            });
         }).start();
     }
 
@@ -268,5 +275,111 @@ public class LevelController {
      */
     public void resetCollectiblesCollected(){
         gameBoard.collectiblesCollected = 0;
+    }
+
+    /**
+     * Method to expand A/B command into full subroutine on execution
+     */
+    private void expandSubroutines() {
+        // Variables to be used later
+        int removeIndex;
+        int lastAddedCommandIndex;
+
+        // Loop through each command in script searching for subroutine placeholders
+        for (int i = 0; i < commandScript.size(); i++) {
+            // Get the command out of list
+            ICommand c = commandScript.get(i);
+
+            // Set variables if command is a subroutine placeholder
+            CommandList subroutineToAdd;
+            SubroutineType subroutineType;
+            if (c instanceof A) {
+                subroutineToAdd = subroutineA;
+                subroutineType = SubroutineType.A;
+            }
+            else if (c instanceof B) {
+                subroutineToAdd = subroutineB;
+                subroutineType = SubroutineType.B;
+            }
+            else {
+                // If command was not an A/B placeholder, we can continue to next command in list
+                continue;
+            }
+
+            // Select the correct command
+            if (commandScript.getSelect() != i)
+                commandScript.setSelect(i);
+
+            // Store index of placeholder command to be removed
+            removeIndex = i;
+
+            // Add the commands from subroutine into to main script
+            commandScript.addSubroutine(subroutineToAdd, subroutineType);
+            // Store the current select, so we don't have to check the newly added commands
+            lastAddedCommandIndex = commandScript.getSelect() - 1;
+
+            // Remove the placeholder command
+            commandScript.setSelect(removeIndex);
+            try {
+                commandScript.remove();
+            } catch (Exception ignored) {
+                // We should never get here as remove is only called if it found an A command
+            }
+
+            // Set i to be the index of last added command
+            i = lastAddedCommandIndex;
+        }
+    }
+
+    /**
+     * Method to collapse subroutine into A/B command when execution is complete
+     */
+    private void collapseSubroutines() {
+        // Loop through list looking for commands that were added as part of subroutine
+        for (int i = 0; i < commandScript.size(); i++) {
+            // Get command from list
+            ICommand c = commandScript.get(i);
+            CommandList subroutineToCollapse;
+            ICommand subroutineCommand;
+
+            SubroutineType subType = c.getSubroutine();
+
+            // If command is not part of subroutine, continue on to next command
+            if (subType == null) {
+                continue;
+            }
+
+            // Set variables depending on which subroutine command is a part of
+            switch (c.getSubroutine()) {
+                case A:
+                    subroutineToCollapse = subroutineA;
+                    subroutineCommand = new A(gameBoard);
+                    break;
+                case B:
+                    subroutineToCollapse = subroutineB;
+                    subroutineCommand = new B(gameBoard);
+                    break;
+                default: continue;
+            }
+
+            // Get index to insert placeholder command into list after subroutine commands, then select and add
+            int insertIndex = i + subroutineToCollapse.size() - 1;
+            if (insertIndex != commandScript.getSelect())
+                commandScript.setSelect(insertIndex);
+            commandScript.addCommand(subroutineCommand);
+
+            // Remove commands from the script based off of how many commands are in subroutine
+            for (int j = 0; j < subroutineToCollapse.size(); j++) {
+
+                // Set select to be the first command of subroutine
+                if (i != commandScript.getSelect())
+                    commandScript.setSelect(i);
+                try {
+                    commandScript.remove();
+                } catch (Exception ignored) {
+                    // We should never get here as remove is only called if it found an A command
+                }
+            }
+        }
     }
 }
