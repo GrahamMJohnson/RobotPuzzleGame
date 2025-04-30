@@ -228,3 +228,37 @@ collectables:
 collectables:
     row: 2
     column: 2
+    -------------------------------------
+    level: 5
+    size: 5
+    startRow: 2
+    startColumn: 2
+    goalRow: 4
+    goalColumn: 3
+    obstacle:
+        type: chair
+        row: 2
+        column 1
+    obstacle:
+        type: chair
+        row: 1
+        column 3
+    obstacle:
+        type: chair
+        row: 3
+        column 3
+    collectables:
+        row: 0
+        column: 0
+    collectables:
+        row: 0
+        column: 2
+    collectables:
+        row: 3
+        column: 1
+    collectables:
+        row: 4
+        column: 0
+    collectables:
+        row: 4
+        column: 2
