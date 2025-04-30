@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ImageView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="HardcodedText"
-    android:id="@+id/tile_view"
+    android:id="@+id/tile"
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:adjustViewBounds="true"
-    android:scaleType="centerCrop"
 
-    android:background="@color/light_grey"
-    android:gravity="center"
+    android:background="@color/light_grey">
 
-    android:contentDescription="a game tile"
-    android:src="@mipmap/ic_launcher_round"
-    android:layout_gravity="center"/>
+    <ImageView
+        android:id="@+id/tile_view"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:gravity="center"
+
+        android:contentDescription="a game tile"
+        android:src="@mipmap/ic_launcher_round"
+        android:layout_gravity="center"/>
+</LinearLayout>

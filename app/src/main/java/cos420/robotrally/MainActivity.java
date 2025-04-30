@@ -108,6 +108,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private int destinationImage;
     private int roombaImage;
     private boolean isGif;
+    private ImageView moving;
+    private FrameLayout root;
+    private ImageView lastImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         setGifs();
 
         openLevelSelect();
+
+        root = findViewById(android.R.id.content);
     }
 
     /// --------------
@@ -277,12 +282,18 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         float x = toPlace[0] - fromPlace[0];
         float y = toPlace[1] - fromPlace[1];
 
-        //Create a temporary view for the animation
-        ImageView moving = new ImageView(this);
+        //Remove the last temporary view for the animation
+        root.removeView(moving);
+
+        //Set next tile to Invisible
+        lastImage = toView.findViewById(R.id.tile_view);
+        lastImage.setVisibility(View.INVISIBLE);
+
+        //Create new temporary view
+        moving = new ImageView(this);
         moving.setImageDrawable(((ImageView) fromView.findViewById(R.id.tile_view)).getDrawable());
 
         //Layout for temporary view
-        FrameLayout root = findViewById(android.R.id.content);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(fromView.getWidth(), fromView.getHeight());
         params.leftMargin = fromPlace[0];
         params.topMargin = fromPlace[1];
@@ -316,11 +327,13 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
+                //Set the image of the last tile to Visible
+                ImageView fromViewImage = fromView.findViewById(R.id.tile_view);
+                fromViewImage.setVisibility(View.VISIBLE);
+
                 //Set current
                 gridList.set(to, pre);
                 gridAdapter.notifyDataSetChanged();
-                //Remove temporary view for movement
-                root.removeView(moving);
             }
         });
 
@@ -354,8 +367,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         ghostList.add(ghost);
 
         //Add ghost to root
-        FrameLayout root = findViewById(android.R.id.content);
-        root.addView(ghost);
+        root.addView(ghost, root.indexOfChild(moving));
 
         //Animate ghost to fade in over 150 milliseconds
         ghost.animate()
@@ -368,12 +380,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      * Clears the ghost trail
      */
     public void clearGhost() {
-        FrameLayout root = findViewById(android.R.id.content);
-
         for (View ghost : ghostList) {
             root.removeView(ghost);
         }
-
         ghostList.clear();
     }
 
@@ -450,6 +459,12 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      * Resets the grid of the UI game board
      */
     public void resetGrid() {
+        //Removes the temporary view over grid
+        root.removeView(moving);
+        //Sets the last tile back to Visible
+        lastImage.setVisibility(VISIBLE);
+
+        //Grid clear and setup
         gridList.clear();
         setupGrid(levels.get(selectedLevelID));
         gridAdapter.notifyDataSetChanged();
