@@ -43,7 +43,7 @@ public class StatManager {
     private double efficiencyScore;
 
     ///This is the number of collectibles possible for the current level
-    private int numberPossibleCollectibles;
+    public int numberPossibleCollectibles;
 
     ///This is the number of collectibles that the user collected on their current attempt
     public int currentNumberCollectibles;
@@ -83,8 +83,8 @@ public class StatManager {
         bestCollectiblesPercentage = currentSave.GetBestCollectiblesPercentage();
 
         if(levelID + 1 == 1){
-            numberPossibleCollectibles = 3;
-            idealNumMoves = 8;
+            numberPossibleCollectibles = 2;
+            idealNumMoves = 6;
         }
         else if(levelID + 1 == 2){
             numberPossibleCollectibles = 3;
@@ -92,6 +92,14 @@ public class StatManager {
         }
         else if(levelID + 1 == 3){
             numberPossibleCollectibles = 3;
+            idealNumMoves = 8;
+        }
+        else if(levelID == 4){
+            numberPossibleCollectibles = 3;
+            idealNumMoves = 12;
+        }
+        else if(levelID == 5){
+            numberPossibleCollectibles = 4;
             idealNumMoves = 12;
         }
     }
@@ -107,7 +115,9 @@ public class StatManager {
             bestNumMoves = currentNumMoves;
             efficiencyScore = (double) idealNumMoves / (double) currentNumMoves;
             bestNumberCollectibles = currentNumberCollectibles;
-            bestCollectiblesPercentage = (double) currentNumberCollectibles/ (double) numberPossibleCollectibles;
+            if(numberPossibleCollectibles > 0) {
+                bestCollectiblesPercentage = (double) currentNumberCollectibles / (double) numberPossibleCollectibles;
+            }
         }
     }
 

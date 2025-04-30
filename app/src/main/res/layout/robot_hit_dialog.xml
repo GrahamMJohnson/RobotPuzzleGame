@@ -28,7 +28,7 @@
         android:textStyle="bold"/>
 
     <TextView
-        android:id="@+id/Best_Run_Move_Count"
+        android:id="@+id/Hit_Best_Run_Move_Count"
         android:layout_below="@id/Best_Run_Label"
         android:layout_width="100sp"
         android:layout_height="70sp"
@@ -38,7 +38,7 @@
 
     <TextView
         android:id="@+id/Best_Run_Secondary_Label"
-        android:layout_below="@id/Best_Run_Move_Count"
+        android:layout_below="@id/Hit_Best_Run_Move_Count"
         android:layout_width="100sp"
         android:layout_height="25sp"
         android:text="Moves"
@@ -47,7 +47,7 @@
         />
 
     <TextView
-        android:id="@+id/Best_Run_Collectibles_Count"
+        android:id="@+id/Hit_Best_Run_Collectibles_Count"
         android:layout_below="@id/Best_Run_Secondary_Label"
         android:layout_width="100sp"
         android:layout_height="70sp"
@@ -56,8 +56,8 @@
         />
 
     <TextView
-        android:id="@+id/Best_Run_Collectibles_Label"
-        android:layout_below="@id/Best_Run_Collectibles_Count"
+        android:id="@+id/Hit_Best_Run_Collectibles_Label"
+        android:layout_below="@id/Hit_Best_Run_Collectibles_Count"
         android:layout_width="100sp"
         android:layout_height="25sp"
         android:text="Collectibles"
@@ -68,7 +68,7 @@
     <TextView
         android:id="@+id/This_Run_Label"
         android:layout_below="@id/Dialog_Header"
-        android:layout_toEndOf="@id/Best_Run_Collectibles_Label"
+        android:layout_toEndOf="@id/Hit_Best_Run_Collectibles_Label"
         android:layout_marginHorizontal="25sp"
         android:layout_width="100sp"
         android:layout_height="25sp"
@@ -79,9 +79,9 @@
         />
 
     <TextView
-        android:id="@+id/This_Run_Move_Count"
+        android:id="@+id/Hit_This_Run_Move_Count"
         android:layout_below="@id/This_Run_Label"
-        android:layout_toEndOf="@id/Best_Run_Move_Count"
+        android:layout_toEndOf="@id/Hit_Best_Run_Move_Count"
         android:layout_width="100sp"
         android:layout_height="70sp"
         android:layout_marginHorizontal="25sp"
@@ -91,7 +91,7 @@
 
     <TextView
         android:id="@+id/This_Run_Secondary_Label"
-        android:layout_below="@id/This_Run_Move_Count"
+        android:layout_below="@id/Hit_This_Run_Move_Count"
         android:layout_toEndOf="@id/Best_Run_Secondary_Label"
         android:layout_marginHorizontal="25sp"
         android:layout_width="100sp"
@@ -102,9 +102,9 @@
         />
 
     <TextView
-        android:id="@+id/This_Run_Collectibles_Count"
+        android:id="@+id/Hit_This_Run_Collectibles_Count"
         android:layout_below="@id/This_Run_Secondary_Label"
-        android:layout_toEndOf="@id/Best_Run_Move_Count"
+        android:layout_toEndOf="@id/Hit_Best_Run_Move_Count"
         android:layout_width="100sp"
         android:layout_height="70sp"
         android:layout_marginHorizontal="25sp"
@@ -114,8 +114,8 @@
 
     <TextView
         android:id="@+id/This_Run_Collectibles_Label"
-        android:layout_below="@id/This_Run_Collectibles_Count"
-        android:layout_toEndOf="@id/Best_Run_Collectibles_Label"
+        android:layout_below="@id/Hit_This_Run_Collectibles_Count"
+        android:layout_toEndOf="@id/Hit_Best_Run_Collectibles_Label"
         android:layout_marginHorizontal="25sp"
         android:layout_width="100sp"
         android:layout_height="25sp"
@@ -137,9 +137,9 @@
         />
 
     <TextView
-        android:id="@+id/Goal_Move_Count"
+        android:id="@+id/Hit_Goal_Move_Count"
         android:layout_below="@id/Goal_Label"
-        android:layout_toEndOf="@id/This_Run_Move_Count"
+        android:layout_toEndOf="@id/Hit_This_Run_Move_Count"
         android:layout_width="100sp"
         android:layout_height="70sp"
         android:textSize="50sp"
@@ -148,7 +148,7 @@
 
     <TextView
         android:id="@+id/Goal_Secondary_Label"
-        android:layout_below="@id/Goal_Move_Count"
+        android:layout_below="@id/Hit_Goal_Move_Count"
         android:layout_toEndOf="@id/This_Run_Secondary_Label"
         android:layout_width="100sp"
         android:layout_height="25sp"
@@ -158,9 +158,9 @@
         />
 
     <TextView
-        android:id="@+id/Goal_Collectibles_Count"
+        android:id="@+id/Hit_Goal_Collectibles_Count"
         android:layout_below="@id/Goal_Secondary_Label"
-        android:layout_toEndOf="@id/This_Run_Move_Count"
+        android:layout_toEndOf="@id/Hit_This_Run_Move_Count"
         android:layout_width="100sp"
         android:layout_height="70sp"
         android:textSize="50sp"
@@ -169,7 +169,7 @@
 
     <TextView
         android:id="@+id/Goal_Collectibles_Label"
-        android:layout_below="@id/Goal_Collectibles_Count"
+        android:layout_below="@id/Hit_Goal_Collectibles_Count"
         android:layout_toEndOf="@id/This_Run_Secondary_Label"
         android:layout_width="100sp"
         android:layout_height="25sp"

@@ -69,7 +69,7 @@ public class RobotRallySave {
      * It should create shared preferences for the game.
      * @param context this is the context that you are in
      */
-    public RobotRallySave(Context context, int levelNumber) {
+    public RobotRallySave(Context context, int levelNumber){
         //this is the key for the shared prefs that stores the JSON string
         sharedKey = "level" + levelNumber;
 
@@ -110,8 +110,11 @@ public class RobotRallySave {
         currentJSON.put(jsonCurrentNumMoves, 1000);
         currentJSON.put(jsonEfficiencyScore, -1);
         currentJSON.put(jsonCurrentNumCollectibles, -1);
-        currentJSON.put(jsonBestNumCollectibles, -1);
+        currentJSON.put(jsonBestNumCollectibles, 0);
         currentJSON.put(jsonBestCollectiblesPercentage, -100);
+
+        //save the cleared stats
+        this.saveLevelData();
     }
 
     ///--------------
@@ -330,7 +333,7 @@ public class RobotRallySave {
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
             e.printStackTrace();
-            return -1;
+            return 0;
         }
     }
 
@@ -346,7 +349,7 @@ public class RobotRallySave {
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
             e.printStackTrace();
-            return -1;
+            return 1000;
         }
     }
 
@@ -362,7 +365,7 @@ public class RobotRallySave {
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
             e.printStackTrace();
-            return -1;
+            return 1000;
         }
     }
 
@@ -378,7 +381,7 @@ public class RobotRallySave {
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
             e.printStackTrace();
-            return -1;
+            return -100;
         }
     }
 
@@ -394,7 +397,7 @@ public class RobotRallySave {
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
             e.printStackTrace();
-            return -1;
+            return 0;
         }
     }
 
@@ -410,7 +413,7 @@ public class RobotRallySave {
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
             e.printStackTrace();
-            return -1;
+            return 0;
         }
     }
 
@@ -426,7 +429,7 @@ public class RobotRallySave {
         //if it fails, log the exception, and return a default value of -1
         catch (JSONException e) {
             e.printStackTrace();
-            return -1;
+            return -100;
         }
     }
 

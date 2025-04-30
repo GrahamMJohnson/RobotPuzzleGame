@@ -144,8 +144,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // for each level
         for (int i = 0; i < levels.size(); i++) {
-            StatManager thisLevel = new StatManager(this, i + 1);
-            double percentage = 0.75;
+            double percentage;
+            saveFunction = new StatManager(this, i);
+            percentage = saveFunction.GetEfficiencyScore();
             // Create LevelItem
             levelDisplayList.add(new LevelItem(i, percentage));
         }
@@ -381,9 +382,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      */
     @Override
     public void onExecutionEnd(EAfterExecuteCondition result) {
-        handleExecutionEnd(result);
         saveFunction.currentNumberCollectibles = levelController.getCollectiblesCollected();
-        saveFunction.checkBest(levelComplete);
+        handleExecutionEnd(result);;
     }
 
     /**
@@ -397,19 +397,21 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         m.clearHighlight();
         moveAdapterMain.notifyItemChanged(executingMoveUI);
 
-        if (result == EAfterExecuteCondition.DEST_REACHED) {
-            levelComplete = true;
-            showWinScreen();
-        } else if (result == EAfterExecuteCondition.CRASHED) {
-            showCollisionScreen();
-        } else if (result == EAfterExecuteCondition.GOT_LOST) {
-            showLostScreen();
-        } else {
-            Log.d("End Condition Error", "Someone added a new end condition and " +
-                            "forgot to add it to the end-screen handler.");
-        }
-        collapseSubroutinesInUI();
-
+            if (result == EAfterExecuteCondition.DEST_REACHED) {
+                levelComplete = true;
+                saveFunction.checkBest(levelComplete);
+                showWinScreen();
+            } else if (result == EAfterExecuteCondition.CRASHED) {
+                saveFunction.checkBest(levelComplete);
+                showCollisionScreen();
+            } else if (result == EAfterExecuteCondition.GOT_LOST) {
+                saveFunction.checkBest(levelComplete);
+                showLostScreen();
+            } else {
+                Log.d("End Condition Error", "Someone added a new end condition and " +
+                                "forgot to add it to the end-screen handler.");
+            }
+            collapseSubroutinesInUI();
     }
     /**
      * Highlights the currently executing move, graying the previous one anc yellow-ing the current one
@@ -604,17 +606,14 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         findViewById(R.id.back_button).setOnClickListener(v -> {
             clearGameListeners();
             openLevelSelect();
-            if(changesMade) {
-                saveFunction.saveCurrent();
-            }
         });
 
         // gameBoard settings/info
         findViewById(R.id.settings_info_button).setOnClickListener(v -> {
-            showSettingsInfoMenu();
             if(changesMade) {
                 saveFunction.saveCurrent();
             }
+            showSettingsInfoMenu();
         });
     }
 
@@ -922,33 +921,57 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // setup button actions
         customView.findViewById(R.id.last_level_button).setOnClickListener(v -> {
+            if(changesMade) {
+                saveFunction.saveCurrent();
+            }
             Log.v("Win Dialogue", "Previous level button pressed");
             mainMenuButton();
             winScreen.dismiss();
-            if(changesMade) {
-                saveFunction.saveCurrent();
-            }
         });
 
         customView.findViewById(R.id.RetryButton).setOnClickListener(v -> {
-            Log.v("Win Dialogue", "Retry level button pressed");
-            retry();
-            winScreen.dismiss();
             if(changesMade) {
                 saveFunction.saveCurrent();
             }
+            Log.v("Win Dialogue", "Retry level button pressed");
+            retry();
+            winScreen.dismiss();
             restartBlinkAfterRun();
         });
 
         customView.findViewById(R.id.next_level_button).setOnClickListener(v -> {
+            if(changesMade) {
+                saveFunction.saveCurrent();
+            }
             Log.v("Win Dialogue", "Next level button pressed");
             clearGameListeners();
             winScreen.dismiss();
             openSelectedLevel(++selectedLevelID);
-            if(changesMade) {
-                saveFunction.saveCurrent();
-            }
         });
+
+        //This sets the text in the best run move count text view to the saved stat
+        TextView bestRunMoveCount = (TextView) customView.findViewById(R.id.Best_Run_Move_Count);
+        bestRunMoveCount.setText(saveFunction.GetBestNumMoves() + "");
+
+        //This sets the text in the best collectibles count text view to the saved stat
+        TextView bestCollectiblesCount = (TextView) customView.findViewById(R.id.Best_Run_Collectibles_Count);
+        bestCollectiblesCount.setText(saveFunction.getBestNumberCollectibles() + "");
+
+        //This sets the text in the current move count text view to the saved stat
+        TextView currentMoveCount = (TextView) customView.findViewById(R.id.This_Run_Move_Count);
+        currentMoveCount.setText(saveFunction.GetCurrentNumMoves() + "");
+
+        //This sets the text in the current collectibles count text view to the saved stat
+        TextView currentCollectiblesCount = (TextView) customView.findViewById(R.id.This_Run_Collectibles_Count);
+        currentCollectiblesCount.setText(saveFunction.getCurrentNumberCollectibles() + "");
+
+        //This sets the text in the goal moves count text view to the saved stat
+        TextView goalMovesCount = (TextView) customView.findViewById(R.id.Goal_Move_Count);
+        goalMovesCount.setText(saveFunction.idealNumMoves + "");
+
+        //This sets the text in the goal collectibles number text view to the saved stat
+        TextView goalCollectiblesNumber = customView.findViewById(R.id.Goal_Collectibles_Count);
+        goalCollectiblesNumber.setText(saveFunction.numberPossibleCollectibles + "");
 
         // Only show next button if there is another level
         customView.findViewById(R.id.next_level_button).setVisibility(selectedLevelID < levels.size() - 1 ? VISIBLE : INVISIBLE);
@@ -969,6 +992,30 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 .setView(collisionView)
                 .setCancelable(false)
                 .create();
+
+        //This sets the text in the best run move count text view to the saved stat
+        TextView bestRunMoveCount = collisionView.findViewById(R.id.Hit_Best_Run_Move_Count);
+        bestRunMoveCount.setText(saveFunction.GetBestNumMoves() + "");
+
+        //This sets the text in the best collectibles count text view to the saved stat
+        TextView bestCollectiblesCount = collisionView.findViewById(R.id.Hit_Best_Run_Collectibles_Count);
+        bestCollectiblesCount.setText(saveFunction.getBestNumberCollectibles() + "");
+
+        //This sets the text in the current move count text view to the saved stat
+        TextView currentMoveCount = collisionView.findViewById(R.id.Hit_This_Run_Move_Count);
+        currentMoveCount.setText(saveFunction.GetCurrentNumMoves() + "");
+
+        //This sets the text in the current collectibles count text view to the saved stat
+        TextView currentCollectiblesCount = collisionView.findViewById(R.id.Hit_This_Run_Collectibles_Count);
+        currentCollectiblesCount.setText(saveFunction.getCurrentNumberCollectibles() + "");
+
+        //This sets the text in the goal moves count text view to the saved stat
+        TextView goalMovesCount = collisionView.findViewById(R.id.Hit_Goal_Move_Count);
+        goalMovesCount.setText(saveFunction.idealNumMoves + "");
+
+        //This sets the text in the goal collectibles number text view to the saved stat
+        TextView goalCollectiblesNumber = collisionView.findViewById(R.id.Hit_Goal_Collectibles_Count);
+        goalCollectiblesNumber.setText(saveFunction.numberPossibleCollectibles + "");
 
         //this is the button listener to close the dialog
         collisionView.findViewById(R.id.CrashDialogRetryButton).setOnClickListener(v -> {
@@ -999,6 +1046,30 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 .setView(lostView)
                 .setCancelable(false)
                 .create();
+
+        //This sets the text in the best run move count text view to the saved stat
+        TextView bestRunMoveCount = lostView.findViewById(R.id.Lost_Best_Run_Move_Count);
+        bestRunMoveCount.setText(saveFunction.GetBestNumMoves() + "");
+
+        //This sets the text in the best collectibles count text view to the saved stat
+        TextView bestCollectiblesCount = lostView.findViewById(R.id.Lost_Best_Run_Collectibles_Count);
+        bestCollectiblesCount.setText(saveFunction.getBestNumberCollectibles() + "");
+
+        //This sets the text in the current move count text view to the saved stat
+        TextView currentMoveCount = lostView.findViewById(R.id.Lost_This_Run_Move_Count);
+        currentMoveCount.setText(saveFunction.GetCurrentNumMoves() + "");
+
+        //This sets the text in the current collectibles count text view to the saved stat
+        TextView currentCollectiblesCount = lostView.findViewById(R.id.Lost_This_Run_Collectibles_Count);
+        currentCollectiblesCount.setText(saveFunction.getCurrentNumberCollectibles() + "");
+
+        //This sets the text in the goal moves count text view to the saved stat
+        TextView goalMovesCount = lostView.findViewById(R.id.Lost_Goal_Move_Count);
+        goalMovesCount.setText(saveFunction.idealNumMoves + "");
+
+        //This sets the text in the goal collectibles number text view to the saved stat
+        TextView goalCollectiblesNumber = lostView.findViewById(R.id.Lost_Goal_Collectibles_Count);
+        goalCollectiblesNumber.setText(saveFunction.numberPossibleCollectibles + "");
 
         // This is the button listener to close the dialog
         lostView.findViewById(R.id.LostDialogRetryButton).setOnClickListener(v -> {
