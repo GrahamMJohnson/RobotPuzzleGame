@@ -8,7 +8,7 @@ import cos420.robotrally.enumerations.EAfterExecuteCondition;
  */
 public interface ExecutionCallback {
         void onStepHighlight(int index);
-        void onStepMove(int index);
+        void onStepMove();
         void onExecutionEnd(EAfterExecuteCondition result);
 }
 

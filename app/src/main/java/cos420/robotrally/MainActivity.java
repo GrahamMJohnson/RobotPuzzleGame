@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -52,61 +51,74 @@ import cos420.robotrally.models.StatManager;
 import cos420.robotrally.services.LevelMapper;
 import cos420.robotrally.models.ExecutionCallback;
 
-// TODO javadoc for the class itself
+/**
+ * Class that handles all UI related stuff
+ */
 public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener, MoveAdapter.MoveListener, ExecutionCallback{
 
-    // TODO javadoc
-    List<MoveItem> activeMoveList;
-    List<MoveItem> moveListMain;
-    List<MoveItem> moveListA;
-    List<MoveItem> moveListB;
-    // TODO javadoc
-    MoveAdapter activeMoveAdapter;
-    MoveAdapter moveAdapterMain;
-    MoveAdapter moveAdapterA;
-    MoveAdapter moveAdapterB;
-    RecyclerView activeRecyclerView;
-    RecyclerView recyclerViewMain;
-    RecyclerView recyclerViewA;
-    RecyclerView recyclerViewB;
-    View subroutineEditView;
-    int curSelectUI;
-    GridView gridView;
-    GridAdapter gridAdapter;
-    ArrayList<GridItem> gridList;
-
-    /**Independent tracking of where we are in execution, in the UI*/
-    int executingMoveUI;
-    ObjectAnimator animator;
-    private final List<View> ghostList = new ArrayList<>();
-
+    /** The move list that is currently active */
+    private List<MoveItem> activeMoveList;
+    /** The move list for the main list */
+    private List<MoveItem> moveListMain;
+    /** The move list for the A subroutine */
+    private List<MoveItem> moveListA;
+    /** The move list for the B subroutine */
+    private List<MoveItem> moveListB;
+    /** The list of ghost elements for the movement trail  */
+    private List<View> ghostList;
+    /** The move adapter that is currently active */
+    private MoveAdapter activeMoveAdapter;
+    /** The move adapter for the main list */
+    private MoveAdapter moveAdapterMain;
+    /** The move adapter for the A subroutine */
+    private MoveAdapter moveAdapterA;
+    /** The move adapter for the B subroutine */
+    private MoveAdapter moveAdapterB;
+    /** The recycler view that is currently active */
+    private RecyclerView activeRecyclerView;
+    /** The recycler view for the main list */
+    private RecyclerView recyclerViewMain;
+    /** The recycler view for the A subroutine */
+    private RecyclerView recyclerViewA;
+    /** The recycler view for the B subroutine */
+    private RecyclerView recyclerViewB;
+    /** Reference to the subroutine edit view */
+    private View subroutineEditView;
+    /** The index of the currently selected command in the UI */
+    private int curSelectUI;
+    /** Reference to the grid view */
+    private GridView gridView;
+    /** Reference to the grid adapter */
+    private GridAdapter gridAdapter;
+    /** Reference to the grid list */
+    private ArrayList<GridItem> gridList;
+    /** Independent tracking of where we are in execution, in the UI */
+    private int executingMoveUI;
+    /** The animator to make the cursor blink */
+    private ObjectAnimator animator;
     /**Creates the stat manager for the level*/
-    StatManager saveFunction;
-
-    LevelController levelController;
-
-    /**Tells whether the level has been completed (primarily for save function)*/
-    boolean levelComplete;
-
-    /**Used to make sure changes don't get saved if a run has not been completed*/
-    boolean changesMade;
-
-    /**
-     * 0 indexed list of the data for level layout<br>
-     * Level 1 can be accessed by levels.get(0)
-     */
-    List<LevelData> levels;
-
-    // TODO javadoc
+    private StatManager saveFunction;
+    /** Reference to the Level Controller for the level */
+    private LevelController levelController;
+    /** Used to make sure changes don't get saved if a run has not been completed */
+    private boolean changesMade;
+    /** 0 indexed list of the data for level layout. Level 1 can be accessed by levels.get(0) */
+    private List<LevelData> levels;
+    /** The ID for the selected level */
     private int selectedLevelID;
+    /** Boolean to track if animation is active or not */
     private boolean animationIsOff;
-
     /** Attribute to track if subroutines are being edited */
     private ListName activeListName = ListName.MAIN;
+    /** The image to display on obstacle tiles */
     private int obstacleImage;
+    /** The image to display on collectable tiles */
     private int collectableImage;
+    /** The image to display on destination tile */
     private int destinationImage;
+    /** The image to display for the roomba */
     private int roombaImage;
+    /** Attribute to track if images are gifs or not */
     private boolean isGif;
     private ImageView moving;
     private FrameLayout root;
@@ -143,9 +155,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         setContentView(R.layout.level_select_dynamic);
         levelDisplayList = new ArrayList<>();
 
-        findViewById(R.id.settingsButton).setOnClickListener(v -> {
-            showSettingsMenu();
-        });
+        findViewById(R.id.settingsButton).setOnClickListener(v -> showSettingsMenu());
 
         // for each level
         for (int i = 0; i < levels.size(); i++) {
@@ -160,6 +170,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         levelLayout.setAdapter(levelAdapter);
     }
 
+    /**
+     * Method that handles level being selected
+     * @param levelID to try to open
+     */
     @Override
     public void onLevelSelectClick(int levelID) {
         if (levelID < 0 || levelID >= levels.size()) {
@@ -185,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         moveListMain = new ArrayList<>();
         moveListA = new ArrayList<>();
         moveListB = new ArrayList<>();
+        ghostList = new ArrayList<>();
 
         // Moves view set up
         recyclerViewMain = findViewById(R.id.move_viewer);
@@ -235,10 +250,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
     /**
      * Move tiles in the grid UI
-     * @param index
      */
     @Override
-    public void onStepMove(int index) {
+    public void onStepMove() {
         GameBoard g = levelController.getGameBoard();
 
         int previousIndex = (g.getPreviousRow() * g.getSize()) + g.getPreviousColumn();
@@ -352,8 +366,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         View ghost = new View(this);
         int ghostSize = (int) (tileW / 1.5);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ghostSize, ghostSize);
-        params.leftMargin = (int) (x + (tileW / 2) - (ghostSize / 2));
-        params.topMargin = (int) (y + (tileH / 2) - (ghostSize / 2));
+        params.leftMargin = (int) (x + (tileW / 2.0) - (ghostSize / 2.0));
+        params.topMargin = (int) (y + (tileH / 2.0) - (ghostSize / 2.0));
 
         //Create drawable, which is a white circle
         GradientDrawable draw = new GradientDrawable();
@@ -392,29 +406,27 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     @Override
     public void onExecutionEnd(EAfterExecuteCondition result) {
         saveFunction.currentNumberCollectibles = levelController.getCollectiblesCollected();
-        handleExecutionEnd(result);;
+        handleExecutionEnd(result);
     }
 
     /**
-     * last piece of execution run, used to show the correct screen based on execution result
-     *
+     * Last piece of execution run, used to show the correct screen based on execution result
      * @param result end result determined by the execution script in level controller
      */
     private void handleExecutionEnd(EAfterExecuteCondition result){
-        //resetting color of last highlighted move.
+        // Resetting color of last highlighted move.
         MoveItem m = moveListMain.get(executingMoveUI);
         m.clearHighlight();
         moveAdapterMain.notifyItemChanged(executingMoveUI);
 
             if (result == EAfterExecuteCondition.DEST_REACHED) {
-                levelComplete = true;
-                saveFunction.checkBest(levelComplete);
+                saveFunction.checkBest(true);
                 showWinScreen();
             } else if (result == EAfterExecuteCondition.CRASHED) {
-                saveFunction.checkBest(levelComplete);
+                saveFunction.checkBest(false);
                 showCollisionScreen();
             } else if (result == EAfterExecuteCondition.GOT_LOST) {
-                saveFunction.checkBest(levelComplete);
+                saveFunction.checkBest(false);
                 showLostScreen();
             } else {
                 Log.d("End Condition Error", "Someone added a new end condition and " +
@@ -422,9 +434,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             }
             collapseSubroutinesInUI();
     }
+
     /**
      * Highlights the currently executing move, graying the previous one anc yellow-ing the current one
-     *
      * @param index of execution in list
      */
     public void highlightExecutionStep(int index) {
@@ -470,6 +482,11 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         gridAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Method that handles when a move item in the move list is clicked
+     * @param position The position of the move item
+     * @param list The list the move item is in
+     */
     @Override
     public void onMoveClick(int position, ListName list) {
         if (activeListName == list) {
@@ -485,6 +502,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         }
     }
 
+    /**
+     * Method that creates/shows the blinking cursor
+     */
     public void blinkUI() {
 
         //update UI of selected command
@@ -599,7 +619,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
             levelController.resetCollectiblesCollected();
-            levelComplete = false;
             setButtonsClickable(false);
             animator.end();
             recyclerViewMain.smoothScrollToPosition(0);
@@ -612,9 +631,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
             expandSubroutinesInUI();
 
-            recyclerViewMain.post(() -> {
-                levelC.executeScript(moveListMain, this, this);
-            });
+            recyclerViewMain.post(() -> levelC.executeScript(moveListMain, this, this));
         });
 
         // BACK
@@ -737,7 +754,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 backgroundColor = new ColorDrawable(getResources().getColor(R.color.indian_red, null));
                 break;
             case "B":
-                backgroundColor = new ColorDrawable(getResources().getColor(R.color.sea_green, null));
+                backgroundColor = new ColorDrawable(getResources().getColor(R.color.steel_blue, null));
                 break;
             default: throw new InvalidParameterException(moveText + " is not a valid move.");
         }
@@ -753,19 +770,26 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         activeRecyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
     }
 
+    /**
+     * Method to add moves of a subroutine to UI
+     * @param moveText The text to display
+     * @param location Where in the list it is being added
+     */
     private void addSubroutineToUI(String moveText, int location) {
         List<MoveItem> subsequenceToAdd;
-        ColorDrawable color1;
+        ColorDrawable color1 = new ColorDrawable(getResources().getColor(R.color.light_grey, null));
         ColorDrawable color2;
         switch(moveText){
             case "A":
-                color1 = new ColorDrawable(getResources().getColor(R.color.light_grey, null));
                 color2 = new ColorDrawable(getResources().getColor(R.color.indian_red, null));
                 subsequenceToAdd = moveListA;
                 break;
             case "B":
-                color1 = new ColorDrawable(getResources().getColor(R.color.light_grey, null));
-                color2 = new ColorDrawable(getResources().getColor(R.color.sea_green, null));
+                color2 = new ColorDrawable(getResources().getColor(R.color.steel_blue, null));
+                subsequenceToAdd = moveListB;
+                break;
+            case "AB":
+                color2 = new ColorDrawable(getResources().getColor(R.color.mediumPurple, null));
                 subsequenceToAdd = moveListB;
                 break;
             default: throw new InvalidParameterException(moveText + " is not a valid move.");
@@ -776,8 +800,12 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         // Add all moves from designated subsequence
         for (var move : subsequenceToAdd) {
             var text = move.getText();
+
+            // Check for a B subroutine being inside of A subroutine
+            if (text.equals("B"))
+                text = "AB";
             MoveItem m = new MoveItem(text, color1, color2);
-            m.setSubroutine(moveText);
+            m.setSubroutineType(moveText);
             moveListMain.add(s, m); //add item
             s++;
         }
@@ -792,7 +820,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         for (int i = 0; i < moveListMain.size(); i++) {
             MoveItem m = moveListMain.get(i);
             String subroutine = m.getText();
-            if (!(subroutine.equals("A") || subroutine.equals("B"))) {
+            if (!(subroutine.equals("A") ||
+                    subroutine.equals("B") ||
+                    subroutine.equals("AB"))) {
                 continue;
             }
 
@@ -804,7 +834,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
             // add the commands from a to main script
             addSubroutineToUI(subroutine, i);
-            i = levelController.getSelected(ListName.MAIN);
+
+            // Check the new item at at same index, as this could be a nested subroutine
+            i--;
         }
         levelController.setSelected(0, ListName.MAIN);
     }
@@ -816,8 +848,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private void collapseSubroutinesInUI() {
         for (int i = 0; i < moveListMain.size(); i++) {
             MoveItem m = moveListMain.get(i);
-            List<MoveItem> subroutineToCollapse;
-            MoveItem newMoveItem;
 
             String subroutine = m.getSubroutineType();
 
@@ -825,29 +855,33 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 continue;
             }
 
+            MoveItem newMoveItem;
+            int commandsToRemove;
+
             ColorDrawable color1 = new ColorDrawable(getResources().getColor(R.color.light_grey, null));
             ColorDrawable color2;
 
             switch (subroutine) {
+                case "AB":
                 case "A":
-                    subroutineToCollapse = moveListA;
+                    commandsToRemove = moveListA.size() + getNumberOfBCommandsInA() * (moveListB.size() - 1);
                     color2 = new ColorDrawable(getResources().getColor(R.color.indian_red, null));
                     newMoveItem = new MoveItem("A", color1, color2);
                     break;
                 case "B":
-                    subroutineToCollapse = moveListB;
-                    color2 = new ColorDrawable(getResources().getColor(R.color.sea_green, null));
+                    commandsToRemove = moveListB.size();
+                    color2 = new ColorDrawable(getResources().getColor(R.color.steel_blue, null));
                     newMoveItem = new MoveItem("B", color1, color2);
                     break;
                 default: continue;
             }
 
             // Remove commands from the script based off of how many commands are in subroutine
-            for (int j = 0; j < subroutineToCollapse.size(); j++) {
+            for (int j = 0; j < commandsToRemove; j++) {
                 moveListMain.remove(i);
             }
 
-            moveAdapterMain.notifyItemRangeRemoved(i, subroutineToCollapse.size());
+            moveAdapterMain.notifyItemRangeRemoved(i, commandsToRemove);
 
             // Add placeholder subroutine command back to script
             moveListMain.add(i, newMoveItem);
@@ -855,6 +889,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         }
     }
 
+    /**
+     * Method that restarts the blinking cursor after execution
+     */
     private void restartBlinkAfterRun() {
         int lastIndex = moveListMain.size() - 1;
         levelController.setSelected(lastIndex, ListName.MAIN);
@@ -873,6 +910,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         blinkUI();
     }
 
+    /**
+     * Method that can be used to enable/disable all buttons
+     * @param value boolean value True enables buttons, False disables them
+     */
     private void setButtonsClickable(boolean value) {
         findViewById(R.id.up_button).setClickable(value);
         findViewById(R.id.down_button).setClickable(value);
@@ -917,6 +958,19 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 activeRecyclerView.post(this::blinkUI);
                 break;
         }
+    }
+
+    /**
+     * Method to get the number of B commands in the A subroutine. Used for collapsing subroutines after run
+     * @return The number of B commands in A
+     */
+    private int getNumberOfBCommandsInA() {
+        int count = 0;
+        for (MoveItem m : moveListA) {
+            if (m.getText().equals("B"))
+                count++;
+        }
+        return count;
     }
 
     /// VICTORY / FAILURE SCREENS
@@ -965,28 +1019,28 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         });
 
         //This sets the text in the best run move count text view to the saved stat
-        TextView bestRunMoveCount = (TextView) customView.findViewById(R.id.Best_Run_Move_Count);
-        bestRunMoveCount.setText(saveFunction.GetBestNumMoves() + "");
+        TextView bestRunMoveCount = customView.findViewById(R.id.Best_Run_Move_Count);
+        bestRunMoveCount.setText(String.valueOf(saveFunction.GetBestNumMoves()));
 
         //This sets the text in the best collectibles count text view to the saved stat
-        TextView bestCollectiblesCount = (TextView) customView.findViewById(R.id.Best_Run_Collectibles_Count);
-        bestCollectiblesCount.setText(saveFunction.getBestNumberCollectibles() + "");
+        TextView bestCollectiblesCount = customView.findViewById(R.id.Best_Run_Collectibles_Count);
+        bestCollectiblesCount.setText(String.valueOf(saveFunction.getBestNumberCollectibles()));
 
         //This sets the text in the current move count text view to the saved stat
-        TextView currentMoveCount = (TextView) customView.findViewById(R.id.This_Run_Move_Count);
-        currentMoveCount.setText(saveFunction.GetCurrentNumMoves() + "");
+        TextView currentMoveCount = customView.findViewById(R.id.This_Run_Move_Count);
+        currentMoveCount.setText(String.valueOf(saveFunction.GetCurrentNumMoves()));
 
         //This sets the text in the current collectibles count text view to the saved stat
-        TextView currentCollectiblesCount = (TextView) customView.findViewById(R.id.This_Run_Collectibles_Count);
-        currentCollectiblesCount.setText(saveFunction.getCurrentNumberCollectibles() + "");
+        TextView currentCollectiblesCount = customView.findViewById(R.id.This_Run_Collectibles_Count);
+        currentCollectiblesCount.setText(String.valueOf(saveFunction.getCurrentNumberCollectibles()));
 
         //This sets the text in the goal moves count text view to the saved stat
-        TextView goalMovesCount = (TextView) customView.findViewById(R.id.Goal_Move_Count);
-        goalMovesCount.setText(saveFunction.idealNumMoves + "");
+        TextView goalMovesCount = customView.findViewById(R.id.Goal_Move_Count);
+        goalMovesCount.setText(String.valueOf(saveFunction.idealNumMoves));
 
         //This sets the text in the goal collectibles number text view to the saved stat
         TextView goalCollectiblesNumber = customView.findViewById(R.id.Goal_Collectibles_Count);
-        goalCollectiblesNumber.setText(saveFunction.numberPossibleCollectibles + "");
+        goalCollectiblesNumber.setText(String.valueOf(saveFunction.numberPossibleCollectibles));
 
         // Only show next button if there is another level
         customView.findViewById(R.id.next_level_button).setVisibility(selectedLevelID < levels.size() - 1 ? VISIBLE : INVISIBLE);
@@ -1010,27 +1064,27 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //This sets the text in the best run move count text view to the saved stat
         TextView bestRunMoveCount = collisionView.findViewById(R.id.Hit_Best_Run_Move_Count);
-        bestRunMoveCount.setText(saveFunction.GetBestNumMoves() + "");
+        bestRunMoveCount.setText(String.valueOf(saveFunction.GetBestNumMoves()));
 
         //This sets the text in the best collectibles count text view to the saved stat
         TextView bestCollectiblesCount = collisionView.findViewById(R.id.Hit_Best_Run_Collectibles_Count);
-        bestCollectiblesCount.setText(saveFunction.getBestNumberCollectibles() + "");
+        bestCollectiblesCount.setText(String.valueOf(saveFunction.getBestNumberCollectibles()));
 
         //This sets the text in the current move count text view to the saved stat
         TextView currentMoveCount = collisionView.findViewById(R.id.Hit_This_Run_Move_Count);
-        currentMoveCount.setText(saveFunction.GetCurrentNumMoves() + "");
+        currentMoveCount.setText(String.valueOf(saveFunction.GetCurrentNumMoves()));
 
         //This sets the text in the current collectibles count text view to the saved stat
         TextView currentCollectiblesCount = collisionView.findViewById(R.id.Hit_This_Run_Collectibles_Count);
-        currentCollectiblesCount.setText(saveFunction.getCurrentNumberCollectibles() + "");
+        currentCollectiblesCount.setText(String.valueOf(saveFunction.getCurrentNumberCollectibles()));
 
         //This sets the text in the goal moves count text view to the saved stat
         TextView goalMovesCount = collisionView.findViewById(R.id.Hit_Goal_Move_Count);
-        goalMovesCount.setText(saveFunction.idealNumMoves + "");
+        goalMovesCount.setText(String.valueOf(saveFunction.idealNumMoves));
 
         //This sets the text in the goal collectibles number text view to the saved stat
         TextView goalCollectiblesNumber = collisionView.findViewById(R.id.Hit_Goal_Collectibles_Count);
-        goalCollectiblesNumber.setText(saveFunction.numberPossibleCollectibles + "");
+        goalCollectiblesNumber.setText(String.valueOf(saveFunction.numberPossibleCollectibles));
 
         //this is the button listener to close the dialog
         collisionView.findViewById(R.id.CrashDialogRetryButton).setOnClickListener(v -> {
@@ -1064,27 +1118,27 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //This sets the text in the best run move count text view to the saved stat
         TextView bestRunMoveCount = lostView.findViewById(R.id.Lost_Best_Run_Move_Count);
-        bestRunMoveCount.setText(saveFunction.GetBestNumMoves() + "");
+        bestRunMoveCount.setText(String.valueOf(saveFunction.GetBestNumMoves()));
 
         //This sets the text in the best collectibles count text view to the saved stat
         TextView bestCollectiblesCount = lostView.findViewById(R.id.Lost_Best_Run_Collectibles_Count);
-        bestCollectiblesCount.setText(saveFunction.getBestNumberCollectibles() + "");
+        bestCollectiblesCount.setText(String.valueOf(saveFunction.getBestNumberCollectibles()));
 
         //This sets the text in the current move count text view to the saved stat
         TextView currentMoveCount = lostView.findViewById(R.id.Lost_This_Run_Move_Count);
-        currentMoveCount.setText(saveFunction.GetCurrentNumMoves() + "");
+        currentMoveCount.setText(String.valueOf(saveFunction.GetCurrentNumMoves()));
 
         //This sets the text in the current collectibles count text view to the saved stat
         TextView currentCollectiblesCount = lostView.findViewById(R.id.Lost_This_Run_Collectibles_Count);
-        currentCollectiblesCount.setText(saveFunction.getCurrentNumberCollectibles() + "");
+        currentCollectiblesCount.setText(String.valueOf(saveFunction.getCurrentNumberCollectibles()));
 
         //This sets the text in the goal moves count text view to the saved stat
         TextView goalMovesCount = lostView.findViewById(R.id.Lost_Goal_Move_Count);
-        goalMovesCount.setText(saveFunction.idealNumMoves + "");
+        goalMovesCount.setText(String.valueOf(saveFunction.idealNumMoves));
 
         //This sets the text in the goal collectibles number text view to the saved stat
         TextView goalCollectiblesNumber = lostView.findViewById(R.id.Lost_Goal_Collectibles_Count);
-        goalCollectiblesNumber.setText(saveFunction.numberPossibleCollectibles + "");
+        goalCollectiblesNumber.setText(String.valueOf(saveFunction.numberPossibleCollectibles));
 
         // This is the button listener to close the dialog
         lostView.findViewById(R.id.LostDialogRetryButton).setOnClickListener(v -> {
@@ -1102,6 +1156,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         lostScreen.show();
     }
 
+    /**
+     * Shows the Subroutine Edit Screen
+     */
     private void showSubroutineEditScreen() {
         ViewGroup rootLayout = findViewById(android.R.id.content);
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -1130,13 +1187,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         recyclerViewA.setAdapter(moveAdapterA);
         recyclerViewB.setAdapter(moveAdapterB);
 
-        subroutineEditView.findViewById(R.id.empty_a_click_area).setOnClickListener(v -> {
-            setActiveList(ListName.A);
-        });
+        subroutineEditView.findViewById(R.id.empty_a_click_area).setOnClickListener(v -> setActiveList(ListName.A));
 
-        subroutineEditView.findViewById(R.id.empty_b_click_area).setOnClickListener(v -> {
-            setActiveList(ListName.B);
-        });
+        subroutineEditView.findViewById(R.id.empty_b_click_area).setOnClickListener(v -> setActiveList(ListName.B));
 
         updateEmptyClickAreaVisibility();
 
@@ -1194,9 +1247,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 .setCancelable(false)
                 .create();
 
-        settingsView.findViewById(R.id.settingsCloseButton).setOnClickListener(v -> {
-            settingsScreen.dismiss();
-        });
+        settingsView.findViewById(R.id.settingsCloseButton).setOnClickListener(v -> settingsScreen.dismiss());
 
         //Checkbox for animations
         CheckBox check = settingsView.findViewById(R.id.checkAnimations);
@@ -1205,15 +1256,12 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         check.setChecked(animationIsOff);
 
         //Check box listener
-        check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                //Animation turns off if true, turns on if false
-                animationIsOff = isChecked;
-                setGifs();
-                changeGridForGif();
-                gridAdapter.notifyDataSetChanged();
-            }
+        check.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            //Animation turns off if true, turns on if false
+            animationIsOff = isChecked;
+            setGifs();
+            changeGridForGif();
+            gridAdapter.notifyDataSetChanged();
         });
 
         settingsScreen.show();
@@ -1232,9 +1280,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 .setCancelable(false)
                 .create();
 
-        settingsView.findViewById(R.id.settingsCloseButton).setOnClickListener(v -> {
-            settingsScreen.dismiss();
-        });
+        settingsView.findViewById(R.id.settingsCloseButton).setOnClickListener(v -> settingsScreen.dismiss());
 
         //Checkbox for animations
         CheckBox check = settingsView.findViewById(R.id.checkAnimations);
@@ -1243,13 +1289,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         check.setChecked(animationIsOff);
 
         //Check box listener
-        check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                //Animation turns off if true, turns on if false
-                animationIsOff = isChecked;
-                setGifs();
-            }
+        check.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            //Animation turns off if true, turns on if false
+            animationIsOff = isChecked;
+            setGifs();
         });
 
         settingsScreen.show();
@@ -1310,37 +1353,35 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 .create();
 
         //this is the button listener to close the dialog
-        saveDebug.findViewById(R.id.save_debug_close).setOnClickListener(v ->{
-            saveDebugScreen.dismiss();
-        });
+        saveDebug.findViewById(R.id.save_debug_close).setOnClickListener(v -> saveDebugScreen.dismiss());
 
         //This is setting the move sequence text to the current move sequence save value
-        TextView moveSequence = (TextView) saveDebug.findViewById(R.id.save_content_moveSequence);
-        moveSequence.setText(saveFunction.GetBestMoveSequence() + "");
+        TextView moveSequence = saveDebug.findViewById(R.id.save_content_moveSequence);
+        moveSequence.setText(String.valueOf(saveFunction.GetBestMoveSequence()));
 
         //This is setting the number of attempts text to the current number of attempts save value
-        TextView numberOfAttempts = (TextView) saveDebug.findViewById(R.id.save_content_numberOfAttempts);
-        numberOfAttempts.setText(saveFunction.GetCurrentNumAttempts() + "");
+        TextView numberOfAttempts = saveDebug.findViewById(R.id.save_content_numberOfAttempts);
+        numberOfAttempts.setText(String.valueOf(saveFunction.GetCurrentNumAttempts()));
 
         //This is setting the efficiency score text to the current efficiency score save value
-        TextView efficiencyScore = (TextView) saveDebug.findViewById(R.id.save_content_efficiencyScore);
-        efficiencyScore.setText(saveFunction.GetEfficiencyScore() + "");
+        TextView efficiencyScore = saveDebug.findViewById(R.id.save_content_efficiencyScore);
+        efficiencyScore.setText(String.valueOf(saveFunction.GetEfficiencyScore()));
 
         //This is setting the total squares traveled text to the current total squares traveled save value
-        TextView totalSquaresTraveled = (TextView) saveDebug.findViewById(R.id.save_content_totalSquaresTraveled);
-        totalSquaresTraveled.setText(saveFunction.GetBestNumMoves() + "");
+        TextView totalSquaresTraveled = saveDebug.findViewById(R.id.save_content_totalSquaresTraveled);
+        totalSquaresTraveled.setText(String.valueOf(saveFunction.GetBestNumMoves()));
 
         //This is setting the current move difference text to the current move difference save value
-        TextView currentMoveDifference = (TextView) saveDebug.findViewById(R.id.save_content_currentMoveDifference);
-        currentMoveDifference.setText((saveFunction.GetCurrentNumMoves() - saveFunction.idealNumMoves) + "");
+        TextView currentMoveDifference = saveDebug.findViewById(R.id.save_content_currentMoveDifference);
+        currentMoveDifference.setText(String.valueOf(saveFunction.GetCurrentNumMoves() - saveFunction.idealNumMoves));
 
         //This is setting the best move difference text to the best move difference save value
-        TextView bestMoveDifference = (TextView) saveDebug.findViewById(R.id.save_content_bestMoveDifference);
-        bestMoveDifference.setText((saveFunction.GetBestNumMoves() - saveFunction.idealNumMoves) + "");
+        TextView bestMoveDifference = saveDebug.findViewById(R.id.save_content_bestMoveDifference);
+        bestMoveDifference.setText(String.valueOf(saveFunction.GetBestNumMoves() - saveFunction.idealNumMoves));
 
         //This is setting the percentage collectibles collected text to the current percentage collectibles collected save value
-        TextView percentageCollectiblesCollected = (TextView) saveDebug.findViewById(R.id.save_content_percentageCollectiblesCollected);
-        percentageCollectiblesCollected.setText(saveFunction.getBestCollectiblesPercentage() + " ");
+        TextView percentageCollectiblesCollected = saveDebug.findViewById(R.id.save_content_percentageCollectiblesCollected);
+        percentageCollectiblesCollected.setText(String.valueOf(saveFunction.getBestCollectiblesPercentage()));
 
         saveDebugScreen.show();
     }

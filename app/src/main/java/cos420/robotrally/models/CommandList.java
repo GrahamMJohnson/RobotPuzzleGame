@@ -52,10 +52,6 @@ public class CommandList {
      */
     public void addSubroutine(CommandList commands, SubroutineType subroutineType)
     {
-        // Can only add a subroutine to another script if there at least 2 commands in the subroutine
-        if (commands.size() < 2) {
-            return;
-        }
         for (int i = 0; i < commands.size(); i++) {
             ICommand c = commands.get(i);
             ICommand newCommand;
@@ -69,11 +65,16 @@ public class CommandList {
             else if (c instanceof Left) {
                 newCommand = new Left(c.getGameBoard());
             }
-            else {
+            else if (c instanceof Right){
                 newCommand = new Right(c.getGameBoard());
             }
+            else {
+                // Command could be subroutine B so if it didn't match anything above that is what it is.
+                // We cannot have an A command inside of a subroutine, so don't have to account for that
+                newCommand = new B(c.getGameBoard());
+                subroutineType = SubroutineType.AB;
+            }
 
-            // Check if it is first command
             newCommand.setSubroutine(subroutineType);
             addCommand(newCommand);
         }
@@ -136,6 +137,20 @@ public class CommandList {
     public ICommand get(int index)
     {
         return script.get(index);
+    }
+
+    /**
+     * Method to count how many instances of B subroutine exist script
+     * @return The number of occurrences of B in the script
+     */
+    public int containsSubroutineB() {
+        int count = 0;
+        for (ICommand c : script) {
+            if (c instanceof B) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**

@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/b_subroutine_label"
                 android:textSize="30sp"
-                android:textColor="@color/green">
+                android:textColor="@color/blue">
 
             </TextView>
 

@@ -3,8 +3,6 @@ package cos420.robotrally.adaptersAndItems;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 
-import androidx.annotation.ColorInt;
-
 /**
  * Model for adding data to a Move
  */
@@ -69,13 +67,14 @@ public class MoveItem {
 
     /**
      * Method to set the subroutine this command is associated with
-     * @param subroutine String, either A or B, for subroutine
+     * @param subroutine String, either A or B, for subroutine or AB for subroutine B nested in A
      *                   <br>will be set to null if not a or b
      */
-    public void setSubroutine(String subroutine) {
+    public void setSubroutineType(String subroutine) {
         switch (subroutine) {
             case "A":
             case "B":
+            case "AB":
                 this.subroutineType = subroutine;
                 break;
             default: break;

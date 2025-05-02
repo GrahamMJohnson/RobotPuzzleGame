@@ -239,7 +239,7 @@ public class LevelController {
                 }
 
                 //Move grid
-                activity.runOnUiThread(() -> callback.onStepMove(finalI));
+                activity.runOnUiThread(callback::onStepMove);
 
                 try {
                     Thread.sleep(450);
@@ -299,7 +299,7 @@ public class LevelController {
             }
             else if (c instanceof B) {
                 subroutineToAdd = subroutineB;
-                subroutineType = SubroutineType.B;
+                subroutineType = c.getSubroutine();
             }
             else {
                 // If command was not an A/B placeholder, we can continue to next command in list
@@ -316,7 +316,6 @@ public class LevelController {
             // Add the commands from subroutine into to main script
             commandScript.addSubroutine(subroutineToAdd, subroutineType);
             // Store the current select, so we don't have to check the newly added commands
-            lastAddedCommandIndex = commandScript.getSelect() - 1;
 
             // Remove the placeholder command
             commandScript.setSelect(removeIndex);
@@ -326,8 +325,8 @@ public class LevelController {
                 // We should never get here as remove is only called if it found an A command
             }
 
-            // Set i to be the index of last added command
-            i = lastAddedCommandIndex;
+            // Subtract 1 from i so we check the same index again, as this could now be a B command if we just expanded an A
+            i--;
         }
     }
 
@@ -339,8 +338,8 @@ public class LevelController {
         for (int i = 0; i < commandScript.size(); i++) {
             // Get command from list
             ICommand c = commandScript.get(i);
-            CommandList subroutineToCollapse;
             ICommand subroutineCommand;
+            int commandsInExpandedSubroutine;
 
             SubroutineType subType = c.getSubroutine();
 
@@ -351,25 +350,29 @@ public class LevelController {
 
             // Set variables depending on which subroutine command is a part of
             switch (c.getSubroutine()) {
+                case AB:
+                    // an AB means the command is part of subroutine B, but is nested in A, so we want to collapse it as if it is A
                 case A:
-                    subroutineToCollapse = subroutineA;
                     subroutineCommand = new A(gameBoard);
+                    commandsInExpandedSubroutine = subroutineA.size() + subroutineA.containsSubroutineB() * (subroutineB.size() - 1);
                     break;
                 case B:
-                    subroutineToCollapse = subroutineB;
                     subroutineCommand = new B(gameBoard);
+                    commandsInExpandedSubroutine = subroutineB.size();
                     break;
                 default: continue;
             }
 
+            // Calculate the number of Commands in expanded Subroutine
+
             // Get index to insert placeholder command into list after subroutine commands, then select and add
-            int insertIndex = i + subroutineToCollapse.size() - 1;
+            int insertIndex = i + commandsInExpandedSubroutine - 1;
             if (insertIndex != commandScript.getSelect())
                 commandScript.setSelect(insertIndex);
             commandScript.addCommand(subroutineCommand);
 
             // Remove commands from the script based off of how many commands are in subroutine
-            for (int j = 0; j < subroutineToCollapse.size(); j++) {
+            for (int j = 0; j < commandsInExpandedSubroutine; j++) {
 
                 // Set select to be the first command of subroutine
                 if (i != commandScript.getSelect())
