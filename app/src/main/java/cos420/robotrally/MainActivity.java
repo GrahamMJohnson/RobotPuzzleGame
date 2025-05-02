@@ -130,8 +130,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         // list of data for all the levels
         levels = LevelMapper.mapLevelDataFromFile(this);
 
-        //Sets animations to "ON" by default
-        animationIsOff = false;
+        //Sets animations to "OFF" by default
+        animationIsOff = true;
         setGifs();
 
         openLevelSelect();
@@ -263,6 +263,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         if(current.getImage() == collectableImage || current.getImage() == destinationImage) {
             current.setImage(R.drawable.empty);
         }
+        animateTileMove(previousIndex, currentIndex);
+        /**
         if (!animationIsOff) { //Animation is on
             //Animate tile move
             animateTileMove(previousIndex, currentIndex);
@@ -270,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             //Swap the two tiles
             Collections.swap(gridList, previousIndex, currentIndex);
             gridAdapter.notifyDataSetChanged();
-        }
+        }*/
 
     }
 
