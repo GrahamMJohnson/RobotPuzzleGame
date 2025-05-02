@@ -47,8 +47,8 @@ public class LevelController {
         levelData = level;
         gameBoard = new GameBoard(level.gameBoardData);
         commandScript = new CommandList();
-        subroutineA = new CommandList();
-        subroutineB = new CommandList();
+        subroutineA = new CommandList(level.maxMovesA);
+        subroutineB = new CommandList(level.maxMovesB);
 
         attempts = 0;
     }
@@ -64,53 +64,61 @@ public class LevelController {
     /**
      * Method to add an Up command to script
      * @param list The list to add command to
+     * @return boolean if adding the command was successful
      */
-    public void addUpCommand(ListName list)
+    public boolean addUpCommand(ListName list)
     {
         switch(list) {
-            case MAIN: commandScript.addCommand(new Up(gameBoard)); break;
-            case A: subroutineA.addCommand(new Up(gameBoard)); break;
-            case B: subroutineB.addCommand(new Up(gameBoard)); break;
+            case MAIN: return commandScript.addCommand(new Up(gameBoard));
+            case A: return subroutineA.addCommand(new Up(gameBoard));
+            case B: return subroutineB.addCommand(new Up(gameBoard));
         }
+        return false;
     }
 
     /**
      * Method to add a Down command
      * @param list The list to add command to
+     * @return boolean if adding the command was successful
      */
-    public void addDownCommand(ListName list)
+    public boolean addDownCommand(ListName list)
     {
         switch(list) {
-            case MAIN: commandScript.addCommand(new Down(gameBoard)); break;
-            case A: subroutineA.addCommand(new Down(gameBoard)); break;
-            case B: subroutineB.addCommand(new Down(gameBoard)); break;
+            case MAIN: return commandScript.addCommand(new Down(gameBoard));
+            case A: return subroutineA.addCommand(new Down(gameBoard));
+            case B: return subroutineB.addCommand(new Down(gameBoard));
         }
+        return false;
     }
 
     /**
      * Method to add a Left command
      * @param list The list to add command to
+     * @return boolean if adding the command was successful
      */
-    public void addLeftCommand(ListName list)
+    public boolean addLeftCommand(ListName list)
     {
         switch(list) {
-            case MAIN: commandScript.addCommand(new Left(gameBoard)); break;
-            case A: subroutineA.addCommand(new Left(gameBoard)); break;
-            case B: subroutineB.addCommand(new Left(gameBoard)); break;
+            case MAIN: return commandScript.addCommand(new Left(gameBoard));
+            case A: return subroutineA.addCommand(new Left(gameBoard));
+            case B: return subroutineB.addCommand(new Left(gameBoard));
         }
+        return false;
     }
 
     /**
      * Method to add a Right command
      * @param list The list to add command to
+     * @return boolean if adding the command was successful
      */
-    public void addRightCommand(ListName list)
+    public boolean addRightCommand(ListName list)
     {
         switch(list) {
-            case MAIN: commandScript.addCommand(new Right(gameBoard)); break;
-            case A: subroutineA.addCommand(new Right(gameBoard)); break;
-            case B: subroutineB.addCommand(new Right(gameBoard)); break;
+            case MAIN: return commandScript.addCommand(new Right(gameBoard));
+            case A: return subroutineA.addCommand(new Right(gameBoard));
+            case B: return subroutineB.addCommand(new Right(gameBoard));
         }
+        return false;
     }
 
     /**
@@ -121,9 +129,9 @@ public class LevelController {
     public boolean addSubroutineA(ListName list)
     {
         switch(list) {
-            case MAIN: commandScript.addCommand(new A(gameBoard)); return true;
-            case A: ; // Can't add to itself
-            case B: ; // A can only be added to main to prevent loops
+            case MAIN: return commandScript.addCommand(new A(gameBoard));
+            case A: // Can't add to itself
+            case B: // A can only be added to main to prevent loops
         }
         return false;
     }
@@ -136,9 +144,9 @@ public class LevelController {
     public boolean addSubroutineB(ListName list)
     {
         switch(list) {
-            case MAIN: commandScript.addCommand(new B(gameBoard)); return true;
-            case A: subroutineA.addCommand(new B(gameBoard)); return true;
-            case B: ; // Can't add to itself
+            case MAIN: return commandScript.addCommand(new B(gameBoard));
+            case A: return subroutineA.addCommand(new B(gameBoard));
+            case B: // Can't add to itself
         }
         return false;
     }
@@ -278,12 +286,19 @@ public class LevelController {
     }
 
     /**
+     * Method to get the max moves for Subroutines A and B
+     * @return int array -> index 0 has max moves for A, index 1 has max moves for B
+     */
+    public int[] getSubroutineMaxMoves() {
+        return new int[]{levelData.maxMovesA, levelData.maxMovesB};
+    }
+
+    /**
      * Method to expand A/B command into full subroutine on execution
      */
     private void expandSubroutines() {
         // Variables to be used later
         int removeIndex;
-        int lastAddedCommandIndex;
 
         // Loop through each command in script searching for subroutine placeholders
         for (int i = 0; i < commandScript.size(); i++) {
@@ -318,7 +333,8 @@ public class LevelController {
             // Store the current select, so we don't have to check the newly added commands
 
             // Remove the placeholder command
-            commandScript.setSelect(removeIndex);
+            if (removeIndex != commandScript.getSelect())
+                commandScript.setSelect(removeIndex);
             try {
                 commandScript.remove();
             } catch (Exception ignored) {

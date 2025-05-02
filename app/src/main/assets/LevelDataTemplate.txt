@@ -16,6 +16,8 @@ startRow: 0
 startColumn: 0
 goalRow: 4
 goalColumn: 4
+maxMovesSubroutineA: 5
+maxMovesSubroutineB: 5
 obstacle:
     type: chair
     row: 0

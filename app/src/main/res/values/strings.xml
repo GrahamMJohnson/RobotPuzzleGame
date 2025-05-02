@@ -33,4 +33,6 @@
     <string name="move_list">List of moves</string>
     <string name="a_subroutine_label">A</string>
     <string name="b_subroutine_label">B</string>
+    <string name="close_button">Close</string>
+    <string name="max_moves_placeholder">Max Moves: 4</string>
 </resources>

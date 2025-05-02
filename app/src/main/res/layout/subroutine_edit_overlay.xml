@@ -21,11 +21,10 @@
         android:textStyle="bold" />
 
     <LinearLayout
-        android:id="@+id/views_container"
+        android:id="@+id/moves_view_holder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/Dialog_Header"
-        android:layout_marginTop="10dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
 
@@ -49,20 +48,18 @@
                 android:layout_width="130dp"
                 android:layout_height="220dp">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/subroutine_a_viewer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="10dp"
-                    android:background="@drawable/rounded_outline"
-                    android:contentDescription="@string/move_list" />
-
                 <View
                     android:id="@+id/empty_a_click_area"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
-                    android:visibility="gone" />
+                    android:background="@drawable/rounded_outline" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/subroutine_a_viewer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:contentDescription="@string/move_list" />
 
             </FrameLayout>
 
@@ -88,20 +85,18 @@
                 android:layout_width="130dp"
                 android:layout_height="220dp">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/subroutine_b_viewer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="10dp"
-                    android:background="@drawable/rounded_outline"
-                    android:contentDescription="@string/move_list" />
-
                 <View
                     android:id="@+id/empty_b_click_area"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
-                    android:visibility="gone" />
+                    android:background="@drawable/rounded_outline" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/subroutine_b_viewer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:contentDescription="@string/move_list" />
 
             </FrameLayout>
 
@@ -109,10 +104,33 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/max_moves_holder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/views_container"
-        android:layout_marginTop="20dp"
+        android:layout_below="@id/moves_view_holder"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/subroutine_a_max_moves"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="50dp"
+            android:text="@string/max_moves_placeholder"/>
+
+        <TextView
+            android:id="@+id/subroutine_b_max_moves"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:text="@string/max_moves_placeholder"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/max_moves_holder"
         android:gravity="center_horizontal">
 
         <Button
@@ -120,7 +138,7 @@
             android:layout_width="110dp"
             android:layout_height="50dp"
             android:backgroundTint="@color/dim_gray"
-            android:text="Close"
+            android:text="@string/close_button"
             android:textSize="23sp" />
 
     </LinearLayout>

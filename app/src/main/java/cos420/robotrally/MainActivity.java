@@ -491,14 +491,16 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     public void onMoveClick(int position, ListName list) {
         if (activeListName == list) {
             //set which command is selected
-            levelController.setSelected(position, activeListName);
+            levelController.setSelected(position, list);
             blinkUI();
         }
         // editing sub commands and clicking on A or B (whichever isn't currently active
         else if (list != ListName.MAIN) {
+            // Make sure cursor ends up on clicked move. If this move is already selected,
+            //  selecting it again would cause the last move to become selected
+            if (position != levelController.getSelected(list))
+                levelController.setSelected(position, list);
             setActiveList(list);
-            levelController.setSelected(position, activeListName);
-            blinkUI();
         }
     }
 
@@ -554,42 +556,44 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private void setupGUIButtons(LevelController levelC) {
         // UP
         findViewById(R.id.up_button).setOnClickListener(v -> {
-            levelC.addUpCommand(activeListName);
-            addMoveToUI("UP");
+            boolean moveAdded = levelC.addUpCommand(activeListName);
+            if (moveAdded)
+                addMoveToUI("UP");
         });
 
         // DOWN
         findViewById(R.id.down_button).setOnClickListener(v -> {
-            levelC.addDownCommand(activeListName);
-            addMoveToUI("DOWN");
+            boolean moveAdded = levelC.addDownCommand(activeListName);
+            if (moveAdded)
+                addMoveToUI("DOWN");
         });
 
         // LEFT
         findViewById(R.id.left_button).setOnClickListener(v -> {
-            levelC.addLeftCommand(activeListName);
-            addMoveToUI("LEFT");
+            boolean moveAdded = levelC.addLeftCommand(activeListName);
+            if (moveAdded)
+                addMoveToUI("LEFT");
         });
 
         // RIGHT
         findViewById(R.id.right_button).setOnClickListener(v -> {
-            levelC.addRightCommand(activeListName);
-            addMoveToUI("RIGHT");
+            boolean moveAdded = levelC.addRightCommand(activeListName);
+            if (moveAdded)
+                addMoveToUI("RIGHT");
         });
 
         // A
         findViewById(R.id.button_a).setOnClickListener(v -> {
-            // only update UI if subroutine was successfully added
-            if (levelC.addSubroutineA(activeListName)) {
+            boolean moveAdded = levelC.addSubroutineA(activeListName);
+            if (moveAdded)
                 addMoveToUI("A");
-            }
         });
 
         // B
         findViewById(R.id.button_b).setOnClickListener(v -> {
-            // only update UI if subroutine was successfully added
-            if (levelC.addSubroutineB(activeListName)) {
+            boolean moveAdded = levelC.addSubroutineB(activeListName);
+            if (moveAdded)
                 addMoveToUI("B");
-            }
         });
 
         // DELETE
@@ -764,7 +768,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         activeMoveList.add(s, new MoveItem(moveText, color1, backgroundColor));//add item
         activeMoveAdapter.notifyItemInserted(s);
-        updateEmptyClickAreaVisibility();
 
         activeRecyclerView.scrollToPosition(s);
         activeRecyclerView.post(this::blinkUI);//Delays adding animation until after view holder is set
@@ -825,8 +828,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                     subroutine.equals("AB"))) {
                 continue;
             }
-
-            levelController.setSelected(i, ListName.MAIN);
 
             // remove the a command
             moveListMain.remove(i);
@@ -906,7 +907,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private void removeMoveFromUI (int before) {
         activeMoveList.remove(before);
         activeMoveAdapter.notifyItemRemoved(before); //notify adapter of change
-        updateEmptyClickAreaVisibility();
         blinkUI();
     }
 
@@ -1162,7 +1162,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private void showSubroutineEditScreen() {
         ViewGroup rootLayout = findViewById(android.R.id.content);
         LayoutInflater inflater = LayoutInflater.from(this);
-        subroutineEditView = inflater.inflate(R.layout.subroutine_edit_dialog, rootLayout, false);
+        subroutineEditView = inflater.inflate(R.layout.subroutine_edit_overlay, rootLayout, false);
 
         View grid = findViewById(R.id.grid);
         int height = grid.getHeight();
@@ -1187,15 +1187,32 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         recyclerViewA.setAdapter(moveAdapterA);
         recyclerViewB.setAdapter(moveAdapterB);
 
-        subroutineEditView.findViewById(R.id.empty_a_click_area).setOnClickListener(v -> setActiveList(ListName.A));
+        subroutineEditView.findViewById(R.id.empty_a_click_area).setOnClickListener(v -> {
+            int select = moveListA.size() - 1;
+            if (select > 0)
+                levelController.setSelected(select, ListName.A);
+            setActiveList(ListName.A);
+        });
 
-        subroutineEditView.findViewById(R.id.empty_b_click_area).setOnClickListener(v -> setActiveList(ListName.B));
+        subroutineEditView.findViewById(R.id.empty_b_click_area).setOnClickListener(v -> {
+            int select = moveListB.size() - 1;
+            if (select > 0)
+                levelController.setSelected(select, ListName.B);
+            setActiveList(ListName.B);
+        });
 
-        updateEmptyClickAreaVisibility();
+        int[] maxMoves = levelController.getSubroutineMaxMoves();
+
+        TextView subAMaxMoves = subroutineEditView.findViewById(R.id.subroutine_a_max_moves);
+        String maxMovesA = "Max Moves: " + maxMoves[0];
+        subAMaxMoves.setText(maxMovesA);
+
+        TextView subBMaxMoves = subroutineEditView.findViewById(R.id.subroutine_b_max_moves);
+        String maxMovesB = "Max Moves: " + maxMoves[1];
+        subBMaxMoves.setText(maxMovesB);
 
         // Add it to root
         rootLayout.addView(subroutineEditView);
-
 
         // Handle button press inside the floating panel
         subroutineEditView.findViewById(R.id.close_button).setOnClickListener(v -> {
@@ -1203,34 +1220,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             rootLayout.removeView(subroutineEditView);
             findViewById(R.id.start_button).setClickable(true);
         });
-    }
-
-    /**
-     * Method that makes the empty clickable views for subroutines visible or not
-     */
-    private void updateEmptyClickAreaVisibility() {
-
-        if (subroutineEditView == null) {
-            return;
-        }
-
-        View aView = subroutineEditView.findViewById(R.id.empty_a_click_area);
-
-        if (moveAdapterA.getItemCount() == 0) {
-            aView.setVisibility(View.VISIBLE);
-        }
-        else if (aView.getVisibility() == VISIBLE){
-            aView.setVisibility(View.GONE);
-        }
-
-        View bView = subroutineEditView.findViewById(R.id.empty_b_click_area);
-
-        if (moveAdapterB.getItemCount() == 0) {
-            bView.setVisibility(View.VISIBLE);
-        }
-        else if (bView.getVisibility() == VISIBLE){
-            bView.setVisibility(View.GONE);
-        }
     }
 
     /**

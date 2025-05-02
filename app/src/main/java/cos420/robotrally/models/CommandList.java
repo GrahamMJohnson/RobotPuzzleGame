@@ -14,6 +14,8 @@ public class CommandList {
     private final LinkedList<ICommand> script;
     /** The position in script of the selected command*/
     private int select;
+    /** Stores the max number of moves that can be in this list */
+    private final int maxMoves;
     /** Tracks if the roomba crashed or not */
     public boolean didWeDriveSafe;
 
@@ -25,8 +27,19 @@ public class CommandList {
      */
     public CommandList()
     {
+        // Pass in negative 1 if there is no move limit, so we know there isn't a limit
+        this(-1);
+    }
+
+    /**
+     * Constructor<br>
+     * Creates an empty linked list for the script with max moves
+     */
+    public CommandList(int maxMoves)
+    {
         script = new LinkedList<>();
         select = 0;
+        this.maxMoves = maxMoves;
     }
 
     /// Public methods
@@ -34,15 +47,21 @@ public class CommandList {
     /**
      * Method to add a new command to the list
      * @param command  ICommand - the command to be added to the list
+     * @return True if command could be added, False if not
      */
-    public void addCommand(ICommand command)
+    public boolean addCommand(ICommand command)
     {
-        if(script.isEmpty()) { //list is empty, so command that's added is selected
-            script.add(command);
-        } else { //adds command in list at position
-            select = select + 1; //selects command to the right
-            script.add(select, command);
+        // Check if there is a move limit, and that we are under it if there is
+        if (maxMoves == -1 || script.size() < maxMoves) {
+            if (script.isEmpty()) { //list is empty, so command that's added is selected
+                script.add(command);
+            } else { //adds command in list at position
+                select = select + 1; //selects command to the right
+                script.add(select, command);
+            }
+            return true;
         }
+        return false;
     }
 
     /**

@@ -8,4 +8,6 @@ import cos420.robotrally.helpers.GameBoardData;
 public class LevelData {
     /** Data for the game board */
     public GameBoardData gameBoardData;
+    public int maxMovesA;
+    public int maxMovesB;
 }

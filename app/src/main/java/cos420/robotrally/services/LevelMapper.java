@@ -5,7 +5,6 @@ import android.content.res.AssetManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -17,13 +16,19 @@ import cos420.robotrally.levels.LevelData;
 import cos420.robotrally.models.Collectable;
 import cos420.robotrally.models.Obstacle;
 
-// TODO javadoc for the class itself
+/**
+ * Class that maps in LevelData from text file into list of LevelData classes
+ */
 public class LevelMapper {
 
-    // TODO javadoc
+    /** Variable that holds tag for logs for this class */
     private static final String LOG_TAG = "Level Mapper";
 
-    // TODO javadoc
+    /**
+     * Method to map in Level Data
+     * @param context Reference to the context that is calling this method
+     * @return List of LevelData objects that hold data for all levels
+     */
     public static List<LevelData> mapLevelDataFromFile(Context context)
     {
         AssetManager assetManager = context.getAssets();
@@ -124,6 +129,8 @@ public class LevelMapper {
                         String[] startColumnArray = reader.readLine().trim().split(" ");
                         String[] goalRowArray = reader.readLine().trim().split(" ");
                         String[] goalColumnArray = reader.readLine().trim().split(" ");
+                        String[] maxMovesAArray = reader.readLine().trim().split(" ");
+                        String[] maxMovesBArray = reader.readLine().trim().split(" ");
 
                         // Getting the wanted values
                         int size = Integer.parseInt(sizeArray[sizeArray.length - 1]);
@@ -131,6 +138,8 @@ public class LevelMapper {
                         int startColumn = Integer.parseInt(startColumnArray[startColumnArray.length - 1]);
                         int goalRow = Integer.parseInt(goalRowArray[goalRowArray.length - 1]);
                         int goalColumn = Integer.parseInt(goalColumnArray[goalColumnArray.length - 1]);
+                        int maxMovesA = Integer.parseInt(maxMovesAArray[maxMovesAArray.length - 1]);
+                        int maxMovesB = Integer.parseInt(maxMovesBArray[maxMovesBArray.length - 1]);
 
                         // Add values to gameBoardData object of level
                         level.gameBoardData.size = size;
@@ -138,6 +147,8 @@ public class LevelMapper {
                         level.gameBoardData.startColumn = startColumn;
                         level.gameBoardData.goalRow = goalRow;
                         level.gameBoardData.goalColumn = goalColumn;
+                        level.maxMovesA = maxMovesA;
+                        level.maxMovesB = maxMovesB;
 
                         Log.v(LOG_TAG, "End mapping general data");
                     }
@@ -158,7 +169,7 @@ public class LevelMapper {
 
     /**
      * Checks if a line of the data file is a comment or blank
-     * @param line the line of file to check
+     * @param line The line from the text file to check
      * @return true -> line is a comment<br>
      *         false -> line is data
      */
@@ -167,19 +178,31 @@ public class LevelMapper {
         return line.startsWith("//") || line.isEmpty();
     }
 
-    // TODO javadoc
+    /**
+     * Checks if line is start of new level
+     * @param line The line from the text file to check
+     * @return True or False
+     */
     private static boolean isNewLevel(String line)
     {
         return line.startsWith("-----------------");
     }
 
-    // TODO javadoc
+    /**
+     * Checks if the line is declaring an Obstacle
+     * @param line The line from the text file to check
+     * @return True or False
+     */
     private static boolean isObstacle(String line)
     {
         return line.startsWith("obstacle");
     }
 
-    // TODO javadoc
+    /**
+     * Checks if line is declaring a Collectable
+     * @param line The line from the text file to check
+     * @return True or False
+     */
     private static boolean isCollectable(String line)
     {
         return line.startsWith("collectable");
