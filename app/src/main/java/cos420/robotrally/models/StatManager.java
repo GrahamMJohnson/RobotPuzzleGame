@@ -94,13 +94,17 @@ public class StatManager {
             numberPossibleCollectibles = 3;
             idealNumMoves = 8;
         }
-        else if(levelID == 4){
+        else if(levelID + 1 == 4){
             numberPossibleCollectibles = 3;
             idealNumMoves = 12;
         }
-        else if(levelID == 5){
+        else if(levelID + 1 == 5){
             numberPossibleCollectibles = 4;
             idealNumMoves = 12;
+        }
+        else if(levelID + 1 == 6){
+            numberPossibleCollectibles = 5;
+            idealNumMoves = 3;
         }
     }
 

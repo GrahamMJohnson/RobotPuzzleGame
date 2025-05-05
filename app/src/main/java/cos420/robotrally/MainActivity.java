@@ -24,6 +24,7 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -172,6 +173,14 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         levelAdapter = new LevelAdapter(this, levelDisplayList, this);
         GridView levelLayout = findViewById(R.id.dynamicLevelLayout);
         levelLayout.setAdapter(levelAdapter);
+
+        findViewById(R.id.clearSaveButton).setOnClickListener(v -> {
+            for(int i = 0; i < levels.size(); i++){
+                saveFunction = new StatManager(this, i);
+                saveFunction.resetSave();
+            }
+            openLevelSelect();
+        });
     }
 
     /**
@@ -1051,6 +1060,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         // Only show next button if there is another level
         customView.findViewById(R.id.next_level_button).setVisibility(selectedLevelID < levels.size() - 1 ? VISIBLE : INVISIBLE);
 
+        ProgressBar winProgressBar = customView.findViewById(R.id.winProgressBar);
+        winProgressBar.setProgress((int) (saveFunction.GetEfficiencyScore() * 100));
+
         winScreen.show();
     }
 
@@ -1105,6 +1117,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             collisionScreen.dismiss();
         });
 
+        ProgressBar collisionProgressBar = collisionView.findViewById(R.id.collisionProgressBar);
+        collisionProgressBar.setProgress((int) (saveFunction.GetEfficiencyScore() * 100));
+
         collisionScreen.show();
     }
 
@@ -1157,6 +1172,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             mainMenuButton();
             lostScreen.dismiss();
         });
+
+        ProgressBar lostProgressBar = lostView.findViewById(R.id.lostProgressBar);
+        lostProgressBar.setProgress((int) (saveFunction.GetEfficiencyScore() * 100));
 
         // Show the dialog
         lostScreen.show();

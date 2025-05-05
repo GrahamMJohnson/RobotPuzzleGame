@@ -37,4 +37,15 @@
         android:gravity="center"
         android:textStyle="bold"/>
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/clearSaveButton"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/settingsButton"
+        android:layout_marginStart="131.5dp"
+        android:layout_marginTop="10dp"
+        android:text="Clear Save"
+        android:textStyle="bold"
+        android:textSize="20sp"/>
+
 </RelativeLayout>

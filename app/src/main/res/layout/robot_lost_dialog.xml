@@ -178,7 +178,7 @@
         android:textSize="18sp"
         />
 
-    <ImageView
+    <View
         android:id="@+id/status_bar_background"
         android:layout_width="300sp"
         android:layout_height="40sp"
@@ -187,15 +187,18 @@
         android:background="@color/gray"
         android:layout_below="@id/Goal_Collectibles_Label"
         android:contentDescription="@string/background_status_bar_description"/>
-    <ImageView
-        android:id="@+id/status_bar_inside_295dpTotal"
-        android:layout_width="250sp"
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:id="@+id/lostProgressBar"
+        android:layout_width="280sp"
         android:layout_height="35sp"
         android:layout_below="@id/Goal_Collectibles_Label"
         android:layout_marginVertical="22.5sp"
-        android:layout_marginHorizontal="27.5sp"
-        android:contentDescription="@string/status_bar_description"
-        android:background="@color/light_grey"/>
+        android:layout_marginHorizontal="37.5sp"
+        android:background="@color/gray"
+        android:progressBackgroundTint="@color/snow"
+        android:progressBackgroundTintMode="add"
+        android:progressTint="@color/light_grey" />
 
 
     <androidx.appcompat.widget.AppCompatButton
