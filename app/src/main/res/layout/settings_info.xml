@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_grey">
+
+    <TextView
+        android:id="@+id/Settings_Top"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:background="@color/dark_gray"
+        android:text="Settings"
+        android:gravity="center"
+        android:textSize="50sp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/settingsCloseButton"
+        android:layout_width="125dp"
+        android:layout_height="100dp"
+        android:layout_toEndOf="@id/Settings_Top"
+        android:background="@color/dark_gray"
+        android:text="X"
+        android:textSize="50sp"/>
+
+    <RelativeLayout
+        android:id="@+id/Accessibility_Panel"
+        android:layout_width="350dp"
+        android:layout_height="102dp"
+        android:layout_below="@id/Settings_Top"
+        android:layout_marginHorizontal="35dp"
+        android:layout_marginVertical="20dp"
+        android:background="@color/snow"/>
+
+    <TextView
+        android:id="@+id/Accessibility_Title"
+        android:layout_width="350dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/Settings_Top"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="35dp"
+        android:text="Accessibility"
+        android:textSize="25sp"
+        android:paddingStart="15sp"
+        android:gravity="center_vertical"
+        android:textStyle="bold"/>
+
+    <ImageView
+        android:id="@+id/Accessibility_Bar"
+        android:layout_width="325dp"
+        android:layout_height="2dp"
+        android:layout_below="@id/Accessibility_Title"
+        android:layout_marginHorizontal="57.5dp"
+        android:background="@color/black"/>
+
+    <TextView
+        android:id="@+id/Play_Animations"
+        android:layout_width="275dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/Accessibility_Bar"
+        android:layout_marginStart="35dp"
+        android:text="Turn off animations"
+        android:textSize="20sp"
+        android:gravity="center_vertical"
+        android:paddingStart="30sp"/>
+
+    <CheckBox
+        android:id="@+id/checkAnimations"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_toEndOf="@id/Play_Animations"
+        android:layout_below="@id/Accessibility_Bar"/>
+
+    <RelativeLayout
+        android:id="@+id/Volume_Panel"
+        android:layout_width="350dp"
+        android:layout_height="202dp"
+        android:layout_below="@id/Accessibility_Panel"
+        android:layout_marginHorizontal="35dp"
+        android:background="@color/snow"/>
+
+    <TextView
+        android:id="@+id/Volume_Title"
+        android:layout_width="350dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/Accessibility_Panel"
+        android:layout_marginHorizontal="35dp"
+        android:text="Volume"
+        android:gravity="center_vertical"
+        android:textSize="25sp"
+        android:paddingStart="15dp"
+        android:textStyle="bold"/>
+
+    <ImageView
+        android:id="@+id/Volume_Bar"
+        android:layout_width="325dp"
+        android:layout_height="2dp"
+        android:layout_below="@id/Volume_Title"
+        android:layout_marginHorizontal="57.5dp"
+        android:background="@color/black"/>
+
+    <TextView
+        android:id="@+id/Overall"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/Volume_Bar"
+        android:layout_marginStart="35dp"
+        android:text="Overall"
+        android:gravity="center_vertical"
+        android:paddingStart="30dp"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/Music"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/Overall"
+        android:layout_marginHorizontal="35dp"
+        android:text="Music"
+        android:gravity="center_vertical"
+        android:paddingStart="30dp"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/SFX"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/Music"
+        android:layout_marginStart="35dp"
+        android:text="SFX"
+        android:gravity="center_vertical"
+        android:paddingStart="30dp"
+        android:textSize="20sp" />
+
+    <SeekBar
+        android:id="@+id/Overall_Drag"
+        android:layout_width="210dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/Volume_Bar"
+        android:layout_toEndOf="@id/Overall"
+        android:layout_marginStart="5dp"/>
+
+    <SeekBar
+        android:id="@+id/Music_Drag"
+        android:layout_width="210dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/Overall_Drag"
+        android:layout_toEndOf="@id/Overall"
+        android:layout_marginStart="5dp"/>
+
+    <SeekBar
+        android:id="@+id/SFX_Drag"
+        android:layout_width="210dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/Music_Drag"
+        android:layout_toEndOf="@id/SFX"
+        android:layout_marginStart="5dp"/>
+
+    <View
+        android:layout_width="360dp"
+        android:layout_height="202dp"
+        android:layout_below="@id/SFX_Drag"
+        android:layout_marginTop="25dp"
+        android:background="@color/snow"/>
+
+    <TextView
+        android:id="@+id/attempts_title"
+        android:layout_width="340dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/SFX_Drag"
+        android:layout_marginTop="25dp"
+        android:text="Attempts"
+        android:textSize="25sp"
+        android:paddingStart="15dp"
+        android:textStyle="bold"/>
+
+    <View
+        android:id="@+id/attempts_bar"
+        android:layout_width="325dp"
+        android:layout_height="2dp"
+        android:layout_below="@id/attempts_title"
+        android:layout_marginHorizontal="10dp"
+        android:background="@color/black"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/attempts_recycler"
+        android:layout_width="360dp"
+        android:layout_height="150dp"
+        android:layout_below="@id/attempts_bar"
+        android:padding="10dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"/>
+
+</RelativeLayout>

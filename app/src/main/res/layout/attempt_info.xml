@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/attempt_button"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:orientation="horizontal"
+    android:background="@drawable/custom_button"
+    android:clickable="true"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/attempt_number"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:text="10"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:gravity="center"/>
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@color/black"/>
+
+    <TextView
+        android:layout_width="170dp"
+        android:layout_height="match_parent"
+        android:text="# of commands used:"
+        android:gravity="center"
+        android:textSize="17sp"/>
+
+    <TextView
+        android:id="@+id/move_number"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:text="12"
+        android:textSize="18sp"
+        android:gravity="center"/>
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@color/black"/>
+
+    <TextView
+        android:id="@+id/success_or_failure"
+        android:layout_width="115dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Success"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textColor="@color/lime_green"/>
+</LinearLayout>

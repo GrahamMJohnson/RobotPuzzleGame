@@ -23,6 +23,8 @@ import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import cos420.robotrally.adaptersAndItems.AttemptAdapter;
+import cos420.robotrally.adaptersAndItems.AttemptItem;
 import cos420.robotrally.adaptersAndItems.GridAdapter;
 import cos420.robotrally.adaptersAndItems.GridItem;
 import cos420.robotrally.adaptersAndItems.LevelAdapter;
@@ -54,7 +58,7 @@ import cos420.robotrally.models.ExecutionCallback;
 /**
  * Class that handles all UI related stuff
  */
-public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener, MoveAdapter.MoveListener, ExecutionCallback{
+public class MainActivity extends AppCompatActivity implements LevelAdapter.LevelSelectListener, MoveAdapter.MoveListener, AttemptAdapter.AttemptListener, ExecutionCallback{
 
     /** The move list that is currently active */
     private List<MoveItem> activeMoveList;
@@ -1231,7 +1235,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         //TODO: make this bring up level information too, make it scrollable, with the information above the settings.
         //Create the view to be referenced
         LayoutInflater settingsInflater = getLayoutInflater();
-        View settingsView = settingsInflater.inflate(R.layout.settings_screen, null);
+        View settingsView = settingsInflater.inflate(R.layout.settings_info, null);
 
         AlertDialog settingsScreen = new AlertDialog.Builder(this)
                 .setView(settingsView)
@@ -1254,6 +1258,21 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             changeGridForGif();
             gridAdapter.notifyDataSetChanged();
         });
+
+        //Set up attempts
+        RecyclerView attemptView = settingsView.findViewById(R.id.attempts_recycler);
+        attemptView.setLayoutManager(new LinearLayoutManager(this));
+        ArrayList<AttemptItem> attemptList = new ArrayList<>();
+        AttemptAdapter attemptAdapter = new AttemptAdapter(attemptList, this, this);
+        attemptView.setAdapter(attemptAdapter);
+
+        //TODO remove TEST
+        attemptList.add(new AttemptItem(1, 9, true));
+        attemptList.add(new AttemptItem(2, 5, false));
+        attemptList.add(new AttemptItem(3, 17, true));
+        attemptList.add(new AttemptItem(4, 7, false));
+        attemptList.add(new AttemptItem(5, 10, true));
+        attemptAdapter.notifyDataSetChanged();
 
         settingsScreen.show();
     }
@@ -1392,6 +1411,15 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         findViewById(R.id.delete_button).setOnClickListener(null);
         findViewById(R.id.start_button).setOnClickListener(null);
         findViewById(R.id.back_button).setOnClickListener(null);
+    }
+
+    /**
+     * What to do when an attempt is clicked
+     * @param position
+     */
+    @Override
+    public void onClick(int position) {
+        //TODO
     }
 
     /// END PLAYABLE UI METHODS
