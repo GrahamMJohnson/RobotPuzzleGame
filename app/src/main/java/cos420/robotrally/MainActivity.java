@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.GridView;
@@ -321,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         //Set next tile to Invisible
         lastImage = toView.findViewById(R.id.tile_view);
-        lastImage.setVisibility(View.INVISIBLE);
+        lastImage.setVisibility(INVISIBLE);
 
         //Create new temporary view
         moving = new ImageView(this);
@@ -366,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             public void onAnimationEnd(Animator animation) {
                 //Set the image of the last tile to Visible
                 ImageView fromViewImage = fromView.findViewById(R.id.tile_view);
-                fromViewImage.setVisibility(View.VISIBLE);
+                fromViewImage.setVisibility(VISIBLE);
 
                 //Set current
                 gridList.set(to, pre);
@@ -375,6 +376,23 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         });
 
         animator.start();
+    }
+
+    /**
+     * Adds animations to desired button.
+     * Scaling button on press.
+     * @param view this view
+     */
+    private void animateButton(View view) {
+        ScaleAnimation scaleAnimation = new ScaleAnimation(
+                1f, 0.9f, // Start and end values for the X axis scaling
+                1f, 0.9f, // Start and end values for the Y axis scaling
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        scaleAnimation.setDuration(100);
+        scaleAnimation.setRepeatCount(1);
+        scaleAnimation.setRepeatMode(Animation.REVERSE);
+        view.startAnimation(scaleAnimation);
     }
 
     /**
@@ -583,6 +601,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private void setupGUIButtons(LevelController levelC) {
         // UP
         findViewById(R.id.up_button).setOnClickListener(v -> {
+            animateButton(v);
             boolean moveAdded = levelC.addUpCommand(activeListName);
             if (moveAdded)
                 addMoveToUI("UP");
@@ -590,6 +609,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // DOWN
         findViewById(R.id.down_button).setOnClickListener(v -> {
+            animateButton(v);
             boolean moveAdded = levelC.addDownCommand(activeListName);
             if (moveAdded)
                 addMoveToUI("DOWN");
@@ -597,6 +617,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // LEFT
         findViewById(R.id.left_button).setOnClickListener(v -> {
+            animateButton(v);
             boolean moveAdded = levelC.addLeftCommand(activeListName);
             if (moveAdded)
                 addMoveToUI("LEFT");
@@ -604,6 +625,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // RIGHT
         findViewById(R.id.right_button).setOnClickListener(v -> {
+            animateButton(v);
             boolean moveAdded = levelC.addRightCommand(activeListName);
             if (moveAdded)
                 addMoveToUI("RIGHT");
@@ -611,6 +633,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // A
         findViewById(R.id.button_a).setOnClickListener(v -> {
+            animateButton(v);
             boolean moveAdded = levelC.addSubroutineA(activeListName);
             if (moveAdded)
                 addMoveToUI("A");
@@ -618,6 +641,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // B
         findViewById(R.id.button_b).setOnClickListener(v -> {
+            animateButton(v);
             boolean moveAdded = levelC.addSubroutineB(activeListName);
             if (moveAdded)
                 addMoveToUI("B");
@@ -625,6 +649,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // DELETE
         findViewById(R.id.delete_button).setOnClickListener(v -> {
+            animateButton(v);
             try {
                 int before = levelC.getSelected(activeListName); //The command that was deleted
                 levelC.remove(activeListName);
@@ -636,6 +661,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // Edit Subroutines
         findViewById(R.id.subroutine_button).setOnClickListener(v -> {
+            animateButton(v);
             if (!editingSubroutine) {
                 editingSubroutine = true;
                 findViewById(R.id.start_button).setClickable(false);
@@ -658,6 +684,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // START
         findViewById(R.id.start_button).setOnClickListener(v -> {
+            animateButton(v);
             levelController.resetCollectiblesCollected();
             setButtonsClickable(false);
             animator.end();
@@ -676,12 +703,14 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // BACK
         findViewById(R.id.back_button).setOnClickListener(v -> {
+            animateButton(v);
             clearGameListeners();
             openLevelSelect();
         });
 
         // gameBoard settings/info
         findViewById(R.id.settings_info_button).setOnClickListener(v -> {
+            animateButton(v);
             if(changesMade) {
                 saveFunction.saveCurrent();
             }
