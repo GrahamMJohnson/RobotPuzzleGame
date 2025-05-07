@@ -92,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private RecyclerView recyclerViewB;
     /** Reference to the subroutine edit view */
     private View subroutineEditView;
+    /** Tracks if use is editing subroutine or not */
+    private boolean editingSubroutine;
     /** The index of the currently selected command in the UI */
     private int curSelectUI;
     /** Reference to the grid view */
@@ -634,15 +636,24 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // Edit Subroutines
         findViewById(R.id.subroutine_button).setOnClickListener(v -> {
-            findViewById(R.id.start_button).setClickable(false);
-            showSubroutineEditScreen();
-            // Edit subroutine A the first time, otherwise the last subroutine being edited
-            setActiveList(ListName.A);
-            int lastIndex = activeMoveList.size() - 1;
-            if (lastIndex > 0) {
-                levelController.setSelected(lastIndex, activeListName);
+            if (!editingSubroutine) {
+                editingSubroutine = true;
+                findViewById(R.id.start_button).setClickable(false);
+                showSubroutineEditScreen();
+                // Edit subroutine A the first time, otherwise the last subroutine being edited
+                setActiveList(ListName.A);
+                int lastIndex = activeMoveList.size() - 1;
+                if (lastIndex > 0) {
+                    levelController.setSelected(lastIndex, activeListName);
+                }
+                activeRecyclerView.post(this::blinkUI);
+            } else {
+                editingSubroutine = false;
+                ViewGroup rootLayout = findViewById(android.R.id.content);
+                setActiveList(ListName.MAIN);
+                rootLayout.removeView(subroutineEditView);
+                findViewById(R.id.start_button).setClickable(true);
             }
-            activeRecyclerView.post(this::blinkUI);
         });
 
         // START
@@ -1250,6 +1261,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         // Handle button press inside the floating panel
         subroutineEditView.findViewById(R.id.close_button).setOnClickListener(v -> {
+            editingSubroutine = false;
             setActiveList(ListName.MAIN);
             rootLayout.removeView(subroutineEditView);
             findViewById(R.id.start_button).setClickable(true);
