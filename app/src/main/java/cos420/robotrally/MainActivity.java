@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -71,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private List<MoveItem> moveListB;
     /** The list of ghost elements for the movement trail  */
     private List<View> ghostList;
+    /** The media player responsible for playing sounds */
+    private MediaPlayer mediaPlayer;
     /** The move adapter that is currently active */
     private MoveAdapter activeMoveAdapter;
     /** The move adapter for the main list */
@@ -332,6 +335,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         gridList.set(from, gridList.get(to));
         gridAdapter.notifyDataSetChanged();
 
+        //Play movement sound
+        playRoombaMoveSound();
+
         //Animator for movement
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
         animator.setDuration(300);
@@ -441,6 +447,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             } else if (result == EAfterExecuteCondition.CRASHED) {
                 saveFunction.saveCurrentMoveSequence(false);
                 saveFunction.checkBest(false);
+                playRoombaCrashSound();
                 showCollisionScreen();
             } else if (result == EAfterExecuteCondition.GOT_LOST) {
                 saveFunction.saveCurrentMoveSequence(false);
@@ -1442,4 +1449,14 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     }
 
     /// END PLAYABLE UI METHODS
+
+    public void playRoombaMoveSound() {
+        mediaPlayer = MediaPlayer.create(this, R.raw.roombamove);
+        mediaPlayer.start();
+    }
+
+    public void playRoombaCrashSound() {
+        mediaPlayer = MediaPlayer.create(this, R.raw.roombacrash);
+        mediaPlayer.start();
+    }
 }
