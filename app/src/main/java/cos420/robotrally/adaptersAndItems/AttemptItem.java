@@ -4,13 +4,13 @@ import cos420.robotrally.R;
 
 public class AttemptItem {
     private int attemptNumber;
-    private int numberOfMoves;
+    private String moveSequence;
     private String success;
     private int successColor;
 
-    public AttemptItem(int attemptNumber, int numberOfMoves, boolean success) {
+    public AttemptItem(int attemptNumber, String moveSequence, boolean success) {
         this.attemptNumber = attemptNumber;
-        this.numberOfMoves = numberOfMoves;
+        this.moveSequence = moveSequence;
 
         if (success) {//If success, make it green
             this.success = "Success";
@@ -25,8 +25,8 @@ public class AttemptItem {
         return attemptNumber;
     }
 
-    public int getNumberOfMoves() {
-        return numberOfMoves;
+    public String getMoveSequence() {
+        return moveSequence;
     }
 
     public String getSuccess() {

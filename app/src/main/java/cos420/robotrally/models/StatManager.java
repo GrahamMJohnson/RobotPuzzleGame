@@ -289,4 +289,28 @@ public class StatManager {
         bestCollectiblesPercentage = 0;
     }
 
+    /**
+     * Saves the most recent attempt to memory
+     * @param win whether the attempt was successful or not
+     */
+    public void saveCurrentMoveSequence(boolean win){
+        try {
+            currentSave.saveLevelAttempt(currentMoveSequence, win);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * The method to get past move sequences from memory
+     * @param attemptNumber how many attempts ago you want to get (last move -> 1, 2 moves ago -> 2, etc.)
+     * @return a string representing that move sequence
+     */
+    public String getPastMoveSequence(int attemptNumber){
+        return currentSave.getPastMoveSequence(attemptNumber);
+    }
+
+    public boolean getPastMoveSequenceSuccess(int attemptNumber){
+        return currentSave.getPastMoveSequenceSuccess(attemptNumber);
+    }
 }

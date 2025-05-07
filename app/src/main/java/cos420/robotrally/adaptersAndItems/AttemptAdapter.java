@@ -44,7 +44,7 @@ public class AttemptAdapter extends RecyclerView.Adapter<AttemptAdapter.AttemptV
     public void onBindViewHolder(@NonNull AttemptViewHolder holder, int position) {
         AttemptItem attemptItem = list.get(position);
         holder.attemptNumber.setText(String.valueOf(attemptItem.getAttemptNumber()));
-        holder.numberOfMoves.setText(String.valueOf(attemptItem.getNumberOfMoves()));
+        holder.moveSequence.setText(String.valueOf(attemptItem.getMoveSequence()));
         holder.success.setText(attemptItem.getSuccess());
         holder.success.setTextColor(ContextCompat.getColor(context,attemptItem.getSuccessColor()));
 
@@ -64,7 +64,7 @@ public class AttemptAdapter extends RecyclerView.Adapter<AttemptAdapter.AttemptV
     public class AttemptViewHolder extends RecyclerView.ViewHolder {
         LinearLayout attemptButton;
         TextView attemptNumber;
-        TextView numberOfMoves;
+        TextView moveSequence;
         TextView success;
 
 
@@ -72,7 +72,7 @@ public class AttemptAdapter extends RecyclerView.Adapter<AttemptAdapter.AttemptV
             super(itemView);
             attemptButton = itemView.findViewById(R.id.attempt_button);
             attemptNumber = itemView.findViewById(R.id.attempt_number);
-            numberOfMoves = itemView.findViewById(R.id.move_number);
+            moveSequence = itemView.findViewById(R.id.move_number);
             success = itemView.findViewById(R.id.success_or_failure);
         }
 

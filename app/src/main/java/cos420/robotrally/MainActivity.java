@@ -435,12 +435,15 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         moveAdapterMain.notifyItemChanged(executingMoveUI);
 
             if (result == EAfterExecuteCondition.DEST_REACHED) {
+                saveFunction.saveCurrentMoveSequence(true);
                 saveFunction.checkBest(true);
                 showWinScreen();
             } else if (result == EAfterExecuteCondition.CRASHED) {
+                saveFunction.saveCurrentMoveSequence(false);
                 saveFunction.checkBest(false);
                 showCollisionScreen();
             } else if (result == EAfterExecuteCondition.GOT_LOST) {
+                saveFunction.saveCurrentMoveSequence(false);
                 saveFunction.checkBest(false);
                 showLostScreen();
             } else {
@@ -1284,12 +1287,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         AttemptAdapter attemptAdapter = new AttemptAdapter(attemptList, this, this);
         attemptView.setAdapter(attemptAdapter);
 
-        //TODO remove TEST
-        attemptList.add(new AttemptItem(1, 9, true));
-        attemptList.add(new AttemptItem(2, 5, false));
-        attemptList.add(new AttemptItem(3, 17, true));
-        attemptList.add(new AttemptItem(4, 7, false));
-        attemptList.add(new AttemptItem(5, 10, true));
+        for(int x = 1; x <= 15; x++) {
+            attemptList.add(new AttemptItem(x, saveFunction.getPastMoveSequence(x),
+                    saveFunction.getPastMoveSequenceSuccess(x)));
+        }
         attemptAdapter.notifyDataSetChanged();
 
         settingsScreen.show();
