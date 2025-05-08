@@ -24,10 +24,9 @@
 
     <RelativeLayout
         android:id="@+id/Accessibility_Panel"
-        android:layout_width="350dp"
+        android:layout_width="360dp"
         android:layout_height="102dp"
         android:layout_below="@id/Settings_Top"
-        android:layout_marginHorizontal="35dp"
         android:layout_marginVertical="20dp"
         android:background="@color/snow"/>
 
@@ -37,19 +36,18 @@
         android:layout_height="50dp"
         android:layout_below="@id/Settings_Top"
         android:layout_marginTop="20dp"
-        android:layout_marginHorizontal="35dp"
         android:text="Accessibility"
         android:textSize="25sp"
         android:paddingStart="15sp"
         android:gravity="center_vertical"
         android:textStyle="bold"/>
 
-    <ImageView
+    <View
         android:id="@+id/Accessibility_Bar"
         android:layout_width="325dp"
         android:layout_height="2dp"
         android:layout_below="@id/Accessibility_Title"
-        android:layout_marginHorizontal="57.5dp"
+        android:layout_marginHorizontal="17.5dp"
         android:background="@color/black"/>
 
     <TextView
@@ -57,7 +55,6 @@
         android:layout_width="275dp"
         android:layout_height="50dp"
         android:layout_below="@id/Accessibility_Bar"
-        android:layout_marginStart="35dp"
         android:text="Turn off animations"
         android:textSize="20sp"
         android:gravity="center_vertical"
@@ -72,10 +69,9 @@
 
     <RelativeLayout
         android:id="@+id/Volume_Panel"
-        android:layout_width="350dp"
+        android:layout_width="360dp"
         android:layout_height="202dp"
         android:layout_below="@id/Accessibility_Panel"
-        android:layout_marginHorizontal="35dp"
         android:background="@color/snow"/>
 
     <TextView
@@ -83,19 +79,18 @@
         android:layout_width="350dp"
         android:layout_height="50dp"
         android:layout_below="@id/Accessibility_Panel"
-        android:layout_marginHorizontal="35dp"
         android:text="Volume"
         android:gravity="center_vertical"
         android:textSize="25sp"
         android:paddingStart="15dp"
         android:textStyle="bold"/>
 
-    <ImageView
+    <View
         android:id="@+id/Volume_Bar"
         android:layout_width="325dp"
         android:layout_height="2dp"
         android:layout_below="@id/Volume_Title"
-        android:layout_marginHorizontal="57.5dp"
+        android:layout_marginHorizontal="17.5dp"
         android:background="@color/black"/>
 
     <TextView
@@ -103,7 +98,6 @@
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:layout_below="@id/Volume_Bar"
-        android:layout_marginStart="35dp"
         android:text="Overall"
         android:gravity="center_vertical"
         android:paddingStart="30dp"
@@ -114,7 +108,6 @@
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:layout_below="@id/Overall"
-        android:layout_marginHorizontal="35dp"
         android:text="Music"
         android:gravity="center_vertical"
         android:paddingStart="30dp"
@@ -125,7 +118,6 @@
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:layout_below="@id/Music"
-        android:layout_marginStart="35dp"
         android:text="SFX"
         android:gravity="center_vertical"
         android:paddingStart="30dp"
@@ -171,6 +163,7 @@
         android:text="Attempts"
         android:textSize="25sp"
         android:paddingStart="15dp"
+        android:gravity="center_vertical"
         android:textStyle="bold"/>
 
     <View

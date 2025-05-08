@@ -1335,7 +1335,16 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         AttemptAdapter attemptAdapter = new AttemptAdapter(attemptList, this, this);
         attemptView.setAdapter(attemptAdapter);
 
-        for(int x = 1; x <= 15; x++) {
+        //Determines the number of attempts to show
+        int numAttemptsToShow = 0;
+        if(saveFunction.getSavedMSNumber() <= 15){
+            numAttemptsToShow = saveFunction.getSavedMSNumber();
+        }
+        else {
+            numAttemptsToShow = 15;
+        }
+
+        for(int x = 1; x <= numAttemptsToShow; x++) {
             attemptList.add(new AttemptItem(x, saveFunction.getPastMoveSequence(x),
                     saveFunction.getPastMoveSequenceSuccess(x)));
         }

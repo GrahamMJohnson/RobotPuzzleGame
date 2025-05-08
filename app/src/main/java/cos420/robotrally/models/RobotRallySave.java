@@ -122,12 +122,16 @@ public class RobotRallySave {
         currentJSON.put(jsonBestNumCollectibles, 0);
         currentJSON.put(jsonBestCollectiblesPercentage, -100);
 
-        for(int s = 1; s < 16; s++){
+        for(int s = 0; s <= 16; s++){
             String currentKey = jsonSavedMoveSequence + s;
             String currentSuccessKey = jsonSuccessfulMoveSequence + s;
             currentJSON.put(currentKey, "No data yet.");
             currentJSON.put(currentSuccessKey, false);
         }
+
+        currentJSON.put(jsonNumberMoveSequences, 0);
+        currentJSON.put(jsonBeginningMoveSequences, 0);
+        currentJSON.put(jsonEndMoveSequences, 0);
 
         //save the cleared stats
         this.saveLevelData();
@@ -457,7 +461,7 @@ public class RobotRallySave {
     public String getPastMoveSequence(int attemptNumber){
         try{
             //Find the key for the attempt x times ago
-            String currentKey = jsonSavedMoveSequence + ((currentJSON.getInt(jsonEndMoveSequences) - attemptNumber) + 1);
+            String currentKey = jsonSavedMoveSequence + ((((currentJSON.getInt(jsonEndMoveSequences) - attemptNumber) + 1) + 15) % 15);
             //return that attempt
             return currentJSON.getString(currentKey);
         }
@@ -471,7 +475,7 @@ public class RobotRallySave {
     public boolean getPastMoveSequenceSuccess(int attemptNumber){
         try{
             //Find the key for the attempt x times ago
-            String currentKey = jsonSuccessfulMoveSequence + ((currentJSON.getInt(jsonEndMoveSequences) - attemptNumber) + 1);
+            String currentKey = jsonSuccessfulMoveSequence + ((((currentJSON.getInt(jsonEndMoveSequences) - attemptNumber) + 1) + 15) % 15);
             //return that attempt
             return currentJSON.getBoolean(currentKey);
         }
@@ -479,6 +483,22 @@ public class RobotRallySave {
         catch (JSONException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public int getEndPoint(){
+        try {
+            return currentJSON.getInt(jsonEndMoveSequences);
+        } catch (JSONException e) {
+            return 0;
+        }
+    }
+
+    public int getSavedMSNumber(){
+        try{
+            return currentJSON.getInt(jsonNumberMoveSequences);
+        } catch (JSONException e) {
+            return 15;
         }
     }
 

@@ -313,4 +313,12 @@ public class StatManager {
     public boolean getPastMoveSequenceSuccess(int attemptNumber){
         return currentSave.getPastMoveSequenceSuccess(attemptNumber);
     }
+
+    public int getEndPoint(){
+        return currentSave.getEndPoint();
+    }
+
+    public int getSavedMSNumber(){
+        return currentSave.getSavedMSNumber();
+    }
 }
