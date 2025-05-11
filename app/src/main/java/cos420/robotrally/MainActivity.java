@@ -8,6 +8,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -34,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cos420.robotrally.adaptersAndItems.AttemptAdapter;
@@ -92,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private View subroutineEditView;
     /** Tracks if use is editing subroutine or not */
     private boolean editingSubroutine;
+    /** Reference to the settings menu from the game play screen */
+    AlertDialog settingsScreenAttempts;
     /** The index of the currently selected command in the UI */
     private int curSelectUI;
     /** Reference to the grid view */
@@ -278,16 +282,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             current.setImage(R.drawable.empty);
         }
         animateTileMove(previousIndex, currentIndex);
-        /**
-        if (!animationIsOff) { //Animation is on
-            //Animate tile move
-            animateTileMove(previousIndex, currentIndex);
-        }else { //Animation is off
-            //Swap the two tiles
-            Collections.swap(gridList, previousIndex, currentIndex);
-            gridAdapter.notifyDataSetChanged();
-        }*/
-
     }
 
     /**
@@ -455,24 +449,24 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         m.clearHighlight();
         moveAdapterMain.notifyItemChanged(executingMoveUI);
 
-            if (result == EAfterExecuteCondition.DEST_REACHED) {
-                saveFunction.saveCurrentMoveSequence(true);
-                saveFunction.checkBest(true);
-                showWinScreen();
-            } else if (result == EAfterExecuteCondition.CRASHED) {
-                saveFunction.saveCurrentMoveSequence(false);
-                saveFunction.checkBest(false);
-                playRoombaCrashSound();
-                showCollisionScreen();
-            } else if (result == EAfterExecuteCondition.GOT_LOST) {
-                saveFunction.saveCurrentMoveSequence(false);
-                saveFunction.checkBest(false);
-                showLostScreen();
-            } else {
-                Log.d("End Condition Error", "Someone added a new end condition and " +
-                                "forgot to add it to the end-screen handler.");
-            }
-            collapseSubroutinesInUI();
+        if (result == EAfterExecuteCondition.DEST_REACHED) {
+            saveFunction.saveCurrentMoveSequence(true);
+            saveFunction.checkBest(true);
+            showWinScreen();
+        } else if (result == EAfterExecuteCondition.CRASHED) {
+            saveFunction.saveCurrentMoveSequence(false);
+            saveFunction.checkBest(false);
+            playRoombaCrashSound();
+            showCollisionScreen();
+        } else if (result == EAfterExecuteCondition.GOT_LOST) {
+            saveFunction.saveCurrentMoveSequence(false);
+            saveFunction.checkBest(false);
+            showLostScreen();
+        } else {
+            Log.d("End Condition Error", "Someone added a new end condition and " +
+                    "forgot to add it to the end-screen handler.");
+        }
+        collapseSubroutinesInUI();
     }
 
     /**
@@ -685,13 +679,19 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             animator.end();
             recyclerViewMain.smoothScrollToPosition(0);
 
+            // Save number of moves in list
+            saveFunction.currentNumMoves = moveListMain.size();
+
+            // Expand subroutines and have subroutine letter appended to moves for saving
+            expandSubroutinesWithSubroutineLetter();
+
             //these are the edits that need to be made to the save function each time it is run
             saveFunction.currentMoveSequence = saveFunction.MoveSequenceConverter(moveListMain);
             saveFunction.currentNumAttempts += 1;
-            saveFunction.currentNumMoves = saveFunction.calcNumMoves();
             changesMade = true;
 
-            expandSubroutinesInUI();
+            // Remove appended subroutine letters
+            removeAppendedLetters();
 
             recyclerViewMain.post(() -> levelC.executeScript(moveListMain, this, this));
         });
@@ -701,6 +701,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             animateButton(v);
             clearGameListeners();
             openLevelSelect();
+            editingSubroutine = false;
         });
 
         // gameBoard settings/info
@@ -890,14 +891,14 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
     /**
      * Method to add moves of a subroutine to UI
-     * @param moveText The text to display
+     * @param subroutine The text to display
      * @param location Where in the list it is being added
      */
-    private void addSubroutineToUI(String moveText, int location) {
+    private void addSubroutineToUI(String subroutine, int location) {
         List<MoveItem> subsequenceToAdd;
         ColorDrawable color1 = new ColorDrawable(getResources().getColor(R.color.light_grey, null));
         ColorDrawable color2;
-        switch(moveText){
+        switch(subroutine){
             case "A":
                 color2 = new ColorDrawable(getResources().getColor(R.color.indian_red, null));
                 subsequenceToAdd = moveListA;
@@ -907,23 +908,38 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
                 subsequenceToAdd = moveListB;
                 break;
             case "AB":
+            case "SAB":
                 color2 = new ColorDrawable(getResources().getColor(R.color.mediumPurple, null));
                 subsequenceToAdd = moveListB;
                 break;
-            default: throw new InvalidParameterException(moveText + " is not a valid move.");
+            default: throw new InvalidParameterException(subroutine + " is not a valid move.");
         }
 
         int s = location;
         int start = s;
+        boolean first = true;
         // Add all moves from designated subsequence
         for (var move : subsequenceToAdd) {
             var text = move.getText();
-
-            // Check for a B subroutine being inside of A subroutine
-            if (text.equals("B"))
-                text = "AB";
+            // Mark the start of the subroutine
+            if (first) {
+                first = false;
+                switch(subroutine) {
+                    case "A": text = "SA" + text; break;
+                    case "B": text = "SB" + text; break;
+                    case "AB": text = "ASB" + text; break;
+                    case "SAB": text = "SASB" + text; break;
+                }
+            }
+            else {
+                if (subroutine.equals("SAB"))
+                    text = "AB" + text;
+                else
+                    text = subroutine + text;
+            }
+            // Add move to list
             MoveItem m = new MoveItem(text, color1, color2);
-            m.setSubroutineType(moveText);
+            m.setSubroutineType(subroutine);
             moveListMain.add(s, m); //add item
             s++;
         }
@@ -932,15 +948,17 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     }
 
     /**
-     * Method to expand the A/B command into the full subroutine on execution
+     * Method to expand the A/B command into the full subroutine
+     * Also appends the letter of the subroutine to the beginning of the move for saving purposes
      */
-    private void expandSubroutinesInUI() {
+    private void expandSubroutinesWithSubroutineLetter() {
         for (int i = 0; i < moveListMain.size(); i++) {
             MoveItem m = moveListMain.get(i);
-            String subroutine = m.getText();
-            if (!(subroutine.equals("A") ||
-                    subroutine.equals("B") ||
-                    subroutine.equals("AB"))) {
+            String text = m.getText();
+            if (!(text.equals("A") ||
+                    text.equals("B") ||
+                    text.equals("AB") ||
+                    text.equals("SAB"))) {
                 continue;
             }
 
@@ -949,12 +967,29 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             moveAdapterMain.notifyItemRemoved(i);
 
             // add the commands from a to main script
-            addSubroutineToUI(subroutine, i);
+            addSubroutineToUI(text, i);
 
             // Check the new item at at same index, as this could be a nested subroutine
             i--;
         }
         levelController.setSelected(0, ListName.MAIN);
+    }
+
+    /**
+     *  Method to remove A/B from beginning of move commands
+     */
+    private void removeAppendedLetters() {
+        for (MoveItem m : moveListMain) {
+            String text = m.getText();
+            if (text.startsWith("SASB"))
+                m.setText(text.substring(4));
+            else if (text.startsWith("ASB"))
+                m.setText(text.substring(3));
+            else if (text.startsWith("AB") || text.startsWith("SA") || text.startsWith("SB"))
+                m.setText(text.substring(2));
+            else if (text.startsWith("A") || text.startsWith("B"))
+                m.setText(text.substring(1));
+        }
     }
 
 
@@ -1040,6 +1075,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         findViewById(R.id.subroutine_button).setClickable(value);
         findViewById(R.id.delete_button).setClickable(value);
         findViewById(R.id.back_button).setClickable(value);
+        findViewById(R.id.settings_info_button).setClickable(value);
     }
 
     /**
@@ -1048,7 +1084,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      */
     private void setActiveList(ListName listToEdit) {
 
-        if (activeMoveList != null && !activeMoveList.isEmpty()){
+        if (activeMoveList != null && !activeMoveList.isEmpty() &&
+                animator != null && animator.isRunning()){
             animator.end();
         }
 
@@ -1290,7 +1327,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         View grid = findViewById(R.id.grid);
         int height = grid.getHeight();
-        int topLocation = grid.getTop();
+        int[] location = new int[2];
+        grid.getLocationOnScreen(location);
+        int topLocation = location[1];
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 height
@@ -1351,17 +1390,16 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      * Show the settings/info screen for the gameBoard instance of the settings menu
      */
     private void showSettingsInfoMenu(LevelData curLevel){
-        //TODO: make this bring up level information too, make it scrollable, with the information above the settings.
         //Create the view to be referenced
         LayoutInflater settingsInflater = getLayoutInflater();
         View settingsView = settingsInflater.inflate(R.layout.settings_info, null);
 
-        AlertDialog settingsScreen = new AlertDialog.Builder(this)
+        settingsScreenAttempts = new AlertDialog.Builder(this)
                 .setView(settingsView)
                 .setCancelable(false)
                 .create();
 
-        settingsView.findViewById(R.id.settingsCloseButton).setOnClickListener(v -> settingsScreen.dismiss());
+        settingsView.findViewById(R.id.settingsCloseButton).setOnClickListener(v -> settingsScreenAttempts.dismiss());
 
         //Checkbox for animations
         CheckBox check = settingsView.findViewById(R.id.checkAnimations);
@@ -1386,21 +1424,19 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         attemptView.setAdapter(attemptAdapter);
 
         //Determines the number of attempts to show
-        int numAttemptsToShow = 0;
-        if(saveFunction.getSavedMSNumber() <= 15){
-            numAttemptsToShow = saveFunction.getSavedMSNumber();
-        }
-        else {
-            numAttemptsToShow = 15;
-        }
-
-        for(int x = 1; x <= numAttemptsToShow; x++) {
-            attemptList.add(new AttemptItem(x, saveFunction.getPastMoveSequence(x),
+        for(int x = 1; x <= 15; x++) {
+            // Get number of moves
+            int numMoves = saveFunction.getPastMoveCount(x);
+            // Check if attempt exists
+            if (numMoves == -1)
+                continue;
+            // Create and attempt to list
+            attemptList.add(new AttemptItem(x, "Number of moves: " + numMoves,
                     saveFunction.getPastMoveSequenceSuccess(x)));
         }
-        attemptAdapter.notifyDataSetChanged();
+        attemptAdapter.notifyItemRangeInserted(0, attemptList.size());
 
-        settingsScreen.show();
+        settingsScreenAttempts.show();
     }
 
     /**
@@ -1539,11 +1575,193 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
     /**
      * What to do when an attempt is clicked
-     * @param position
+     * @param position the position of the clicked attempt
      */
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onClick(int position) {
-        //TODO
+        // Get saved move list and convert to array
+        String moveListString = saveFunction.getPastMoveSequence(position + 1);
+        List<String> moveList = new ArrayList<>(Arrays.asList(moveListString.split(" ")));
+
+        // Clear commands out of all lists
+        levelController.resetLists();
+        moveListMain.clear();
+        moveListA.clear();
+        moveListB.clear();
+
+        //TODO rework everything below here with new save format
+
+        // Get subroutine B
+        getSubroutineBFromList(moveList);
+
+        // Get subroutine A
+        getSubroutineAFromList(moveList);
+
+        // Update main move list;
+        convertToMoveList(moveListMain, moveList);
+
+        // Update backend lists
+        updateBackendLists();
+        settingsScreenAttempts.dismiss();
+
+        // Alert Adapters of changes
+        moveAdapterMain.notifyDataSetChanged();
+        moveAdapterA.notifyDataSetChanged();
+        moveAdapterB.notifyDataSetChanged();
+
+        setActiveList(ListName.MAIN);
+        recyclerViewMain.post(this::blinkUI);
+    }
+
+    /**
+     * Get subroutine B from moveList
+     * @param moveList The list of strings of moves
+     */
+    private void getSubroutineBFromList(List<String> moveList) {
+        List<String> subroutineB = new ArrayList<>();
+
+        for (int i = 0; i < moveList.size(); i++) {
+            String text = moveList.get(i);
+            // If move is not part of B, go on to next move
+            if (!text.contains("SB")) {
+                continue;
+            }
+
+            // Add move to subroutine B list
+            subroutineB.add(text);
+            i++;
+
+            // Loop through list ending when a new B starts or when move is not part of B
+            while (i < moveList.size()) {
+                text = moveList.get(i);
+
+                if (text.contains("S") || !text.contains("B"))
+                    break;
+                subroutineB.add(text);
+
+                i++;
+            }
+
+
+            // Convert from Strings to MoveItems and add to moveListB;
+            convertToMoveList(moveListB, subroutineB);
+
+            // Remove instances of subroutine B from moveList
+            removeInstancesOfSubroutine(moveList, "B");
+
+            break;
+        }
+    }
+
+    private void getSubroutineAFromList(List<String> moveList) {
+        List<String> subroutineA = new ArrayList<>();
+
+        for (int i = 0; i < moveList.size(); i++) {
+            String text = moveList.get(i);
+            // If move is not part of B, go on to next move
+            if (!text.contains("SA")) {
+                continue;
+            }
+
+            // Add move to subroutine A list
+            subroutineA.add(text);
+            i++;
+
+            // Loop through list ending when a new A starts or when move is not part of A
+            while (i < moveList.size()) {
+                text = moveList.get(i);
+
+                if (text.contains("SA") || !text.contains("A"))
+                    break;
+                subroutineA.add(text);
+
+                i++;
+            }
+
+
+            // Convert from Strings to MoveItems and add to moveListA;
+            convertToMoveList(moveListA, subroutineA);
+
+            // Remove instances of subroutine A from moveList
+            removeInstancesOfSubroutine(moveList, "A");
+
+            break;
+        }
+    }
+
+    private void convertToMoveList(List<MoveItem> moveList, List<String> stringList) {
+        ColorDrawable gray1 = new ColorDrawable(getResources().getColor(R.color.light_grey, null));
+        ColorDrawable gray2 = new ColorDrawable(getResources().getColor(R.color.light_grey, null));
+        ColorDrawable red = new ColorDrawable(getResources().getColor(R.color.indian_red, null));
+        ColorDrawable blue = new ColorDrawable(getResources().getColor(R.color.steel_blue, null));
+
+        for (String text : stringList) {
+            MoveItem move;
+            if (text.contains("UP"))
+                move = new MoveItem("UP", gray1, gray2);
+            else if (text.contains("DOWN"))
+                move = new MoveItem("DOWN", gray1, gray2);
+            else if (text.contains("LEFT"))
+                move = new MoveItem("LEFT", gray1, gray2);
+            else if (text.contains("RIGHT"))
+                move = new MoveItem("RIGHT", gray1, gray2);
+            else if (text.contains("B"))
+                move = new MoveItem("B", gray1, blue);
+            else if (text.contains("A"))
+                move = new MoveItem("A", gray1, red);
+            else
+                continue;
+
+            moveList.add(move);
+        }
+    }
+
+    private void removeInstancesOfSubroutine(List<String> stringList, String list) {
+        int numCommands;
+
+        if (list.equals("A"))
+            numCommands = moveListA.size();
+        else if (list.equals("B"))
+            numCommands = moveListB.size();
+        else
+            return;
+
+        for (int i = 0; i < stringList.size(); i++) {
+            String move = stringList.get(i);
+            if (move.contains("S" + list)) {
+                stringList.add(i, move.substring(0, move.indexOf(list) - 1) + list);
+                i++;
+                for (int j = 0; j < numCommands; j++)
+                    stringList.remove(i);
+                i--;
+            }
+        }
+    }
+
+    private void updateBackendLists() {
+        for (MoveItem m : moveListMain) {
+            addCommandToBackend(m.getText(), ListName.MAIN);
+        }
+
+        for (MoveItem m : moveListA) {
+            addCommandToBackend(m.getText(), ListName.A);
+        }
+
+        for (MoveItem m : moveListB) {
+            addCommandToBackend(m.getText(), ListName.B);
+        }
+    }
+
+    private void addCommandToBackend(String text, ListName listName) {
+        switch(text.toLowerCase()) {
+            case "up": levelController.addUpCommand(listName); break;
+            case "down": levelController.addDownCommand(listName); break;
+            case "left": levelController.addLeftCommand(listName); break;
+            case "right": levelController.addRightCommand(listName); break;
+            case "a": levelController.addSubroutineA(listName); break;
+            case "b": levelController.addSubroutineB(listName); break;
+        }
     }
 
     /// END PLAYABLE UI METHODS

@@ -149,6 +149,14 @@ public class CommandList {
     }
 
     /**
+     * Clears all commands from list
+     */
+    public void clear() {
+        script.clear();
+        select = 0;
+    }
+
+    /**
      * Gets the element at specified index
      * @param index index of element to return
      * @return the element at the specified index

@@ -62,6 +62,17 @@ public class LevelController {
     }
 
     /**
+     * Method to clear all commands out of all lists
+     */
+    public void resetLists()
+    {
+        commandScript.clear();
+        subroutineA.clear();
+        subroutineB.clear();
+    }
+
+
+    /**
      * Method to add an Up command to script
      * @param list The list to add command to
      * @return boolean if adding the command was successful

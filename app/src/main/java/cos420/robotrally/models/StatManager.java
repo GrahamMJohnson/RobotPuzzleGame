@@ -295,7 +295,7 @@ public class StatManager {
      */
     public void saveCurrentMoveSequence(boolean win){
         try {
-            currentSave.saveLevelAttempt(currentMoveSequence, win);
+            currentSave.saveLevelAttempt(currentMoveSequence, currentNumMoves, win);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -308,6 +308,15 @@ public class StatManager {
      */
     public String getPastMoveSequence(int attemptNumber){
         return currentSave.getPastMoveSequence(attemptNumber);
+    }
+
+    /**
+     * Method to get the number of moves in an attempt
+     * @param attemptNumber how many attempts ago you want to get
+     * @return int - how many moves there were
+     */
+    public int getPastMoveCount(int attemptNumber) {
+        return currentSave.getPastNumMoves(attemptNumber);
     }
 
     public boolean getPastMoveSequenceSuccess(int attemptNumber){

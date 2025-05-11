@@ -13,7 +13,7 @@ public class MoveItem {
     private Drawable color;
 
     private Drawable buttonColor;
-    private Drawable defaultButtonColor;
+    private final Drawable defaultButtonColor;
     private String subroutineType;
 
     /**
@@ -31,10 +31,18 @@ public class MoveItem {
 
     /**
      * Getter
-     * @return
+     * @return The text value for this move item
      */
     public String getText() {
         return text;
+    }
+
+    /**
+     * Method to update the text value of move item
+     * @param value The new value to store in text
+     */
+    public void setText(String value) {
+        text = value;
     }
 
     public Drawable getColor() { return color;}
@@ -77,6 +85,8 @@ public class MoveItem {
             case "AB":
                 this.subroutineType = subroutine;
                 break;
+            case "SAB":
+                this.subroutineType = "AB";
             default: break;
         }
     }
