@@ -25,9 +25,7 @@ import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,7 +34,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import cos420.robotrally.adaptersAndItems.AttemptAdapter;
@@ -121,8 +118,6 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private boolean animationIsOff;
     /** Attribute to track if subroutines are being edited */
     private ListName activeListName = ListName.MAIN;
-    /** The image to display on obstacle tiles */
-    private int obstacleImage;
     /** The image to display on collectable tiles */
     private int collectableImage;
     /** The image to display on destination tile */
@@ -248,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         gridView.setAdapter(gridAdapter);
 
         levelController = new LevelController(levels.get(levelID));
-        setupGUIButtons(levelController);
+        setupGUIButtons(levelController, levels.get(levelID));
 
         setActiveList(ListName.MAIN);
 
@@ -269,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
     /**
      * Move tiles in the grid UI
-     */
+     */ // TODO don't delete destination or obstacles
     @Override
     public void onStepMove() {
         GameBoard g = levelController.getGameBoard();
@@ -598,7 +593,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      *
      * @param levelC    The level controller responsible for the current stage.
      */
-    private void setupGUIButtons(LevelController levelC) {
+    private void setupGUIButtons(LevelController levelC, LevelData curLevel) {
         // UP
         findViewById(R.id.up_button).setOnClickListener(v -> {
             animateButton(v);
@@ -714,7 +709,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             if(changesMade) {
                 saveFunction.saveCurrent();
             }
-            showSettingsInfoMenu();
+            showSettingsInfoMenu(curLevel);
         });
     }
 
@@ -730,15 +725,24 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         for (int i = 0; i < size; i++) { // Row
             for (int j = 0; j < size; j++) { //Column
                 if (i == l.gameBoardData.getStartRow() && j == l.gameBoardData.getStartColumn()) { //Check if start tile
-                    gridList.add(new GridItem(roombaImage, isGif)); //Placeholder for roomba
-                }else if (i == l.gameBoardData.getGoalRow() && j == l.gameBoardData.getGoalColumn()) { //Check if Goal tile
-                    gridList.add(new GridItem(destinationImage, isGif)); //Placeholder for destination
-                }else if(isObstacle(l.gameBoardData.getObstacles(), i, j)) {
-                    gridList.add(new GridItem(obstacleImage, isGif)); //Placeholder for obstacle
-                }else if(isCollectable(l.gameBoardData.getCollectables(), i, j)) {
-                    gridList.add(new GridItem(collectableImage, isGif)); //Placeholder for collectable
+                    gridList.add(new GridItem(roombaImage, 0, isGif, i, j));
+
+                } else if (i == l.gameBoardData.getGoalRow() && j == l.gameBoardData.getGoalColumn()) { //Check if Goal tile
+                    gridList.add(new GridItem(destinationImage, l.gameBoardData.getGoalRotation(), isGif, i, j));
+
+                } else if(isObstacle(l.gameBoardData.getObstacles(), i, j) != -1) {
+                    int obsIndex = isObstacle(l.gameBoardData.getObstacles(), i, j);
+                    int obsRotation = getObstacleSpin(l.gameBoardData.getObstacles(), obsIndex, isGif);
+                    int obsImg = getObstacleImg(l.gameBoardData.getObstacles(), obsIndex, isGif);
+                    gridList.add(new GridItem(obsImg, obsRotation, isGif, i, j));
+
+                } else if(isCollectable(l.gameBoardData.getCollectables(), i, j)) {
+                    // get random rotation
+                    int ranRotate = (int) ((Math.random() * (4))*90);
+                    gridList.add(new GridItem(collectableImage, ranRotate, isGif, i, j));
+
                 } else {// Blank Tile
-                    gridList.add(new GridItem(R.drawable.empty, false)); //Placeholder for empty tile
+                    gridList.add(new GridItem(R.drawable.empty, 0, false, i, j));
                 }
             }
         }
@@ -746,38 +750,84 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
     /**
      * Changes the grid based on if animations are on or off
+     * @param l the level data
      */
-    private void changeGridForGif() {
+    private void changeGridForGif(LevelData l) {
         for (int i = 0; i < gridList.size(); i++) {
             int image = gridList.get(i).getImage();
-            if (image == R.drawable.coin_image || image == R.drawable.coin_gif) { //is a collectable
-                gridList.set(i, new GridItem(collectableImage, isGif));
-            }else if (image == R.drawable.fire_image || image == R.drawable.cat_gif) {//is a obstacle
-                gridList.set(i, new GridItem(obstacleImage, isGif));
-            }else if (image == R.drawable.flag || image == R.drawable.flag_gif) { //Destination
-                gridList.set(i, new GridItem(destinationImage, isGif));
-            }else if (image == R.drawable.circle_image || image == R.drawable.robot_gif) { // roomba
-                gridList.set(i, new GridItem(roombaImage, isGif));
+            int rotation = 0;
+            int r = gridList.get(i).getRow();
+            int c = gridList.get(i).getCol();
+
+            if (image == R.drawable.collectible_dirt || image == R.drawable.coin_gif) { //is a collectable
+                if (!isGif) { rotation = (int) ((Math.random() * (4))*90); }
+                gridList.set(i, new GridItem(collectableImage, rotation, isGif, r, c));
+
+            } else if (image == R.drawable.destination || image == R.drawable.flag_gif) { //Destination
+                if (!isGif) { rotation = l.gameBoardData.getGoalRotation(); }
+                gridList.set(i, new GridItem(destinationImage, rotation, isGif, r, c));
+
+            } else if (image == R.drawable.roomba || image == R.drawable.robot_gif) { // roomba
+                gridList.set(i, new GridItem(roombaImage, 0, isGif, r, c));
+
+            } else if (image != R.drawable.empty) {
+                // is a obstacle; cannot reasonably use 'if' to detect specifically obstacle due to number of walls
+
+                int obsIndex = 0;
+                if (!isGif) { // we don't need to spend the processing time if if's a gif, since they all same
+                    // find the index in obstacle list
+                    obsIndex = isObstacle(l.gameBoardData.getObstacles(), r, c);
+                }
+                int obsImg = getObstacleImg(l.gameBoardData.getObstacles(), obsIndex, isGif);
+                rotation = getObstacleSpin(l.gameBoardData.getObstacles(), obsIndex, isGif);
+                // get the data to display
+                gridList.set(i, new GridItem(obsImg, rotation, isGif, r, c));
             }
         }
     }
 
     /**
-     * checks if the tile is a Obstacle
+     * @param list  of obstacles
+     * @param index of obstacle in list
+     * @param isGif whether or not gifs are active
+     * @return  the image that should be displayed for this obstacle
+     */
+    private int getObstacleImg(List<Obstacle> list, int index, boolean isGif) {
+        if (isGif) {
+            return R.drawable.cat_gif;
+        } else {
+            String obstacleString = list.get(index).getObstacleType();
+            return this.getResources().getIdentifier(obstacleString, "drawable", this.getPackageName());
+        }
+    }
+
+    /**
+     * @param list  of obstacles
+     * @param index of obstacle in list
+     * @param isGif whether or not gifs are active
+     * @return  the rotation the obstacle's image should have
+     */
+    private int getObstacleSpin(List<Obstacle> list, int index, boolean isGif) {
+        if (isGif) { return 0; } // gifs should not be rotated
+        return list.get(index).getRotation();
+    }
+
+    /**
+     * Checks if the tile is a Obstacle and determines what index it bears in the obstacle list
      * @param list  of obstacles
      * @param row   of the tile
      * @param col   of the tile
-     * @return      true if obstacle, false otherwise
+     * @return      the index if obstacle, -1 otherwise
      */
-    private boolean isObstacle(List<Obstacle> list, int row, int col) {
+    private int isObstacle(List<Obstacle> list, int row, int col) {
         for (int i = 0; i < list.size(); i++) {
             int r = list.get(i).getRow();
             int c = list.get(i).getColumn();
             if(r == row && c == col) {
-                return true;
+                return i;
             }
         }
-        return false;
+        return -1;
     }
 
     /**
@@ -1300,7 +1350,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     /**
      * Show the settings/info screen for the gameBoard instance of the settings menu
      */
-    private void showSettingsInfoMenu(){
+    private void showSettingsInfoMenu(LevelData curLevel){
         //TODO: make this bring up level information too, make it scrollable, with the information above the settings.
         //Create the view to be referenced
         LayoutInflater settingsInflater = getLayoutInflater();
@@ -1324,7 +1374,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             //Animation turns off if true, turns on if false
             animationIsOff = isChecked;
             setGifs();
-            changeGridForGif();
+            changeGridForGif(curLevel);
             gridAdapter.notifyDataSetChanged();
         });
 
@@ -1409,13 +1459,11 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
      */
     public void setGifs() {
         if (animationIsOff) {//animation is off
-            obstacleImage = R.drawable.fire_image;
-            collectableImage = R.drawable.coin_image;
-            destinationImage = R.drawable.flag;
-            roombaImage = R.drawable.circle_image;
+            collectableImage = R.drawable.collectible_dirt;
+            destinationImage = R.drawable.destination;
+            roombaImage = R.drawable.roomba;
             isGif = false;
-        }else { //animation is on
-            obstacleImage = R.drawable.cat_gif;
+        } else { //animation is on
             collectableImage  = R.drawable.coin_gif;
             destinationImage = R.drawable.flag_gif;
             roombaImage = R.drawable.robot_gif;

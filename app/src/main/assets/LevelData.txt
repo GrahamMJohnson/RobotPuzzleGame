@@ -11,14 +11,17 @@ startRow: 0
 startColumn: 0
 goalRow: 2
 goalColumn: 0
+goalRotation: 90
 maxMovesSubroutineA: 3
 maxMovesSubroutineB: 3
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 0
     row: 1
     column 1
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 180
     row: 1
     column: 0
 collectables:
@@ -34,22 +37,27 @@ startRow: 0
 startColumn: 0
 goalRow: 4
 goalColumn: 4
+goalRotation: 0
 maxMovesSubroutineA: 5
 maxMovesSubroutineB: 5
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 270
     row: 0
     column 2
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 90
     row: 1
     column: 2
 obstacle:
-    type: chair
+    type: wall_plain_4s
+    rotation: 0
     row: 2
     column: 0
 obstacle:
-    type: chair
+    type: wall_plain_4s
+    rotation: 0
     row: 3
     column: 3
 collectables:
@@ -68,30 +76,37 @@ startRow: 4
 startColumn: 0
 goalRow: 0
 goalColumn: 4
+goalRotation: 270
 maxMovesSubroutineA: 5
 maxMovesSubroutineB: 5
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 270
     row: 0
     column 0
 obstacle:
-    type: wall
+    type: wall_plain_2s_straight
+    rotation: 90
     row: 1
     column: 0
 obstacle:
-    type: wall
+    type: wall_plain_2s1c
+    rotation: 0
     row: 2
     column: 0
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 0
     row: 2
     column: 1
 obstacle:
-    type: chair
+    type: wall_plain_4s
+    rotation: 0
     row: 4
     column: 1
 obstacle:
-    type: chair
+    type: wall_plain_4s
+    rotation: 0
     row: 2
     column: 3
 collectables:
@@ -110,38 +125,47 @@ startRow: 4
 startColumn: 4
 goalRow: 0
 goalColumn: 0
+goalRotation: 180
 maxMovesSubroutineA: 5
 maxMovesSubroutineB: 5
 obstacle:
-    type: chair
+    type: wall_plain_3s
+    rotation: 90
     row: 4
     column 3
 obstacle:
-    type: chair
+    type: wall_plain_1s2c
+    rotation: 90
     row: 3
     column 3
 obstacle:
-    type: chair
+    type: wall_plain_2s_straight
+    rotation: 90
     row: 2
     column 3
 obstacle:
-    type: chair
+    type: wall_plain_3s
+    rotation: 270
     row: 1
     column 3
 obstacle:
-    type: chair
+    type: wall_plain_2s_straight
+    rotation: 0
     row: 3
     column 2
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 270
     row: 0
     column: 1
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 90
     row: 1
     column: 1
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 180
     row: 3
     column: 1
 collectables:
@@ -160,70 +184,87 @@ startRow: 0
 startColumn: 0
 goalRow: 4
 goalColumn: 4
+goalRotation: 270
 maxMovesSubroutineA: 7
 maxMovesSubroutineB: 7
 obstacle:
-    type: wall
+    type: wall_plain_2s1c
+    rotation: 90
     row: 1
     column 1
 obstacle:
-    type: wall
+    type: wall_plain_2s_straight
+    rotation: 0
     row: 1
     column 2
 obstacle:
-    type: wall
+    type: wall_plain_2s_straight
+    rotation: 0
     row: 1
     column 3
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 0
     row: 1
     column 4
 obstacle:
-    type: wall
+    type: wall_plain_2s_straight
+    rotation: 90
     row: 2
     column 1
 obstacle:
-    type: wall
+    type: wall_plain_1s2c
+    rotation: 270
     row: 3
     column 1
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 0
     row: 3
     column 2
 obstacle:
-    type: wall
+    type: wall_plain_3s
+    rotation: 180
     row: 3
     column 4
 obstacle:
-    type: wall
+    type: wall_plain_2s1c
+    rotation: 180
     row: 3
     column 5
 obstacle:
-    type: wall
+    type: wall_plain_2s_straight
+    rotation: 90
     row: 4
     column 1
 obstacle:
-    type: wall
+    type: wall_plain_2s_straight
+    rotation: 90
     row: 4
     column 5
 obstacle:
-    type: wall
+    type: wall_plain_2s1c
+    rotation: 0
     row: 5
     column 1
 obstacle:
-    type: wall
+    type: wall_plain_2s_straight
+    rotation: 0
     row: 5
     column 2
 obstacle:
-    type: wall
+    type: wall_plain_2s_straight
+    rotation: 0
     row: 5
     column 3
 obstacle:
-    type: wall
+    type: wall_plain_2s_straight
+    rotation: 0
     row: 5
     column 4
 obstacle:
-    type: wall
+    type: wall_plain_2s1c
+    rotation: 270
     row: 5
     column 5
 collectables:
@@ -245,18 +286,22 @@ startRow: 2
 startColumn: 2
 goalRow: 4
 goalColumn: 3
+goalRotation: 0
 maxMovesSubroutineA: 5
 maxMovesSubroutineB: 5
 obstacle:
-    type: chair
+    type: wall_plain_4s
+    rotation: 0
     row: 2
     column 1
 obstacle:
-    type: chair
+    type: wall_plain_4s
+    rotation: 0
     row: 1
     column 3
 obstacle:
-    type: chair
+    type: wall_plain_4s
+    rotation: 0
     row: 3
     column 3
 collectables:

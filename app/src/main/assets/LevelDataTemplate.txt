@@ -16,14 +16,16 @@ startRow: 0
 startColumn: 0
 goalRow: 4
 goalColumn: 4
+goalRotation: 0
 maxMovesSubroutineA: 5
 maxMovesSubroutineB: 5
 obstacle:
-    type: chair
+    type: wall_plain_4s
+    rotation: 0
     row: 0
     column 1
 obstacle:
-    type: wall
+    type: wall_plain_4s
     row: 0
     column: 2
 collectables:

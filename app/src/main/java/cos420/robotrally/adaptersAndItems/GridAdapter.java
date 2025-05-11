@@ -50,6 +50,7 @@ public class GridAdapter extends ArrayAdapter<GridItem> {
                         .load(gridItem.getImage())
                         .into(imageView);
             }
+            imageView.setRotation(gridItem.getRotation());
         }
 
         //Dynamically resize tiles

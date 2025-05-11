@@ -1,7 +1,5 @@
 package cos420.robotrally.models;
 
-import cos420.robotrally.enumerations.ObstacleType;
-
 // TODO javadoc for the class itself
 public class Tile {
     /** Boolean to store if this is a goal tile */
@@ -17,9 +15,9 @@ public class Tile {
     private boolean hasCollectable;
 
     /**
-     * An enum to store what is on the tile
+     * A string to store the image-file-name for what is on the tile
      */
-    private ObstacleType obstacleType;
+    private String obstacleType;
 
     //TODO: Can we get by with constructor that has no parameters since GameBoard updates tiles after creating array?
     /**
@@ -36,7 +34,7 @@ public class Tile {
      * @param hasCollectable Does this tile have a collectable?
      * @param isOccupied Is the roomba on this tile?
      */
-    public Tile(ObstacleType obstacleType, boolean isGoalTile, boolean hasCollectable, boolean isOccupied) {
+    public Tile(String obstacleType, boolean isGoalTile, boolean hasCollectable, boolean isOccupied) {
         isObstacle = obstacleType != null;
         this.obstacleType = obstacleType;
         this.isGoalTile = isGoalTile;
@@ -109,7 +107,7 @@ public class Tile {
      * Method to get the type of obstacle on a tile
      * @return The type of obstacle on tile
      */
-    public ObstacleType getObstacleType() {
+    public String getObstacleType() {
         return obstacleType;
     }
 
@@ -118,7 +116,7 @@ public class Tile {
      * @param obstacleType ObstacleType enum to set the obstacle type for the tile<br>
      *                     set to null if tile is not an obstacle
      */
-    public void setObstacleType(ObstacleType obstacleType) {
+    public void setObstacleType(String obstacleType) {
         this.obstacleType = obstacleType;
         isObstacle = obstacleType != null;
     }

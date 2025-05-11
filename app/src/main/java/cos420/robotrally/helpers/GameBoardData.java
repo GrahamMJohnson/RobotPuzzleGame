@@ -17,6 +17,8 @@ public class GameBoardData {
     public int goalRow;
     /** column of the goal tile */
     public int goalColumn;
+    /** What angle the goal should be rotated by */
+    public int goalRotation;
     /** List of obstacles for the level */
     public List<Obstacle> obstacles;
     /** List of collectables for the level */
@@ -27,23 +29,25 @@ public class GameBoardData {
     }
 
     // TODO javadoc
-    public GameBoardData(int size, int startRow, int startColumn, int goalRow, int goalColumn, List<Obstacle> obstacles, List<Collectable> collectables) {
+    public GameBoardData(int size, int startRow, int startColumn, int goalRow, int goalColumn, int goalRotation, List<Obstacle> obstacles, List<Collectable> collectables) {
         this.size = size;
         this.startRow = startRow;
         this.startColumn = startColumn;
         this.goalRow = goalRow;
         this.goalColumn = goalColumn;
+        this.goalRotation = goalRotation;
         this.obstacles = obstacles;
         this.collectables = collectables;
     }
 
     // TODO javadoc
-    public GameBoardData(int size, int startRow, int startColumn, int goalRow, int goalColumn) {
+    public GameBoardData(int size, int startRow, int startColumn, int goalRow, int goalColumn, int goalRotation) {
         this.size = size;
         this.startRow = startRow;
         this.startColumn = startColumn;
         this.goalRow = goalRow;
         this.goalColumn = goalColumn;
+        this.goalRotation = goalRotation;
     }
 
     // TODO javadoc
@@ -69,6 +73,11 @@ public class GameBoardData {
     public int getGoalColumn() {
         return goalColumn;
     }
+
+    /**
+     * @return the angle the goal should be rotated by
+     */
+    public int getGoalRotation() {return goalRotation;}
 
     // TODO javadoc
     public List<Obstacle> getObstacles() {

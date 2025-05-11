@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import cos420.robotrally.enumerations.ObstacleType;
 import cos420.robotrally.helpers.GameBoardData;
 import cos420.robotrally.levels.LevelData;
 import cos420.robotrally.models.Collectable;
@@ -72,16 +71,18 @@ public class LevelMapper {
 
                         // Get data for type row and column
                         String[] typeArray = reader.readLine().split(" ");
+                        String[] rotationArray = reader.readLine().split(" ");
                         String[] rowArray = reader.readLine().split(" ");
                         String[] columnArray = reader.readLine().split(" ");
 
-                        // Get value for type row and column
-                        ObstacleType type = ObstacleType.getTypeFromString(typeArray[typeArray.length - 1]);
+                        // Get value for type, rotation, row, and column
+                        String type = typeArray[typeArray.length - 1];
+                        int rotation = Integer.parseInt(rotationArray[rotationArray.length - 1]);
                         int row = Integer.parseInt(rowArray[rowArray.length - 1]);
                         int column = Integer.parseInt(columnArray[columnArray.length - 1]);
 
                         // Create obstacle object and add it to list of obstacles
-                        level.gameBoardData.obstacles.add(new Obstacle(type, row, column));
+                        level.gameBoardData.obstacles.add(new Obstacle(type, rotation, row, column));
 
                         Log.v(LOG_TAG, "End mapping obstacle");
                     }
@@ -129,6 +130,7 @@ public class LevelMapper {
                         String[] startColumnArray = reader.readLine().trim().split(" ");
                         String[] goalRowArray = reader.readLine().trim().split(" ");
                         String[] goalColumnArray = reader.readLine().trim().split(" ");
+                        String[] goalRotationArray = reader.readLine().trim().split(" ");
                         String[] maxMovesAArray = reader.readLine().trim().split(" ");
                         String[] maxMovesBArray = reader.readLine().trim().split(" ");
 
@@ -138,6 +140,7 @@ public class LevelMapper {
                         int startColumn = Integer.parseInt(startColumnArray[startColumnArray.length - 1]);
                         int goalRow = Integer.parseInt(goalRowArray[goalRowArray.length - 1]);
                         int goalColumn = Integer.parseInt(goalColumnArray[goalColumnArray.length - 1]);
+                        int goalRotation = Integer.parseInt(goalRotationArray[goalRotationArray.length - 1]);
                         int maxMovesA = Integer.parseInt(maxMovesAArray[maxMovesAArray.length - 1]);
                         int maxMovesB = Integer.parseInt(maxMovesBArray[maxMovesBArray.length - 1]);
 
@@ -147,8 +150,11 @@ public class LevelMapper {
                         level.gameBoardData.startColumn = startColumn;
                         level.gameBoardData.goalRow = goalRow;
                         level.gameBoardData.goalColumn = goalColumn;
+                        level.gameBoardData.goalRotation = goalRotation;
                         level.maxMovesA = maxMovesA;
                         level.maxMovesB = maxMovesB;
+
+                        Log.d("Rotation", String.valueOf(goalRotation));
 
                         Log.v(LOG_TAG, "End mapping general data");
                     }

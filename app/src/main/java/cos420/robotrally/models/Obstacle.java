@@ -1,11 +1,12 @@
 package cos420.robotrally.models;
 
-import cos420.robotrally.enumerations.ObstacleType;
-
 // TODO javadoc for the class itself
 public class Obstacle {
-    /** Type of obstacle */
-    private final ObstacleType obstacleType;
+    /** Type/image name of obstacle */
+    private final String obstacleType;
+
+    /** What angle the obstacle image should be rotated at */
+    private final int rotation;
 
     /** Row index of the obstacle */
     private final int row;
@@ -16,11 +17,13 @@ public class Obstacle {
     /**
      * Create a new Obstacle
      * @param obstacleType the type of obstacle to create
+     * @param rotation  for the image to be rotated at
      * @param row the row the obstacle is in
      * @param column the column the obstacle is in
      */
-    public Obstacle(ObstacleType obstacleType, int row, int column) {
+    public Obstacle(String obstacleType, int rotation, int row, int column) {
         this.obstacleType = obstacleType;
+        this.rotation = rotation;
         this.row = row;
         this.column = column;
     }
@@ -29,7 +32,7 @@ public class Obstacle {
      * get the obstacle type
      * @return ObstacleType -> the type of the obstacle
      */
-    public ObstacleType getObstacleType() {
+    public String getObstacleType() {
         return obstacleType;
     }
 
@@ -48,4 +51,9 @@ public class Obstacle {
     public int getColumn() {
         return column;
     }
+
+    /**
+     * @return the degrees the obstacle should be rotated by
+     */
+    public int getRotation() {return rotation;}
 }
