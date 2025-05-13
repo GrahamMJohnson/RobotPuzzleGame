@@ -273,15 +273,23 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     public void onStepMove() {
         GameBoard g = levelController.getGameBoard();
 
-        int previousIndex = (g.getPreviousRow() * g.getSize()) + g.getPreviousColumn();
+        boolean weCrashed = levelController.getWeCrashed();
 
+        int previousIndex = (g.getPreviousRow() * g.getSize()) + g.getPreviousColumn();
         int currentIndex = (g.getCurrentRow() * g.getSize()) + g.getCurrentColumn();
+
         GridItem current = gridList.get(currentIndex);
 
         if(current.getImage() == collectableImage || current.getImage() == destinationImage) {
             current.setImage(R.drawable.empty);
         }
-        animateTileMove(previousIndex, currentIndex);
+        if (!weCrashed) {
+            animateTileMove(previousIndex, currentIndex);
+        }else {
+            if (!g.isOutOfBounds()) { //is not out of bounds
+                animateCrash(previousIndex, currentIndex);
+            }
+        }
     }
 
     /**
@@ -364,6 +372,71 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             }
         });
 
+        animator.start();
+    }
+
+    /**
+     * Animates the roomba crashing
+     * @param from the valid tile
+     * @param to the tile being crashed into
+     */
+    private void animateCrash(int from, int to) {
+        //Views of tiles
+        View fromView = gridView.getChildAt(from);
+        View toView = gridView.getChildAt(to);
+
+        //Coordinates
+        int[] fromPlace = new int[2];
+        int[] toPlace = new int[2];
+        fromView.getLocationOnScreen(fromPlace);
+        toView.getLocationOnScreen(toPlace);
+
+        //Movement line
+        float halfX = (toPlace[0] - fromPlace[0]) * 0.5f;
+        float halfY = (toPlace[1] - fromPlace[1]) * 0.5f;
+
+        //Remove the last temporary view for the animation
+        root.removeView(moving);
+
+        //Add temporary image to root
+        moving = new ImageView(this);
+        moving.setImageDrawable(((ImageView) fromView.findViewById(R.id.tile_view)).getDrawable());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(fromView.getWidth(), fromView.getHeight());
+        params.leftMargin = fromPlace[0];
+        params.topMargin = fromPlace[1];
+        root.addView(moving, params);
+
+        //Make the original tile invisible
+        ImageView fromImage = fromView.findViewById(R.id.tile_view);
+        fromImage.setVisibility(INVISIBLE);
+
+        //Animator
+        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
+        animator.setDuration(400);
+
+        //animate movement
+        animator.addUpdateListener(animation -> {
+            //Check where movement progress, if halfway turn around
+            float progress = (float) animation.getAnimatedValue();
+            float moveProgress = progress <= 0.5f ? (progress * 2) : (1 - progress) * 2;
+
+            //Set movement
+            float x = fromPlace[0] + halfX * moveProgress;
+            float y = fromPlace[1] + halfY * moveProgress;
+            moving.setTranslationX(x - fromPlace[0]);
+            moving.setTranslationY(y - fromPlace[1]);
+        });
+
+        //End of animation
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                //Cleanup
+                fromImage.setVisibility(VISIBLE);
+            }
+        });
+
+        //Start animator
         animator.start();
     }
 
@@ -507,8 +580,11 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     public void resetGrid() {
         //Removes the temporary view over grid
         root.removeView(moving);
+
         //Sets the last tile back to Visible
-        lastImage.setVisibility(VISIBLE);
+        if (lastImage != null) {
+            lastImage.setVisibility(VISIBLE);
+        }
 
         //Grid clear and setup
         gridList.clear();

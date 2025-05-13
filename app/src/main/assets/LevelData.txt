@@ -12,8 +12,8 @@ startColumn: 0
 goalRow: 2
 goalColumn: 0
 goalRotation: 90
-maxMovesSubroutineA: 3
-maxMovesSubroutineB: 3
+maxMovesSubroutineA: 2
+maxMovesSubroutineB: 2
 obstacle:
     type: wall_plain_3s
     rotation: 0
@@ -185,8 +185,8 @@ startColumn: 0
 goalRow: 4
 goalColumn: 4
 goalRotation: 270
-maxMovesSubroutineA: 7
-maxMovesSubroutineB: 7
+maxMovesSubroutineA: 6
+maxMovesSubroutineB: 2
 obstacle:
     type: wall_plain_2s1c
     rotation: 90

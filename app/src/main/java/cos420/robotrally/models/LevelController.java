@@ -412,4 +412,8 @@ public class LevelController {
             }
         }
     }
+
+    public boolean getWeCrashed() {
+        return commandScript.didWeCrash();
+    }
 }

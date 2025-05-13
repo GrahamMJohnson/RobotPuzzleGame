@@ -18,6 +18,8 @@ public class GameBoard{
     private int currentColumn;
     // TODO javadoc
     private final int size;
+    private boolean crash;
+    private boolean isOutOfBounds;
 
     /**The number of collectibles the user collected on this run*/
     int collectiblesCollected;
@@ -35,6 +37,8 @@ public class GameBoard{
         previousColumn = currentColumn;
         makeBoard(gameBoardData);
         collectiblesCollected = 0;
+        crash = false;
+        isOutOfBounds = false;
     }
 
     /**
@@ -82,7 +86,13 @@ public class GameBoard{
      */
     public void resetGrid(GameBoardData gameBoardData)
     {
-        gameBoard[currentRow][currentColumn].setOccupied(false);
+        if (crash) {
+            gameBoard[previousRow][previousRow].setOccupied(false);
+        }else {
+            gameBoard[currentRow][currentColumn].setOccupied(false);
+        }
+        crash = false;
+
         currentRow = gameBoardData.getStartRow();
         currentColumn = gameBoardData.getStartColumn();
         previousRow = currentRow;
@@ -103,10 +113,22 @@ public class GameBoard{
         // test whether space above Roomba is blocked or out of bounds
         // if Roomba at top of grid, fail, or if space is blocked by obstacle, fail
         if (currentRow == 0 || gameBoard[currentRow-1][currentColumn].isObstacle()) {
+            if (currentRow == 0) {//Out of bounds
+                isOutOfBounds = true;
+            }else {
+                //change the current row that the roomba is in
+                previousRow = currentRow;
+                currentRow -= 1;
+                previousColumn = currentColumn;
+                isOutOfBounds = false;
+            }
+
+            crash = true;
             return false;
         }
         // else move Roomba up
         else {
+            isOutOfBounds = false;
             //set the current tile to roomba is not there
             gameBoard[currentRow][currentColumn].setOccupied(false);
             //change the current row that the roomba is in
@@ -136,10 +158,22 @@ public class GameBoard{
         // test whether space to the left of Roomba is blocked or out of bounds
         // if Roomba at left side of grid, fail, or if space is blocked by obstacle, fail
         if (currentColumn == 0 || gameBoard[currentRow][currentColumn-1].isObstacle()) {
+            if (currentColumn == 0) {//Out of bounds
+                isOutOfBounds = true;
+            }else {
+                //change the current column that the roomba is in
+                previousColumn = currentColumn;
+                currentColumn -= 1;
+                previousRow = currentRow;
+                isOutOfBounds = false;
+            }
+
+            crash = true;
             return false;
         }
         // else move Roomba left
         else {
+            isOutOfBounds = false;
             //set the current tile to roomba is not there
             gameBoard[currentRow][currentColumn].setOccupied(false);
             //change the current column that the roomba is in
@@ -169,10 +203,22 @@ public class GameBoard{
         // test whether space below Roomba is blocked or out of bounds
         // if Roomba at bottom of grid, fail or if space is blocked by obstacle, fail
         if (currentRow == size-1 || gameBoard[currentRow+1][currentColumn].isObstacle()) {
+            if (currentRow == size - 1) {//Out of bounds
+                isOutOfBounds = true;
+            }else {
+                //change the current row that the roomba is in
+                previousRow = currentRow;
+                currentRow += 1;
+                previousColumn = currentColumn;
+                isOutOfBounds = false;
+            }
+
+            crash = true;
             return false;
         }
         // else move Roomba down
         else {
+            isOutOfBounds = false;
             //set the current tile to roomba is not there
             gameBoard[currentRow][currentColumn].setOccupied(false);
             //change the current row that the roomba is in
@@ -203,10 +249,22 @@ public class GameBoard{
         // test whether space to the right of Roomba is blocked or out of bounds
         // if Roomba at right side of grid, fail or if space is blocked by obstacle, fail
         if (currentColumn == size-1 || gameBoard[currentRow][currentColumn+1].isObstacle()) {
+            if (currentColumn == size - 1) {//Out of bounds
+                isOutOfBounds = true;
+            }else {
+                //change the current column that the roomba is in
+                previousColumn = currentColumn;
+                currentColumn += 1;
+                previousRow = currentRow;
+                isOutOfBounds = false;
+            }
+
+            crash = true;
             return false;
         }
         // else move Roomba right
         else {
+            isOutOfBounds = false;
             //set the current tile to roomba is not there
             gameBoard[currentRow][currentColumn].setOccupied(false);
             //change the current column that the roomba is in
@@ -278,5 +336,9 @@ public class GameBoard{
      */
     public int getSize() {
         return size;
+    }
+
+    public boolean isOutOfBounds() {
+        return isOutOfBounds;
     }
 }
