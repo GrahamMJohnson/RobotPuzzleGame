@@ -84,27 +84,27 @@ public class StatManager {
 
         if(levelID + 1 == 1){
             numberPossibleCollectibles = 2;
-            idealNumMoves = 6;
+            idealNumMoves = 5;
         }
         else if(levelID + 1 == 2){
             numberPossibleCollectibles = 3;
-            idealNumMoves = 8;
+            idealNumMoves = 5;
         }
         else if(levelID + 1 == 3){
             numberPossibleCollectibles = 3;
-            idealNumMoves = 8;
+            idealNumMoves = 4;
         }
         else if(levelID + 1 == 4){
             numberPossibleCollectibles = 3;
-            idealNumMoves = 12;
+            idealNumMoves = 9;
         }
         else if(levelID + 1 == 5){
             numberPossibleCollectibles = 4;
-            idealNumMoves = 12;
+            idealNumMoves = 10;
         }
         else if(levelID + 1 == 6){
             numberPossibleCollectibles = 5;
-            idealNumMoves = 3;
+            idealNumMoves = 10;
         }
     }
 

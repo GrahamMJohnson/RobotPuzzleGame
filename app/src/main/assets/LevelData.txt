@@ -38,8 +38,8 @@ startColumn: 0
 goalRow: 4
 goalColumn: 4
 goalRotation: 0
-maxMovesSubroutineA: 5
-maxMovesSubroutineB: 5
+maxMovesSubroutineA: 4
+maxMovesSubroutineB: 2
 obstacle:
     type: wall_plain_3s
     rotation: 270
@@ -77,8 +77,8 @@ startColumn: 0
 goalRow: 0
 goalColumn: 4
 goalRotation: 270
-maxMovesSubroutineA: 5
-maxMovesSubroutineB: 5
+maxMovesSubroutineA: 3
+maxMovesSubroutineB: 2
 obstacle:
     type: wall_plain_3s
     rotation: 270
@@ -126,8 +126,8 @@ startColumn: 4
 goalRow: 0
 goalColumn: 0
 goalRotation: 180
-maxMovesSubroutineA: 5
-maxMovesSubroutineB: 5
+maxMovesSubroutineA: 3
+maxMovesSubroutineB: 2
 obstacle:
     type: wall_plain_3s
     rotation: 90
@@ -186,7 +186,7 @@ goalRow: 4
 goalColumn: 4
 goalRotation: 270
 maxMovesSubroutineA: 6
-maxMovesSubroutineB: 2
+maxMovesSubroutineB: 3
 obstacle:
     type: wall_plain_2s1c
     rotation: 90
@@ -287,8 +287,8 @@ startColumn: 2
 goalRow: 4
 goalColumn: 3
 goalRotation: 0
-maxMovesSubroutineA: 5
-maxMovesSubroutineB: 5
+maxMovesSubroutineA: 3
+maxMovesSubroutineB: 3
 obstacle:
     type: wall_plain_4s
     rotation: 0

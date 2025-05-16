@@ -836,15 +836,15 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             int r = gridList.get(i).getRow();
             int c = gridList.get(i).getCol();
 
-            if (image == R.drawable.collectible_dirt || image == R.drawable.coin_gif) { //is a collectable
+            if (image == R.drawable.collectible_dirt || image == R.drawable.dust) { //is a collectable
                 if (!isGif) { rotation = (int) ((Math.random() * (4))*90); }
                 gridList.set(i, new GridItem(collectableImage, rotation, isGif, r, c));
 
-            } else if (image == R.drawable.destination || image == R.drawable.flag_gif) { //Destination
+            } else if (image == R.drawable.destination || image == R.drawable.destination_gif) { //Destination
                 if (!isGif) { rotation = l.gameBoardData.getGoalRotation(); }
                 gridList.set(i, new GridItem(destinationImage, rotation, isGif, r, c));
 
-            } else if (image == R.drawable.roomba || image == R.drawable.robot_gif) { // roomba
+            } else if (image == R.drawable.roomba || image == R.drawable.roomba_gif) { // roomba
                 gridList.set(i, new GridItem(roombaImage, 0, isGif, r, c));
 
             } else if (image != R.drawable.empty) {
@@ -1576,9 +1576,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             roombaImage = R.drawable.roomba;
             isGif = false;
         } else { //animation is on
-            collectableImage  = R.drawable.coin_gif;
-            destinationImage = R.drawable.flag_gif;
-            roombaImage = R.drawable.robot_gif;
+            collectableImage  = R.drawable.dust;
+            destinationImage = R.drawable.destination_gif;
+            roombaImage = R.drawable.roomba_gif;
             isGif = true;
         }
     }
