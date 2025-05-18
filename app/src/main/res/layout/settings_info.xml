@@ -94,56 +94,20 @@
         android:background="@color/black"/>
 
     <TextView
-        android:id="@+id/Overall"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_below="@id/Volume_Bar"
-        android:text="Overall"
-        android:gravity="center_vertical"
-        android:paddingStart="30dp"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/Music"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_below="@id/Overall"
-        android:text="Music"
-        android:gravity="center_vertical"
-        android:paddingStart="30dp"
-        android:textSize="20sp" />
-
-    <TextView
         android:id="@+id/SFX"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:layout_below="@id/Music"
+        android:layout_below="@id/Volume_Bar"
         android:text="SFX"
         android:gravity="center_vertical"
         android:paddingStart="30dp"
         android:textSize="20sp" />
 
     <SeekBar
-        android:id="@+id/Overall_Drag"
-        android:layout_width="210dp"
-        android:layout_height="50dp"
-        android:layout_below="@id/Volume_Bar"
-        android:layout_toEndOf="@id/Overall"
-        android:layout_marginStart="5dp"/>
-
-    <SeekBar
-        android:id="@+id/Music_Drag"
-        android:layout_width="210dp"
-        android:layout_height="50dp"
-        android:layout_below="@id/Overall_Drag"
-        android:layout_toEndOf="@id/Overall"
-        android:layout_marginStart="5dp"/>
-
-    <SeekBar
         android:id="@+id/SFX_Drag"
         android:layout_width="210dp"
         android:layout_height="50dp"
-        android:layout_below="@id/Music_Drag"
+        android:layout_below="@id/Volume_Bar"
         android:layout_toEndOf="@id/SFX"
         android:layout_marginStart="5dp"/>
 

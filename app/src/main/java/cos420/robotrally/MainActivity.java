@@ -10,9 +10,11 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -72,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private List<MoveItem> moveListB;
     /** The list of ghost elements for the movement trail  */
     private List<View> ghostList;
+    /** AudioManager responsible for managing volume */
+    private AudioManager audioManager;
     /** The media player responsible for playing sounds */
     private MediaPlayer mediaPlayer;
     /** The move adapter that is currently active */
@@ -120,6 +125,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     private int selectedLevelID;
     /** Boolean to track if animation is active or not */
     private boolean animationIsOff;
+    /** Value of game volume */
+    private int volume;
     /** Attribute to track if subroutines are being edited */
     private ListName activeListName = ListName.MAIN;
     /** The image to display on collectable tiles */
@@ -143,6 +150,9 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         //Sets animations to "OFF" by default
         animationIsOff = true;
         setGifs();
+
+        // Sets volume to 10
+        volume = 10;
 
         openLevelSelect();
 
@@ -281,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         GridItem current = gridList.get(currentIndex);
 
         if(current.getImage() == collectableImage || current.getImage() == destinationImage) {
+            playCollectSound();
             current.setImage(R.drawable.empty);
         }
         if (!weCrashed) {
@@ -1492,6 +1503,32 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             gridAdapter.notifyDataSetChanged();
         });
 
+        // Seekbar for setting volume
+        SeekBar sfxvolume = settingsView.findViewById(R.id.SFX_Drag);
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        // Sets seekbar position in settings menu
+        sfxvolume.setProgress(0);
+        sfxvolume.setMax(15);
+        sfxvolume.setProgress(volume);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+
+        // Senses and keeps track of any changes made to the sfx seekbar
+        sfxvolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int newVolume, boolean b) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0);
+                volume = newVolume;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
         //Set up attempts
         RecyclerView attemptView = settingsView.findViewById(R.id.attempts_recycler);
         attemptView.setLayoutManager(new LinearLayoutManager(this));
@@ -1541,6 +1578,32 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
             //Animation turns off if true, turns on if false
             animationIsOff = isChecked;
             setGifs();
+        });
+
+        // Seekbar for setting volume
+        SeekBar sfxvolume = settingsView.findViewById(R.id.SFX_Drag);
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        // Sets seekbar position in settings menu
+        sfxvolume.setProgress(0);
+        sfxvolume.setMax(15);
+        sfxvolume.setProgress(volume);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+
+        // Senses and keeps track of any changes made to the sfx seekbar
+        sfxvolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int newVolume, boolean b) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0);
+                volume = newVolume;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
         settingsScreen.show();
@@ -1843,12 +1906,17 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
     /// END PLAYABLE UI METHODS
 
     public void playRoombaMoveSound() {
-        mediaPlayer = MediaPlayer.create(this, R.raw.roombamove);
+        mediaPlayer = MediaPlayer.create(this, R.raw.move);
         mediaPlayer.start();
     }
 
     public void playRoombaCrashSound() {
-        mediaPlayer = MediaPlayer.create(this, R.raw.roombacrash);
+        mediaPlayer = MediaPlayer.create(this, R.raw.bump);
+        mediaPlayer.start();
+    }
+
+    public void playCollectSound() {
+        mediaPlayer = MediaPlayer.create(this, R.raw.collect);
         mediaPlayer.start();
     }
 }
