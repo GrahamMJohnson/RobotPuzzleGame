@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
 
         GridItem current = gridList.get(currentIndex);
 
-        if(current.getImage() == collectableImage || current.getImage() == destinationImage) {
+        if(current.getImage() == collectableImage || (current.getImage() == destinationImage && !animationIsOff)) {
             playCollectSound();
             current.setImage(R.drawable.empty);
         }
@@ -314,6 +314,8 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         View fromView = gridView.getChildAt(from);
         View toView = gridView.getChildAt(to);
 
+        boolean isNotDestination = gridList.get(to).getImage() != destinationImage;
+
         //Coordinate holders
         int[] fromPlace = new int[2];
         int[] toPlace = new int[2];
@@ -329,8 +331,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         root.removeView(moving);
 
         //Set next tile to Invisible
-        lastImage = toView.findViewById(R.id.tile_view);
-        lastImage.setVisibility(INVISIBLE);
+        if (isNotDestination || !animationIsOff) {//Only do if next tile is not destination
+            lastImage = toView.findViewById(R.id.tile_view);
+            lastImage.setVisibility(INVISIBLE);
+        }
 
         //Create new temporary view
         moving = new ImageView(this);
@@ -343,8 +347,10 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         root.addView(moving, params);
 
         //Set previous
-        gridList.set(from, gridList.get(to));
-        gridAdapter.notifyDataSetChanged();
+        if (isNotDestination || !animationIsOff) {//Only do if next tile is not destination
+            gridList.set(from, gridList.get(to));
+            gridAdapter.notifyDataSetChanged();
+        }
 
         //Play movement sound
         playRoombaMoveSound();
@@ -373,13 +379,15 @@ public class MainActivity extends AppCompatActivity implements LevelAdapter.Leve
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                //Set the image of the last tile to Visible
-                ImageView fromViewImage = fromView.findViewById(R.id.tile_view);
-                fromViewImage.setVisibility(VISIBLE);
-
                 //Set current
-                gridList.set(to, pre);
-                gridAdapter.notifyDataSetChanged();
+                if (isNotDestination || !animationIsOff) {//Only do if next tile is not destination
+                    //Set the image of the last tile to Visible
+                    ImageView fromViewImage = fromView.findViewById(R.id.tile_view);
+                    fromViewImage.setVisibility(VISIBLE);
+
+                    gridList.set(to, pre);
+                    gridAdapter.notifyDataSetChanged();
+                }
             }
         });
 
